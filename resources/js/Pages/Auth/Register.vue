@@ -28,7 +28,7 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Apodo para rApanel (Display Name)" />
+                <InputLabel for="name" value="Display Name" />
 
                 <TextInput
                     id="name"
@@ -59,7 +59,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="country" value="País" />
+                <InputLabel for="country" value="Country" />
                 
                 <select 
                     id="country"
@@ -67,7 +67,7 @@ const submit = () => {
                     class="mt-1 block w-full rounded-md shadow-sm"
                     required
                 >
-                    <option value="" disabled>Selecciona tu país</option>
+                    <option value="" disabled>Select your country</option>
                     <option v-for="country in country_data" :key="country.code" :value="country.code">
                         {{ country.name }}
                     </option>
