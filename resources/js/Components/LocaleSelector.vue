@@ -7,11 +7,11 @@ import { computed } from "vue";
 import CountryFlag from 'vue-country-flag-next';
 
 // Obtenemos el idioma actual desde las props globales de Inertia (con un fallback a 'es' por seguridad)
-const currentLocale = computed(() => usePage().props.auth?.locale || 'es');
+const currentLocale = computed(() => usePage().props.locale || 'en');
 
 const languages = [
-    { code: 'es', name: 'Español', flag: 'es' },
     { code: 'en', name: 'English', flag: 'us' },
+    { code: 'es', name: 'Español', flag: 'es' },
     { code: 'pt', name: 'Português', flag: 'pt' },
     { code: 'fr', name: 'Français', flag: 'fr' },
 ];

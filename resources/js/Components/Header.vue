@@ -9,10 +9,14 @@ const page = usePage();
 
 // Definimos los links de navegación
 // Aquí podrías filtrar si el usuario está logueado o no
+const __ = (key) => {
+    return usePage().props.translations?.[key] || key;
+};
+
 const navigation = [
-    { name: 'Dashboard', href: route('dashboard'), auth: true },
-    { name: 'Login', href: route('login'), auth: false },
-    { name: 'Register', href: route('register'), auth: false },
+    { name: __('Dashboard'), href: route('dashboard'), auth: true },
+    { name: __('Login'), href: route('login'), auth: false },
+    { name: __('Register'), href: route('register'), auth: false },
 ];
 
 const logout = () => {

@@ -33,8 +33,20 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                'locale' => \App::getLocale(),
             ],
+            // Agregamos esto para enviar las traducciones a Vue
+            'translations' => function () {
+                $locale = \App::getLocale();
+                $file = base_path("lang/{$locale}.json");
+                
+                if (file_exists($file)) {
+                    return json_decode(file_get_contents($file), true);
+                }
+
+                return [];
+            },
+            // Mantenemos el locale por si lo necesitas para las banderas
+            'locale' => \App::getLocale(),
         ];
     }
 }
