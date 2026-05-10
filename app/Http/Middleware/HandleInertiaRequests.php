@@ -4,29 +4,17 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Illuminate\Support\Facades\Cache;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that is loaded on the first page visit.
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determine the current asset version.
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
         return [
@@ -34,19 +22,61 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            // Agregamos esto para enviar las traducciones a Vue
+            
+            // Estado del servidor con Cache de 60 segundos
+            'serverStatus' => Cache::remember('ra_server_status', 60, function () {
+                return [
+                    'online' => $this->checkRAthenaStatus(),
+                    'players' => $this->getOnlinePlayersCount(),
+                ];
+            }),
+
             'translations' => function () {
                 $locale = \App::getLocale();
                 $file = base_path("lang/{$locale}.json");
-                
-                if (file_exists($file)) {
-                    return json_decode(file_get_contents($file), true);
-                }
-
-                return [];
+                return file_exists($file) ? json_decode(file_get_contents($file), true) : [];
             },
-            // Mantenemos el locale por si lo necesitas para las banderas
+
             'locale' => \App::getLocale(),
         ];
+    }
+
+    /**
+     * Valida la conexión a los puertos de rAthena usando el .env
+     */
+    private function checkRAthenaStatus(): bool
+    {
+        // Leemos las variables que me pasaste de tu .env
+        $ip   = env('RA_LOGIN_IP', '127.0.0.1');
+        $port = env('RA_LOGIN_PORT', 6900);
+
+        // Intentamos conexión rápida (timeout 1 segundo)
+        $connection = @fsockopen($ip, $port, $errno, $errstr, 1);
+
+        if ($connection) {
+            fclose($connection);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene el conteo de jugadores desde la DB
+     * (De momento devuelve 0 hasta que configuremos tu conexión a la DB de rAthena)
+     */
+
+    private function getOnlinePlayersCount(): int
+    {
+        try {
+            // Usamos la conexión 'mysql_main' que definiste en database.php
+            return \Illuminate\Support\Facades\DB::connection('mysql_main')
+                ->table('char')
+                ->where('online', '>', 0)
+                ->count();
+        } catch (\Exception $e) {
+            // Si hay error (ej: DB no configurada aún), devolvemos 0
+            return 0;
+        }
     }
 }
