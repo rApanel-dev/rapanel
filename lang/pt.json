@@ -89,5 +89,19 @@
     "Actions": "Ações",
     "View Details": "Ver Detalhes",
     "Change Password": "Mudar Senha",
-    "Logged in as": "Sessão iniciada como"
+    "Logged in as": "Sessão iniciada como",
+
+    "Change Password for": "Alterar senha de",
+    "Enter a new password for this game account. For security, we request your main web panel account password.": "Insira uma nova senha para esta conta de jogo. Por segurança, solicitamos a senha da sua conta principal do painel web.",
+    "New Game Password": "Nova Senha do Jogo",
+    "Minimum 4 characters": "Mínimo de 4 caracteres",
+    "Confirm New Password": "Confirmar Nova Senha",
+    "Master Account Password": "Senha do Painel Web",
+    "Your master account password": "Senha da sua conta principal",
+    "For security reasons, please confirm your master account password.": "Por motivos de segurança, por favor, confirme a senha da sua conta mestra.",
+    "Your web panel password": "Sua senha do painel web",
+    "Please enter your master account password.": "Por favor, insira a senha da sua conta mestra.",
+    "The password confirmation does not match.": "A confirmação da senha não corresponde.",
+    "You do not have permission to manage this account.": "Você não tem permissão para gerenciar esta conta.",
+    "Password updated successfully.": "Senha atualizada com sucesso."
 }

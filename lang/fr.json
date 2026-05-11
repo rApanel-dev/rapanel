@@ -89,5 +89,19 @@
     "Actions": "Actions",
     "View Details": "Voir les Détails",
     "Change Password": "Changer le Mot de Passe",
-    "Logged in as": "Connecté en tant que"
+    "Logged in as": "Connecté en tant que",
+
+    "Change Password for": "Changer le mot de passe pour",
+    "Enter a new password for this game account. For security, we request your main web panel account password.": "Entrez un nouveau mot de passe pour ce compte de jeu. Par sécurité, nous vous demandons le mot de passe de votre compte principal du panel web.",
+    "New Game Password": "Nouveau mot de passe du jeu",
+    "Minimum 4 characters": "Minimum 4 caractères",
+    "Confirm New Password": "Confirmer le nouveau mot de passe",
+    "Master Account Password": "Mot de passe du Panel Web",
+    "Your master account password": "Le mot de passe de votre compte principal",
+    "For security reasons, please confirm your master account password.": "Pour des raisons de sécurité, veuillez confirmer le mot de passe de votre compte principal.",
+    "Your web panel password": "Votre mot de passe du panel web",
+    "Please enter your master account password.": "Veuillez saisir le mot de passe de votre compte principal.",
+    "The password confirmation does not match.": "La confirmation du mot de passe ne correspond pas.",
+    "You do not have permission to manage this account.": "Vous n'avez pas la permission de gérer ce compte.",
+    "Password updated successfully.": "Mot de passe mis à jour avec succès."
 }

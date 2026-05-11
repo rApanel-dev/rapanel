@@ -89,5 +89,19 @@
     "Actions": "Actions",
     "View Details": "View Details",
     "Change Password": "Change Password",
-    "Logged in as": "Logged in as"
+    "Logged in as": "Logged in as",
+
+    "Change Password for": "Change Password for",
+    "Enter a new password for this game account. For security, we request your main web panel account password.": "Enter a new password for this game account. For security, we request your main web panel account password.",
+    "New Game Password": "New Game Password",
+    "Minimum 4 characters": "Minimum 4 characters",
+    "Confirm New Password": "Confirm New Password",
+    "Master Account Password": "Master Account Password",
+    "Your master account password": "Your master account password",
+    "For security reasons, please confirm your master account password.": "For security reasons, please confirm your master account password.",
+    "Your web panel password": "Your web panel password",
+    "Please enter your master account password.": "Please enter your master account password.",
+    "The password confirmation does not match.": "The password confirmation does not match.",
+    "You do not have permission to manage this account.": "You do not have permission to manage this account.",
+    "Password updated successfully.": "Password updated successfully."
 }

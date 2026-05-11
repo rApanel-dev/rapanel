@@ -63,6 +63,9 @@ Route::middleware('auth')->group(function () {
 
     // Crear cuenta de juego
     Route::post('/game-accounts', [GameAccountController::class, 'store'])->name('game-accounts.store');
+
+    // Actualizar contraseña cuenta de juego
+    Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->name('game-accounts.password.update');
 });
 
 Route::get('lang/{locale}', function ($locale) {
