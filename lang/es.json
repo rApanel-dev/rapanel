@@ -38,6 +38,9 @@
     "Dashboard": "Panel de control",
     "Log Out": "Cerrar sesión",
     "Already registered?": "¿Ya estás registrado?",
+    "Log in": "Iniciar sesión",
+    "Remember me": "Recordarme",
+    "Forgot your password?": "¿Olvidaste tu contraseña?",
 
     "Delete Account": "Eliminar Cuenta",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Una vez que se elimine su cuenta, todos sus recursos y datos se borrarán permanentemente. Antes de eliminar su cuenta, por favor descargue cualquier dato o información que desee conservar.",
@@ -85,5 +88,6 @@
     "Unknown": "Desconocida",
     "Actions": "Acciones",
     "View Details": "Ver Detalles",
-    "Change Password": "Cambiar Contraseña"
+    "Change Password": "Cambiar Contraseña",
+    "Logged in as": "Sesión iniciada como"
 }

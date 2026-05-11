@@ -8,7 +8,7 @@ import Header from '@/Components/Header.vue';
     <Header class="absolute top-0 left-0 w-full z-50 shadow-md" />
 
     <div
-        class="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0"
+        class="flex min-h-screen flex-col items-center bg-gray-100 dark:bg-black pt-6 sm:justify-center sm:pt-0"
     >
         <div>
             <Link href="/">
@@ -17,7 +17,7 @@ import Header from '@/Components/Header.vue';
         </div>
 
         <div
-            class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg"
+            class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-900 px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg"
         >
             <slot />
         </div>

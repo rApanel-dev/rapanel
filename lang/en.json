@@ -38,6 +38,9 @@
     "Dashboard": "Dashboard",
     "Log Out": "Log Out",
     "Already registered?": "Already registered?",
+    "Log in": "Log in",
+    "Remember me": "Remember me",
+    "Forgot your password?": "Forgot your password?",
 
     "Delete Account": "Delete Account",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
@@ -85,5 +88,6 @@
     "Unknown": "Unknown",
     "Actions": "Actions",
     "View Details": "View Details",
-    "Change Password": "Change Password"
+    "Change Password": "Change Password",
+    "Logged in as": "Logged in as"
 }

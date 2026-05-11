@@ -38,6 +38,9 @@
     "Dashboard": "Painel",
     "Log Out": "Sair",
     "Already registered?": "Já registrado?",
+    "Log in": "Iniciar sessão",
+    "Remember me": "Lembrar-me",
+    "Forgot your password?": "Esqueceu sua senha?",
 
     "Delete Account": "Excluir Conta",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Assim que sua conta for excluída, todos os seus recursos e dados serão permanentemente excluídos. Antes de excluir sua conta, faça o download de quaisquer dados ou informações que você deseja manter.",
@@ -85,5 +88,6 @@
     "Unknown": "Desconhecida",
     "Actions": "Ações",
     "View Details": "Ver Detalhes",
-    "Change Password": "Mudar Senha"
+    "Change Password": "Mudar Senha",
+    "Logged in as": "Sessão iniciada como"
 }

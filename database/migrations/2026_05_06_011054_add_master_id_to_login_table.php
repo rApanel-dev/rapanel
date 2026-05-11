@@ -16,6 +16,7 @@ return new class extends Migration
             // Es "nullable" (permite nulos) porque tus cuentas antiguas de rAthena 
             // aún no tendrán un dueño maestro asignado hasta que las vinculen en el panel.
             $table->unsignedBigInteger('master_id')->nullable()->after('account_id');
+            $table->timestamp('created_at')->nullable()->after('master_id');
             
             // Creamos un índice para que buscar qué cuentas le pertenecen a un usuario sea rapidísimo
             $table->index('master_id');
@@ -27,7 +28,7 @@ return new class extends Migration
         // Para cuando queramos revertir los cambios
         Schema::connection('mysql_main')->table('login', function (Blueprint $table) {
             $table->dropIndex(['master_id']);
-            $table->dropColumn('master_id');
+            $table->dropColumn(['master_id', 'created_at']);
         });
     }
 };

@@ -5,7 +5,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 defineProps({
     canResetPassword: {
@@ -15,6 +15,13 @@ defineProps({
         type: String,
     },
 });
+
+const page = usePage();
+
+// Helper de traducción
+const __ = (key) => {
+    return page.props.translations?.[key] || key;
+};
 
 const form = useForm({
     email: '',
@@ -31,7 +38,7 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <Head :title="__('Log in')" />
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
@@ -39,7 +46,7 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="__('Email')" />
 
                 <TextInput
                     id="email"
@@ -55,7 +62,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" :value="__('Password')" />
 
                 <TextInput
                     id="password"
@@ -73,7 +80,7 @@ const submit = () => {
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
                     <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
+                        >{{ __('Remember me') }}</span
                     >
                 </label>
             </div>
@@ -84,7 +91,7 @@ const submit = () => {
                     :href="route('password.request')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Forgot your password?
+                    {{ __('Forgot your password?') }}
                 </Link>
 
                 <PrimaryButton
@@ -92,7 +99,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Log in
+                    {{ __('Log in') }}
                 </PrimaryButton>
             </div>
         </form>

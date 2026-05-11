@@ -38,6 +38,9 @@
     "Dashboard": "Tableau de bord",
     "Log Out": "Se déconnecter",
     "Already registered?": "Déjà enregistré?",
+    "Log in": "Se connecter",
+    "Remember me": "Se souvenir de moi",
+    "Forgot your password?": "Mot de passe oublié ?",
 
     "Delete Account": "Supprimer le compte",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Une fois votre compte supprimé, toutes ses ressources et données seront définitivement effacées. Avant de supprimer votre compte, veuillez télécharger toutes les données ou informations que vous souhaitez conserver.",
@@ -85,5 +88,6 @@
     "Unknown": "Inconnue",
     "Actions": "Actions",
     "View Details": "Voir les Détails",
-    "Change Password": "Changer le Mot de Passe"
+    "Change Password": "Changer le Mot de Passe",
+    "Logged in as": "Connecté en tant que"
 }

@@ -12,7 +12,9 @@ use Illuminate\Notifications\Notifiable;
 
 #[Fillable([
     'name',
-    'email', 
+    'email',
+    'last_ip',
+    'last_login',
     'country', 
     'password', 
     'donation_points', 

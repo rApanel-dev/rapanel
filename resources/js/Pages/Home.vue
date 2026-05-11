@@ -6,7 +6,7 @@ import Header from '@/Components/Header.vue';
 <template>
     <Head :title="__('Home')" />
 
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div class="min-h-screen bg-gray-100 dark:bg-black">
         
         <Header />
 

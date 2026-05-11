@@ -3,7 +3,7 @@ import { Menu, MenuButton, MenuItems, MenuItem, Disclosure, DisclosureButton, Di
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Link, usePage } from '@inertiajs/vue3';
 import LocaleSelector from '@/Components/LocaleSelector.vue'; 
-// IMPORTANTE: Ahora importamos ambos menús
+import ThemeSelector from '@/Components/ThemeSelector.vue';
 import { visitorMenuItems, authMenuItems } from '@/menu.js';
 import { computed } from 'vue'; // Importamos computed para hacer la lógica dinámica
 
@@ -48,6 +48,9 @@ const currentMenuItems = computed(() => {
                 </Link>
 
                 <div class="hidden md:flex items-center gap-4">
+
+                    <ThemeSelector />
+
                     <div class="flex items-center justify-center p-0">
                         <LocaleSelector />
                     </div>
@@ -99,6 +102,8 @@ const currentMenuItems = computed(() => {
                 </div>
 
                 <div class="flex items-center md:hidden gap-2">
+                    <ThemeSelector />
+                    
                     <LocaleSelector />
 
                     <DisclosureButton class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition">
