@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\GameAccountController;
+use App\Http\Controllers\DashboardController; // <-- 1. AÑADIMOS ESTA LÍNEA
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -44,10 +46,11 @@ Route::prefix('rank')->name('rank.')->group(function() {
 // ==========================================
 Route::middleware('auth')->group(function () {
     
+    // 2. MODIFICAMOS ESTA RUTA PARA USAR EL CONTROLADOR
     // MASTER ACCOUNT: URL de rApanel, pero nombre interno 'dashboard' de Laravel Auth
-    Route::get('/master-account', function () {
-        return Inertia::render('Dashboard');
-    })->middleware(['verified'])->name('dashboard');
+    Route::get('/master-account', [DashboardController::class, 'index'])
+        ->middleware(['verified'])
+        ->name('dashboard');
 
     // NUEVAS RUTAS DEL MENÚ DE USUARIO
     Route::get('/transfer', function() { return Inertia::render('Dashboard'); })->name('account.transfer');
@@ -57,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Crear cuenta de juego
+    Route::post('/game-accounts', [GameAccountController::class, 'store'])->name('game-accounts.store');
 });
 
 Route::get('lang/{locale}', function ($locale) {

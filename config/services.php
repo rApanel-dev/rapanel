@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'ra' => [
+        'use_md5' => env('RA_USE_MD5_PASSWORDS', false),
+        'max_accounts' => env('RA_MAX_GAME_ACCOUNTS', 3),
+    ],
+
 ];

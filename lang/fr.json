@@ -61,5 +61,29 @@
     "Welcome to your central control panel,": "Bienvenue dans votre panneau de contrôle central,",
     "Game Accounts": "Comptes de Jeu",
     "Vote Points": "Points de Vote",
-    "Cash Points": "Points Cash"
+    "Cash Points": "Points Cash",
+
+    "You have reached the maximum limit of :count game accounts.": "Vous avez atteint la limite maximale de :count comptes de jeu.",
+    "Game account created successfully.": "Compte de jeu créé avec succès.",
+    "The userid has already been taken.": "Ce nom d'utilisateur est déjà pris.",
+
+    "Create Game Account": "Créer un compte de jeu",
+    "Create New Game Account": "Créer un nouveau compte de jeu",
+    "Username": "Nom d'utilisateur",
+    "Gender": "Genre",
+    "Male": "Masculin",
+    "Female": "Féminin",
+    "Create Account": "Créer le compte",
+    "My Game Accounts": "Minhas Contas de Jogo",
+    "Account": "Conta",
+    "Login Count": "Nombre de Connexions",
+    "Last Login": "Último Acesso",
+    "Status": "Status",
+    "Never": "Nunca",
+    "Active": "Ativa",
+    "Last IP": "Dernière IP",
+    "Unknown": "Inconnue",
+    "Actions": "Actions",
+    "View Details": "Voir les Détails",
+    "Change Password": "Changer le Mot de Passe"
 }

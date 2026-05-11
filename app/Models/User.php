@@ -66,4 +66,11 @@ class User extends Authenticatable implements MustVerifyEmail
         // Si es true, hace el comportamiento normal de Laravel (revisa si la fecha no es nula)
         return ! is_null($this->email_verified_at);
     }
+    /**
+     * Obtener las cuentas de juego (rAthena) vinculadas a esta cuenta maestra.
+     */
+    public function gameAccounts()
+    {
+        return $this->hasMany(GameAccount::class, 'master_id', 'id');
+    }
 }

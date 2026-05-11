@@ -61,5 +61,29 @@
     "Welcome to your central control panel,": "Welcome to your central control panel,",
     "Game Accounts": "Game Accounts",
     "Vote Points": "Vote Points",
-    "Cash Points": "Cash Points"
+    "Cash Points": "Cash Points",
+
+    "You have reached the maximum limit of :count game accounts.": "You have reached the maximum limit of :count game accounts.",
+    "Game account created successfully.": "Game account created successfully.",
+    "The userid has already been taken.": "This username is already in use.",
+
+    "Create Game Account": "Create Game Account",
+    "Create New Game Account": "Create New Game Account",
+    "Username": "Username",
+    "Gender": "Gender",
+    "Male": "Male",
+    "Female": "Female",
+    "Create Account": "Create Account",
+    "My Game Accounts": "My Game Accounts",
+    "Account": "Account",
+    "Login Count": "Login Count",
+    "Last Login": "Last Login",
+    "Status": "Status",
+    "Never": "Never",
+    "Active": "Active",
+    "Last IP": "Last IP",
+    "Unknown": "Unknown",
+    "Actions": "Actions",
+    "View Details": "View Details",
+    "Change Password": "Change Password"
 }
