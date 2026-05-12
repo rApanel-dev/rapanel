@@ -43,7 +43,7 @@ class GameAccountController extends Controller
         }
 
         // 4. Crear la cuenta en rAthena
-        GameAccount::create([
+        $newAccount = GameAccount::create([
             'userid' => $request->userid,
             'user_pass' => $password, 
             'sex' => $request->sex,
@@ -51,6 +51,20 @@ class GameAccountController extends Controller
             'master_id' => $user->id,
             'group_id' => 0,
             'state' => 0,
+            'created_at' => now(),
+        ]);
+
+        // Dentro de la función store, después de crear la cuenta:
+        ActionLog::create([
+            'user_id'    => auth()->id(),
+            'category'   => 'GAME_ACCOUNT',
+            'action'     => 'game_account_created',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => [
+                'account_id' => (int) $newAccount->account_id,
+                'username'   => $newAccount->userid
+            ]
         ]);
 
         return back()->with('success', __('Game account created successfully.'));
@@ -96,20 +110,95 @@ class GameAccountController extends Controller
             'user_pass' => $newPassword
         ]);
 
-        // 5. Registro de Auditoría (Importante incluir que fue verificada)
+        // 5. Registro de Auditoría
         ActionLog::create([
             'user_id'    => Auth::id(),
-            'category'   => 'security',
+            'category'   => 'GAME_ACCOUNT',
             'action'     => 'game_account_password_change_verified',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'metadata'   => [
-                'account_id' => $account_id,
+                'account_id' => (int) $account_id,
                 'username'   => $gameAccount->userid,
                 'method'     => 'master_password_confirmed' 
             ]
         ]);
 
         return back()->with('success', __('Password updated successfully.'));
+    }
+
+    /**
+     * Obtiene el historial de actividad de una cuenta de juego específica.
+     */
+    public function logs($account_id)
+    {
+        // Verificamos que la cuenta pertenezca al usuario logueado
+        $exists = GameAccount::where('account_id', $account_id)
+                    ->where('master_id', auth()->id())
+                    ->exists();
+
+        if (!$exists) {
+            return response()->json([], 403);
+        }
+
+        return ActionLog::on('mysql') 
+            ->where('user_id', auth()->id())
+            ->where('category', 'GAME_ACCOUNT')
+            ->where(function($query) use ($account_id) {
+                $query->where('metadata->account_id', (int)$account_id)
+                    ->orWhere('metadata->account_id', (string)$account_id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'action', 'ip_address', 'created_at']);
+    }
+
+    public function destroy(Request $request, $account_id)
+    {
+        // 1. Validar la contraseña maestra por seguridad
+        $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => __('The provided password does not match our records.')]);
+        }
+
+        // 2. Buscar la cuenta asegurando que le pertenece
+        $gameAccount = GameAccount::where('account_id', $account_id)
+            ->where('master_id', auth()->id())
+            ->first();
+
+        if (!$gameAccount) {
+            return back()->withErrors(['error' => __('Account not found or unauthorized.')]);
+        }
+
+        // 3. Proceso de Desactivación
+        // Renombramos a 'del_timestamp_username' para liberar el nombre original
+        $newName = 'del_' . time() . '_' . $gameAccount->userid;
+        
+        // Limitamos a 23 caracteres (máximo de rAthena en userid)
+        $newName = substr($newName, 0, 23);
+
+        $gameAccount->update([
+            'userid'    => $newName,
+            'master_id' => null, // O 0, según tu base de datos
+            'state'     => 5,    // Estado de desactivación
+        ]);
+
+        // 4. Registrar en Auditoría
+        ActionLog::create([
+            'user_id'    => auth()->id(),
+            'category'   => 'GAME_ACCOUNT',
+            'action'     => 'game_account_deactivated',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => [
+                'account_id' => (int) $account_id,
+                'previous_username' => $gameAccount->getOriginal('userid'),
+                'new_status' => 'Deactivated and Unlinked'
+            ]
+        ]);
+
+        return back()->with('success', __('Account de-linked successfully. It will no longer appear in your dashboard.'));
     }
 }

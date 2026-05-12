@@ -8,6 +8,8 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
+import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
 const props = defineProps({
@@ -53,7 +55,7 @@ const createAccount = () => {
     });
 };
 
-// --- ESTADO PARA CAMBIAR CONTRASEÑA (LO QUE HABLAMOS AYER) ---
+// --- ESTADO PARA CAMBIAR CONTRASEÑA ---
 const changingPasswordFor = ref(null);
 
 const passwordForm = useForm({
@@ -88,6 +90,14 @@ const updatePassword = () => {
             }
         },
     });
+};
+
+const showingLogsModal = ref(false);
+const selectedAccountForLogs = ref(null);
+
+const openLogsModal = (account) => {
+    selectedAccountForLogs.value = account;
+    showingLogsModal.value = true;
 };
 </script>
 
@@ -149,6 +159,7 @@ const updatePassword = () => {
                                 <th class="px-6 py-4 text-center">{{ __('Login Count') }}</th>
                                 <th class="px-6 py-4">{{ __('Last Login') }}</th>
                                 <th class="px-6 py-4">{{ __('Last IP') }}</th>
+                                <th class="px-6 py-4">{{ __('created') }}</th>   
                                 <th class="px-6 py-4">{{ __('Status') }}</th>
                                 <th class="px-6 py-4 text-center">{{ __('Actions') }}</th>
                             </tr>
@@ -166,6 +177,9 @@ const updatePassword = () => {
                                 </td>
                                 <td class="px-6 py-4 text-gray-400 text-xs italic">
                                     {{ account.last_ip || __('Unknown') }}
+                                </td>
+                                <td class="px-6 py-4 text-gray-400 text-xs italic">
+                                    {{ account.created_at || __('Unknown') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <span v-if="account.state === 0" class="px-2 py-1 bg-green-900/30 text-green-500 rounded text-xs">
@@ -193,11 +207,17 @@ const updatePassword = () => {
                                         </svg>
                                     </button>
                                     
-                                    <button class="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all focus:outline-none" :title="__('Delete Account')">
+                                    <button 
+                                        @click="openLogsModal(account)"
+                                        class="p-2 text-purple-400 hover:text-purple-300 hover:bg-gray-700/50 rounded-lg transition-all focus:outline-none" 
+                                        :title="__('View Activity')"
+                                    >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                         </svg>
                                     </button>
+
+                                    <DeleteGameAccountForm :account="account" />
                                 </td>
                             </tr>
                             <tr v-if="gameAccountsCount === 0">
@@ -307,6 +327,10 @@ const updatePassword = () => {
                 </form>
             </div>
         </Modal>
-
+        <ViewActivityLogs 
+            :show="showingLogsModal" 
+            :account="selectedAccountForLogs" 
+            @close="showingLogsModal = false" 
+            />
     </div>
 </template>

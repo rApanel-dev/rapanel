@@ -66,6 +66,12 @@ Route::middleware('auth')->group(function () {
 
     // Actualizar contraseña cuenta de juego
     Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->name('game-accounts.password.update');
+
+    // Logs cuentas de juego
+    Route::get('/game-accounts/{account_id}/logs', [GameAccountController::class, 'logs'])->name('game-accounts.logs');
+
+    // Eliminar cuenta de juego
+    Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->name('game-accounts.destroy');
 });
 
 Route::get('lang/{locale}', function ($locale) {

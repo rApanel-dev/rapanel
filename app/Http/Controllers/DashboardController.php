@@ -21,7 +21,7 @@ class DashboardController extends Controller
             
             // Enviamos la lista de cuentas para la tabla
             'gameAccounts' => $user->gameAccounts()
-                ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state')
+                ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state', 'created_at')
                 ->get(),
         ]);
     }

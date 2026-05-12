@@ -103,5 +103,23 @@
     "Please enter your master account password.": "Please enter your master account password.",
     "The password confirmation does not match.": "The password confirmation does not match.",
     "You do not have permission to manage this account.": "You do not have permission to manage this account.",
-    "Password updated successfully.": "Password updated successfully."
+    "Password updated successfully.": "Password updated successfully.",
+
+    "game_account_password_change_verified": "Game account password updated",
+    "master_password_confirmed": "Confirmed with master password",
+    "Activity Log for": "Activity Log for",
+    "No recent activity found.": "No recent activity found.",
+    "game_account_created": "Game account created",
+    "Close": "Close",
+    "game_account_deactivated": "Game account deactivated",
+    "Account de-linked successfully...": "Account de-linked successfully. It will no longer appear in your dashboard.",
+    "Delete Game Account": "Delete Game Account",
+    "Are you sure you want to delete this account? Once deleted, you will no longer have access to it from this panel.": "Are you sure you want to delete this account? Once deleted, you will no longer have access to it from this panel.",
+    "Account to Delete": "Account to Delete",
+    "Final Warning": "Final Warning",
+    "Identity Verification": "Identity Verification",
+    "Yes, I am sure": "Yes, I am sure",
+    "Back": "Back",
+    "You are about to delete the game account:": "You are about to delete the game account:",
+    "This will unlink all characters and progress from your master profile. Are you absolutely sure?": "This will unlink all characters and progress from your master profile. Are you absolutely sure?"
 }

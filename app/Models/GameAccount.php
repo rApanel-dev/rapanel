@@ -24,6 +24,7 @@ class GameAccount extends Model
     // 5. Campos permitidos para inserción masiva
     protected $fillable = [
         'master_id', // Nuestro campo mágico para vincular a ra_user
+        'created_at',
         'userid',
         'user_pass',
         'sex',
