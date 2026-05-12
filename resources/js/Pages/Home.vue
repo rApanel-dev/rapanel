@@ -1,17 +1,14 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
-import Header from '@/Components/Header.vue';
+import MainLayout from '@/Layouts/MainLayout.vue'; // Importamos el Layout
 </script>
 
 <template>
     <Head :title="__('Home')" />
 
-    <div class="min-h-screen bg-gray-100 dark:bg-black">
-        
-        <Header />
-
+    <MainLayout>
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-2xl font-bold">Bienvenido a rApanel</h1>
         </main>
-
-    </div>
+    </MainLayout>
 </template>
