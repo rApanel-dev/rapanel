@@ -64,7 +64,7 @@ const submit = () => {
                 <select 
                     id="country"
                     v-model="form.country"
-                    class="mt-1 block w-full rounded-md shadow-sm"
+                    class="mt-1 block w-full rounded-md shadow-sm bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-rapanel-navy-800 text-rapanel-text-light dark:text-white focus:ring-rapanel-blue focus:border-rapanel-blue"
                     required
                 >
                     <option value="" disabled>{{ __('Select your country') }}</option>
@@ -115,7 +115,7 @@ const submit = () => {
             <div class="mt-4 flex items-center justify-end">
                 <Link
                     :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-md text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 underline hover:text-rapanel-text-light dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue focus:ring-offset-2 dark:focus:ring-offset-rapanel-navy-900"
                 >
                     {{ __('Already registered?') }}
                 </Link>

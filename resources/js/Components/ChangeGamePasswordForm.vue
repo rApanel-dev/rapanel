@@ -62,11 +62,11 @@ const closeModal = () => {
 
         <Modal :show="confirmingPasswordChange" @close="closeModal">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <h2 class="text-lg font-medium text-rapanel-text-light dark:text-rapanel-text-dark">
                     {{ __('Change Password for') }} {{ account.userid }}
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p class="mt-1 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                     {{ __('Enter a new password for this game account. For security, we request your main web panel account password.') }}
                 </p>
 

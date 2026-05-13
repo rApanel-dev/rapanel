@@ -5,10 +5,10 @@ import Header from '@/Components/Header.vue';
 </script>
 
 <template>
-    <Header class="absolute top-0 left-0 w-full z-50 shadow-md" />
+    <Header class="relative z-50 shadow-md" />
 
     <div
-        class="flex min-h-screen flex-col items-center bg-rapanel-navy-50 dark:bg-rapanel-navy-900 pt-6 sm:justify-center sm:pt-0"
+        class="flex min-h-[calc(100vh-64px)] flex-col items-center bg-rapanel-navy-50 dark:bg-rapanel-navy-900 sm:justify-center py-6 sm:py-0"
     >
         <div>
             <Link href="/">

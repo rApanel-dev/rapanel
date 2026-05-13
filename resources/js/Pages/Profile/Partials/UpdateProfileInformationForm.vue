@@ -33,11 +33,11 @@ const form = useForm({
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">
                 {{ __('Profile Information') }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                 {{ __("Update your account's profile information and email address.") }}
             </p>
         </header>
@@ -52,7 +52,7 @@ const form = useForm({
                 <TextInput
                     id="name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full sm:w-3/4"
                     v-model="form.name"
                     required
                     autofocus
@@ -63,12 +63,12 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="email" :value="__('Email')" />
+                <InputLabel for="email" :value="__('Email Address')" />
 
                 <TextInput
                     id="email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full sm:w-3/4"
                     v-model="form.email"
                     required
                     autocomplete="username"
@@ -77,14 +77,15 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="mt-2 text-sm text-gray-800">
+            <div v-if="mustVerifyEmail && user.email_verified_at === null" 
+                 class="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30">
+                <p class="text-sm text-yellow-800 dark:text-yellow-200">
                     {{ __('Your email address is unverified.') }}
                     <Link
                         :href="route('verification.send')"
                         method="post"
                         as="button"
-                        class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        class="ms-2 font-bold underline hover:no-underline focus:outline-none"
                     >
                         {{ __('Click here to re-send the verification email.') }}
                     </Link>
@@ -92,26 +93,35 @@ const form = useForm({
 
                 <div
                     v-show="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
+                    class="mt-2 text-sm font-bold text-green-600 dark:text-green-400 flex items-center"
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 me-1.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
                     {{ __('A new verification link has been sent to your email address.') }}
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">{{ __('Save') }}</PrimaryButton>
+                <PrimaryButton :disabled="form.processing">
+                    {{ __('Save Changes') }}
+                </PrimaryButton>
 
                 <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
+                    enter-active-class="transition duration-300 ease-out"
+                    enter-from-class="opacity-0 translate-x-4"
+                    enter-to-class="opacity-100 translate-x-0"
+                    leave-active-class="transition duration-200 ease-in"
+                    leave-to-class="opacity-0 translate-x-4"
                 >
                     <p
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm text-rapanel-success font-bold flex items-center"
                     >
-                        {{ __('Saved.') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 me-1.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        {{ __('Profile updated.') }}
                     </p>
                 </Transition>
             </div>

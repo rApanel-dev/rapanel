@@ -41,23 +41,23 @@ const formatDate = (date) => new Date(date).toLocaleString(undefined, {
 
 <template>
     <Modal :show="show" @close="emit('close')">
-        <div class="bg-white dark:bg-gray-900 p-6">
-            <h2 class="text-lg font-medium text-white mb-4">
+        <div class="bg-white dark:bg-rapanel-navy-800 p-6">
+            <h2 class="text-lg font-medium text-rapanel-text-light dark:text-rapanel-text-dark mb-4">
                 {{ __('Activity Log for') }} {{ account?.userid }}
             </h2>
 
-            <div v-if="isLogsLoading" class="py-8 text-center text-gray-400">
+            <div v-if="isLogsLoading" class="py-8 text-center text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                 {{ __('Loading activity...') }}
             </div>
 
-            <div v-else-if="currentLogs.length === 0" class="py-8 text-center text-gray-500">
+            <div v-else-if="currentLogs.length === 0" class="py-8 text-center text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                 {{ __('No recent activity found.') }}
             </div>
 
             <div v-else class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                <div v-for="log in currentLogs" :key="log.id" class="border-l-2 border-purple-500 pl-4 py-1">
-                    <p class="text-sm text-gray-200 font-semibold">{{ __(log.action) }}</p>
-                    <p class="text-xs text-gray-500">{{ formatDate(log.created_at) }} • IP: {{ log.ip_address }}</p>
+                <div v-for="log in currentLogs" :key="log.id" class="border-l-2 border-rapanel-blue pl-4 py-1">
+                    <p class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark font-semibold">{{ __(log.action) }}</p>
+                    <p class="text-xs text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ formatDate(log.created_at) }} • IP: {{ log.ip_address }}</p>
                 </div>
             </div>
 

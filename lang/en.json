@@ -60,6 +60,9 @@
     "Your email address is unverified.": "Your email address is unverified.",
     "Click here to re-send the verification email.": "Click here to re-send the verification email.",
     "A new verification link has been sent to your email address.": "A new verification link has been sent to your email address.",
+    "Save Changes": "Save Changes",
+    "Profile updated.": "Profile updated.",
+    "Saved successfully.": "Saved successfully.",
 
     "Welcome to your central control panel,": "Welcome to your central control panel,",
     "Game Accounts": "Game Accounts",
@@ -85,6 +88,7 @@
     "Never": "Never",
     "Active": "Active",
     "Last IP": "Last IP",
+    "Created": "Created",
     "Unknown": "Unknown",
     "Actions": "Actions",
     "View Details": "View Details",

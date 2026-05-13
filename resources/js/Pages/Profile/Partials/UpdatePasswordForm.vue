@@ -44,11 +44,11 @@ const updatePassword = () => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">
                 {{ __('Update Password') }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                 {{ __('Ensure your account is using a long, random password to stay secure.') }}
             </p>
         </header>
@@ -62,7 +62,7 @@ const updatePassword = () => {
                     ref="currentPasswordInput"
                     v-model="form.current_password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full sm:w-3/4"
                     autocomplete="current-password"
                 />
 
@@ -80,7 +80,7 @@ const updatePassword = () => {
                     ref="passwordInput"
                     v-model="form.password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full sm:w-3/4"
                     autocomplete="new-password"
                 />
 
@@ -97,7 +97,7 @@ const updatePassword = () => {
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full sm:w-3/4"
                     autocomplete="new-password"
                 />
 
@@ -108,19 +108,25 @@ const updatePassword = () => {
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">{{ __('Save') }}</PrimaryButton>
+                <PrimaryButton :disabled="form.processing">
+                    {{ __('Update Password') }}
+                </PrimaryButton>
 
                 <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
+                    enter-active-class="transition duration-300 ease-out"
+                    enter-from-class="opacity-0 translate-x-4"
+                    enter-to-class="opacity-100 translate-x-0"
+                    leave-active-class="transition duration-200 ease-in"
+                    leave-to-class="opacity-0 translate-x-4"
                 >
                     <p
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm text-rapanel-success font-bold flex items-center"
                     >
-                        {{ __('Saved.') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 me-1.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        {{ __('Saved successfully.') }}
                     </p>
                 </Transition>
             </div>

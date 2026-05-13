@@ -60,6 +60,9 @@
     "Your email address is unverified.": "Votre adresse e-mail n'est pas vérifiée.",
     "Click here to re-send the verification email.": "Cliquez ici pour renvoyer l'e-mail de vérification.",
     "A new verification link has been sent to your email address.": "Un nouveau lien de vérification a été envoyé à votre adresse e-mail.",
+    "Save Changes": "Enregistrer les modifications",
+    "Profile updated.": "Profil mis à jour.",
+    "Saved successfully.": "Mot de passe mis à jour avec succès.",
 
     "Welcome to your central control panel,": "Bienvenue dans votre panneau de contrôle central,",
     "Game Accounts": "Comptes de Jeu",
@@ -85,6 +88,7 @@
     "Never": "Nunca",
     "Active": "Ativa",
     "Last IP": "Dernière IP",
+    "Created": "Créée",
     "Unknown": "Inconnue",
     "Actions": "Actions",
     "View Details": "Voir les Détails",

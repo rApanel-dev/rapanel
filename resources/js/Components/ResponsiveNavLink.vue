@@ -14,8 +14,8 @@ const props = defineProps({
 
 const classes = computed(() =>
     props.active
-        ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-indigo-400 text-start text-base font-medium text-indigo-700 bg-indigo-50 focus:outline-none focus:text-indigo-800 focus:bg-indigo-100 focus:border-indigo-700 transition duration-150 ease-in-out'
-        : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out',
+        ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-rapanel-blue text-start text-base font-medium text-rapanel-blue dark:text-white bg-rapanel-navy-50 dark:bg-rapanel-navy-800 focus:outline-none focus:text-rapanel-navy-900 dark:focus:text-white focus:bg-rapanel-navy-100 dark:focus:bg-rapanel-navy-900 focus:border-rapanel-blue transition duration-150 ease-in-out'
+        : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-text-light dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 hover:border-rapanel-navy-100 dark:hover:border-rapanel-navy-800 focus:outline-none focus:text-rapanel-text-light dark:focus:text-white focus:bg-rapanel-navy-50 dark:focus:bg-rapanel-navy-800 focus:border-rapanel-navy-100 dark:focus:border-rapanel-navy-800 transition duration-150 ease-in-out',
 );
 </script>
 

@@ -23,7 +23,7 @@ onMounted(() => {
 <template>
     <button 
         @click="toggleTheme" 
-        class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-yellow-400 transition-colors duration-300"
+        class="p-2 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-navy-900 dark:text-rapanel-gold transition-colors duration-300"
     >
         <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />

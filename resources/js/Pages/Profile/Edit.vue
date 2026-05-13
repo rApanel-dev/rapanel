@@ -25,21 +25,21 @@ const __ = (key) => {
 <template>
     <Head :title="__('Profile')" />
 
-    <div class="min-h-screen bg-black text-gray-100 font-sans antialiased">
+    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
         
         <Header />
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             
-            <div class="mb-6 border-b border-gray-800 pb-4">
-                <h1 class="text-2xl font-bold text-white uppercase tracking-widest">
+            <div class="mb-6 border-b border-rapanel-navy-100 dark:border-rapanel-navy-800 pb-4">
+                <h1 class="text-2xl font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-widest">
                     {{ __('Profile') }}
                 </h1>
             </div>
 
             <div class="space-y-6">
                 
-                <div class="bg-gray-900 border border-gray-800 p-4 shadow-2xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-800 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
@@ -47,11 +47,11 @@ const __ = (key) => {
                     />
                 </div>
 
-                <div class="bg-gray-900 border border-gray-800 p-4 shadow-2xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-800 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <UpdatePasswordForm class="max-w-xl" />
                 </div>
 
-                <div class="bg-gray-900 border border-gray-800 p-4 shadow-2xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-800 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <DeleteUserForm class="max-w-xl" />
                 </div>
                 

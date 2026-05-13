@@ -44,7 +44,7 @@ const currentMenuItems = computed(() => {
             <div class="flex justify-between items-center h-20 border-b border-rapanel-navy-100 dark:border-white/10">
                 
                 <Link :href="safeRoute('home')" class="shrink-0">
-                    <img class="h-12 w-auto" src="/images/logo.png" alt="rApanel" />
+                    <img class="h-9 md:h-12 w-auto max-w-[150px] md:max-w-none object-contain" src="/images/logo.png" alt="rApanel" />
                 </Link>
 
                 <div class="hidden md:flex items-center gap-4">
@@ -60,7 +60,7 @@ const currentMenuItems = computed(() => {
                             <Link :href="safeRoute('login')" class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
                                 {{ __('Login') }}
                             </Link>
-                            <Link :href="safeRoute('register')" class="bg-rapanel-blue hover:opacity-90 text-white px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
+                            <Link :href="safeRoute('register')" class="bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
                                 {{ __('Register') }}
                             </Link>
                         </template>
@@ -101,7 +101,7 @@ const currentMenuItems = computed(() => {
                     </div>
                 </div>
 
-                <div class="flex items-center md:hidden gap-2">
+                <div class="flex items-center md:hidden gap-1 -me-2">
                     <ThemeSelector />
                     
                     <LocaleSelector />
