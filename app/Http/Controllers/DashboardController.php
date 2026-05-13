@@ -23,6 +23,10 @@ class DashboardController extends Controller
             'gameAccounts' => $user->gameAccounts()
                 ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state', 'created_at')
                 ->get(),
+
+            // Nueva variable para controlar el límite desde el .env
+            // Si no existe en el .env, por defecto será 3
+            'maxAccounts' => (int) env('RA_MAX_GAME_ACCOUNTS', 3),
         ]);
     }
 }

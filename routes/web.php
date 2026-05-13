@@ -72,6 +72,9 @@ Route::middleware('auth')->group(function () {
 
     // Eliminar cuenta de juego
     Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->name('game-accounts.destroy');
+
+    // Ruta para generar/obtener el token de reclamación
+    Route::get('/game-accounts/claim-token', [DashboardController::class, 'getClaimToken'])->name('game-accounts.claim.token');
 });
 
 Route::get('lang/{locale}', function ($locale) {

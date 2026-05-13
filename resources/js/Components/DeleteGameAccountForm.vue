@@ -50,7 +50,7 @@ const deleteAccount = () => {
     <div>
         <button 
             @click="openModal"
-            class="p-0.5 text-rapanel-danger hover:opacity-80 rounded-lg transition-all focus:outline-none"
+            class="p-0.5 text-rapanel-danger hover:opacity-80 hover:text-white rounded-lg transition-all focus:outline-none"
             :title="__('Delete Account')"
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" >
