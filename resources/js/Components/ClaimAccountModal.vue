@@ -19,7 +19,7 @@ const timerDisplay = computed(() => {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 });
 
-const linkCommand = computed(() => token.value ? `/link ${token.value}` : '...');
+const linkCommand = computed(() => token.value ? `@link ${token.value}` : '...');
 
 const fetchToken = async () => {
     try {
@@ -126,7 +126,7 @@ onUnmounted(() => clearInterval(interval.value));
             </div>
 
             <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-rapanel-navy-900/50 p-5 rounded-xl border border-gray-200 dark:border-white/5">
-                <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">01.</span> {{ __('Copy the /link command above.') }}</p>
+                <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">01.</span> {{ __('Copy the @link command above.') }}</p>
                 <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">02.</span> {{ __('Log in to RO with the account you want to claim.') }}</p>
                 <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">03.</span> {{ __('Paste the command in any chat window.') }}</p>
             </div>
