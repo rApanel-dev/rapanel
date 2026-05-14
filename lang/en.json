@@ -72,6 +72,7 @@
     "You have reached the maximum limit of :count game accounts.": "You have reached the maximum limit of :count game accounts.",
     "Game account created successfully.": "Game account created successfully.",
     "The userid has already been taken.": "This username is already in use.",
+    "No game accounts found. Create or claim your first one above!": "No game accounts found. Create or claim your first one above!",
 
     "Create Game Account": "Create Game Account",
     "Create New Game Account": "Create New Game Account",
@@ -127,6 +128,7 @@
     "Activity Log for": "Activity Log for",
     "No recent activity found.": "No recent activity found.",
     "game_account_created": "Game account created",
+    "game_account_linked_in-game": "Game account linked from game client",
     "Close": "Close",
     "game_account_deactivated": "Game account deactivated",
     "Account de-linked successfully...": "Account de-linked successfully. It will no longer appear in your dashboard.",

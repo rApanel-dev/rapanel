@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('last_ip', 45)->nullable()->after('email');
-            $table->timestamp('last_login')->nullable()->after('last_ip');
+            $table->string('last_ip', 45)->nullable();
+            $table->timestamp('last_login')->nullable();
             $table->string('country')->default('CL');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

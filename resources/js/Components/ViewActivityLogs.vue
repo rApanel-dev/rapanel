@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     show: Boolean,
@@ -62,7 +62,7 @@ const formatDate = (date) => new Date(date).toLocaleString(undefined, {
             </div>
 
             <div class="mt-6 flex justify-end">
-                <SecondaryButton @click="emit('close')">{{ __('Close') }}</SecondaryButton>
+                <PrimaryButton @click="emit('close')">{{ __('Close') }}</PrimaryButton>
             </div>
         </div>
     </Modal>

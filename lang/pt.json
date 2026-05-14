@@ -72,6 +72,7 @@
     "You have reached the maximum limit of :count game accounts.": "Você atingiu o limite máximo de :count contas de jogo.",
     "Game account created successfully.": "Conta de jogo criada com sucesso.",
     "The userid has already been taken.": "Este nome de usuário já está em uso.",
+    "No game accounts found. Create or claim your first one above!": "Nenhuma conta de jogo encontrada. Crie ou vincule a sua primeira conta acima!",
 
     "Create Game Account": "Criar Conta de Jogo",
     "Create New Game Account": "Criar Nova Conta de Jogo",
@@ -127,6 +128,7 @@
     "Activity Log for": "Log de atividade de",
     "No recent activity found.": "Nenhuma atividade recente encontrada.",
     "game_account_created": "Conta de jogo criada",
+    "game_account_linked_in-game": "Conta de jogo vinculada pelo cliente",
     "Close": "Fechar",
     "game_account_deactivated": "Conta de jogo desativada",
     "Account de-linked successfully...": "Conta desvinculada com sucesso. Ela não aparecerá mais no seu painel.",
