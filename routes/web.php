@@ -7,7 +7,8 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\GameAccountController;
-use App\Http\Controllers\DashboardController; // <-- 1. AÑADIMOS ESTA LÍNEA
+use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -73,8 +74,15 @@ Route::middleware('auth')->group(function () {
     // Eliminar cuenta de juego
     Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->name('game-accounts.destroy');
 
-    // Ruta para generar/obtener el token de reclamación
+    // Ruta para generar/obtener el token de reclamación (debe ir ANTES del wildcard)
     Route::get('/game-accounts/claim-token', [DashboardController::class, 'getClaimToken'])->name('game-accounts.claim.token');
+
+    // Detalle de cuenta de juego
+    Route::get('/game-accounts/{account_id}', [GameAccountController::class, 'show'])->name('game-accounts.show');
+
+    // Acciones de personaje
+    Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
+    Route::put('/characters/{char_id}/reset-look', [CharacterController::class, 'resetLook'])->name('characters.reset-look');
 });
 
 Route::get('lang/{locale}', function ($locale) {

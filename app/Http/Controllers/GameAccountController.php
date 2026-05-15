@@ -3,13 +3,71 @@
 namespace App\Http\Controllers;
 
 use App\Models\GameAccount;
+use App\Models\Character;
 use App\Models\ActionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class GameAccountController extends Controller
 {
+    public function show(int $accountId)
+    {
+        $gameAccount = GameAccount::where('account_id', $accountId)
+            ->where('master_id', Auth::id())
+            ->firstOrFail();
+
+        $characters = Character::where('account_id', $accountId)
+            ->orderBy('char_num')
+            ->get([
+                'char_id', 'char_num', 'name', 'class',
+                'base_level', 'job_level', 'base_exp', 'job_exp', 'zeny',
+                'str', 'agi', 'vit', DB::raw('`int`'), 'dex', 'luk',
+                'hp', 'max_hp', 'sp', 'max_sp',
+                'status_point', 'skill_point', 'online',
+                'last_map', 'last_x', 'last_y',
+                'hair', 'hair_color', 'clothes_color', 'body', 'sex',
+            ]);
+
+        $charIds = $characters->pluck('char_id')->toArray();
+        $inventoryByChar = [];
+
+        if (!empty($charIds)) {
+            try {
+                $placeholders = implode(',', array_fill(0, count($charIds), '?'));
+                $items = DB::connection('mysql_main')->select(
+                    "SELECT inv.char_id, inv.nameid, inv.amount, inv.equip,
+                            inv.identify, inv.refine,
+                            COALESCE(idb.name_english, idb2.name_english, CONCAT('Item #', inv.nameid)) AS name_english
+                     FROM inventory AS inv
+                     LEFT JOIN item_db  AS idb  ON idb.id  = inv.nameid
+                     LEFT JOIN item_db2 AS idb2 ON idb2.id = inv.nameid
+                     WHERE inv.char_id IN ({$placeholders})
+                     ORDER BY IF(inv.equip > 0, 1, 0) DESC, inv.nameid ASC",
+                    $charIds
+                );
+
+                foreach ($items as $item) {
+                    $inventoryByChar[$item->char_id][] = $item;
+                }
+            } catch (\Exception) {
+                // item_db puede no existir o tener estructura diferente
+            }
+        }
+
+        $characters = $characters->map(function ($char) use ($inventoryByChar) {
+            $char->inventory = $inventoryByChar[$char->char_id] ?? [];
+            return $char;
+        });
+
+        return Inertia::render('GameAccount/Show', [
+            'gameAccount' => $gameAccount,
+            'characters'  => $characters,
+        ]);
+    }
+
     public function store(Request $request)
     {
         // Traemos las configuraciones usando el prefijo unificado

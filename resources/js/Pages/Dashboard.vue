@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, usePage, useForm } from '@inertiajs/vue3';
+import { Head, usePage, useForm, Link } from '@inertiajs/vue3';
 import Header from '@/Components/Header.vue';
 import Modal from '@/Components/Modal.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -234,7 +234,8 @@ const openLogsModal = (account) => {
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-1">
-                                        <button 
+                                        <Link
+                                            :href="route('game-accounts.show', account.account_id)"
                                             class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-500 bg-rapanel-navy-100 hover:bg-rapanel-blue hover:text-white dark:text-gray-400 dark:hover:text-white dark:hover:bg-rapanel-blue transition-all focus:outline-none"
                                             :title="__('View Details')"
                                         >
@@ -242,7 +243,7 @@ const openLogsModal = (account) => {
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                        </button>
+                                        </Link>
 
                                         <button 
                                             @click="openChangePasswordModal(account)"

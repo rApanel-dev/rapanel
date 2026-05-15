@@ -36,8 +36,11 @@ return [
     ],
 
     'ra' => [
-        'use_md5' => env('RA_USE_MD5_PASSWORDS', false),
+        'use_md5'      => env('RA_USE_MD5_PASSWORDS', false),
         'max_accounts' => env('RA_MAX_GAME_ACCOUNTS', 3),
+        'reset_map'    => env('RA_RESET_MAP', 'prontera'),
+        'reset_x'      => env('RA_RESET_X', 150),
+        'reset_y'      => env('RA_RESET_Y', 180),
     ],
 
 ];
