@@ -17,13 +17,13 @@
     <meta property="og:description" content="Gestiona tu cuenta, vincula tus personajes y mantente al tanto de las novedades del servidor.">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:site_name" content="{{ config('app.name', 'rApanel') }}">
-<!--<meta property="og:image" content="{{ asset('img/web_share.jpg') }}">-->
+    <!--<meta property="og:image" content="{{ asset('images/web_share.jpg') }}">-->
     <meta property="og:image:width" content="512">
     <meta property="og:image:height" content="512">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
     <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg') }}" color="#4A90E2">
     <meta name="msapplication-TileColor" content="#E74C3C">
