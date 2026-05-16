@@ -8,10 +8,23 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import CharacterDetail from '@/Pages/GameAccount/Partials/CharacterDetail.vue';
+import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
+import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
 
 const props = defineProps({
     gameAccount: Object,
-    characters: Array,
+    characters:  Array,
+    storageItems: Array,
+    cardNames:   Object,
+    serverName:  String,
+    vipEnabled:        Boolean,
+    bankEnabled:       Boolean,
+    cashPointsEnabled: Boolean,
+    bankZeny:          Number,
+    cashPoints:        Number,
 });
 
 const page = usePage();
@@ -20,473 +33,527 @@ const __ = (key) => page.props.translations?.[key] || key;
 const flashSuccess = computed(() => page.props.flash?.success);
 const flashError   = computed(() => page.props.flash?.error);
 
-// --- MAPA DE CLASES DE rAthena (Sincronizado con mmo.hpp) ---
-const JOB_NAMES = {
-    // Clases Básicas y Sprites Especiales
-    0: 'Novice', 1: 'Swordman', 2: 'Mage', 3: 'Archer', 4: 'Acolyte', 5: 'Merchant', 6: 'Thief',
-    7: 'Knight', 8: 'Priest', 9: 'Wizard', 10: 'Blacksmith', 11: 'Hunter', 12: 'Assassin',
-    13: 'Knight (Peco)', 14: 'Crusader', 15: 'Monk', 16: 'Sage', 17: 'Rogue', 18: 'Alchemist',
-    19: 'Bard', 20: 'Dancer', 21: 'Crusader (Peco)', 22: 'Wedding', 23: 'Super Novice',
-    24: 'Gunslinger', 25: 'Ninja', 26: 'Xmas', 27: 'Hanbok', 28: 'Oktoberfest', 29: 'Summer', 30: 'Summer 2',
+const totalZeny = computed(() => props.characters.reduce((sum, c) => sum + Number(c.zeny || 0), 0));
 
-    // Clases High / Trans (Inician en 4001)
-    4001: 'High Novice', 4002: 'High Swordman', 4003: 'High Mage', 4004: 'High Archer',
-    4005: 'High Acolyte', 4006: 'High Merchant', 4007: 'High Thief', 4008: 'Lord Knight',
-    4009: 'High Priest', 4010: 'High Wizard', 4011: 'Whitesmith', 4012: 'Sniper',
-    4013: 'Assassin Cross', 4014: 'Lord Knight (Peco)', 4015: 'Paladin', 4016: 'Champion',
-    4017: 'Professor', 4018: 'Stalker', 4019: 'Creator', 4020: 'Clown', 4021: 'Gypsy', 4022: 'Paladin (Peco)',
+// Bloquea acciones si la cuenta o algún personaje está online
+const isAccountOnline = computed(() => props.characters.some(c => c.online > 0));
 
-    // Baby Classes
-    4023: 'Baby', 4024: 'Baby Swordman', 4025: 'Baby Mage', 4026: 'Baby Archer',
-    4027: 'Baby Acolyte', 4028: 'Baby Merchant', 4029: 'Baby Thief', 4030: 'Baby Knight',
-    4031: 'Baby Priest', 4032: 'Baby Wizard', 4033: 'Baby Blacksmith', 4034: 'Baby Hunter',
-    4035: 'Baby Assassin', 4036: 'Baby Knight (Peco)', 4037: 'Baby Crusader', 4038: 'Baby Monk',
-    4039: 'Baby Sage', 4040: 'Baby Rogue', 4041: 'Baby Alchemist', 4042: 'Baby Bard',
-    4043: 'Baby Dancer', 4044: 'Baby Crusader (Peco)', 4045: 'Super Baby',
+const vipStatus = computed(() => {
+    if (!props.vipEnabled) return null;
+    const raw = Number(props.gameAccount.vip_time || 0);
+    const now  = Math.floor(Date.now() / 1000);
+    if (raw <= 0) return { active: false, label: __('No VIP'), expires: null };
+    if (raw < now) return {
+        active: false,
+        label: __('VIP Expired'),
+        expires: new Date(raw * 1000).toLocaleDateString(),
+    };
+    const diff  = raw - now;
+    const days  = Math.floor(diff / 86400);
+    const hours = Math.floor((diff % 86400) / 3600);
+    const mins  = Math.floor((diff % 3600) / 60);
+    return {
+        active: true,
+        label: `${days}d ${hours}h ${mins}m`,
+        expires: new Date(raw * 1000).toLocaleString(),
+    };
+});
 
-    // Clases Expandidas Originales
-    4046: 'Taekwon', 4047: 'Star Gladiator', 4048: 'Star Gladiator (Flying)', 4049: 'Soul Linker',
-    4050: 'Gangsi', 4051: 'Death Knight', 4052: 'Dark Collector',
-
-    // 3rd Classes (Inician en 4054)
-    4054: 'Rune Knight', 4055: 'Warlock', 4056: 'Ranger', 4057: 'Arch Bishop',
-    4058: 'Mechanic', 4059: 'Guillotine Cross',
-    4060: 'Rune Knight (T)', 4061: 'Warlock (T)', 4062: 'Ranger (T)', 4063: 'Arch Bishop (T)',
-    4064: 'Mechanic (T)', 4065: 'Guillotine Cross (T)',
-    4066: 'Royal Guard', 4067: 'Sorcerer', 4068: 'Minstrel', 4069: 'Wanderer',
-    4070: 'Sura', 4071: 'Genetic', 4072: 'Shadow Chaser',
-    4073: 'Royal Guard (T)', 4074: 'Sorcerer (T)', 4075: 'Minstrel (T)', 4076: 'Wanderer (T)',
-    4077: 'Sura (T)', 4078: 'Genetic (T)', 4079: 'Shadow Chaser (T)',
-    4080: 'Rune Knight (Dragon)', 4081: 'Rune Knight (T) (Dragon)', 4082: 'Royal Guard (Gryphon)',
-    4083: 'Royal Guard (T) (Gryphon)', 4084: 'Ranger (Warg)', 4085: 'Ranger (T) (Warg)',
-    4086: 'Mechanic (Mado)', 4087: 'Mechanic (T) (Mado)',
-
-    // Baby 3rd Classes
-    4096: 'Baby Rune Knight', 4097: 'Baby Warlock', 4098: 'Baby Ranger', 4099: 'Baby Arch Bishop',
-    4100: 'Baby Mechanic', 4101: 'Baby Guillotine Cross', 4102: 'Baby Royal Guard',
-    4103: 'Baby Sorcerer', 4104: 'Baby Minstrel', 4105: 'Baby Wanderer', 4106: 'Baby Sura',
-    4107: 'Baby Genetic', 4108: 'Baby Shadow Chaser', 4109: 'Baby Rune Knight (Dragon)',
-    4110: 'Baby Royal Guard (Gryphon)', 4111: 'Baby Ranger (Warg)', 4112: 'Baby Mechanic (Mado)',
-
-    // Clases Expandidas Evolucionadas
-    4190: 'Super Novice Ex', 4191: 'Super Baby Ex',
-    4211: 'Kagerou', 4212: 'Oboro', 4215: 'Rebellion', 4218: 'Summoner (Doram)',
-    4220: 'Baby Summoner', 4222: 'Baby Ninja', 4223: 'Baby Kagerou', 4224: 'Baby Oboro',
-    4225: 'Baby Taekwon', 4226: 'Baby Star Gladiator', 4227: 'Baby Soul Linker',
-    4228: 'Baby Gunslinger', 4229: 'Baby Rebellion', 4238: 'Baby Star Gladiator (Flying)',
-    4239: 'Star Emperor', 4240: 'Soul Reaper', 4241: 'Baby Star Emperor', 4242: 'Baby Soul Reaper',
-    4243: 'Star Emperor (Mounted)', 4244: 'Baby Star Emperor (Mounted)',
-
-    // 4th Classes (Inician en 4252)
-    4252: 'Dragon Knight', 4253: 'Meister', 4254: 'Shadow Cross', 4255: 'Arch Mage',
-    4256: 'Cardinal', 4257: 'Windhawk', 4258: 'Imperial Guard', 4259: 'Biolo',
-    4260: 'Abyss Chaser', 4261: 'Elemental Master', 4262: 'Inquisitor',
-    4263: 'Troubadour', 4264: 'Trouvere',
-    4278: 'Windhawk (Warg)', 4279: 'Meister (Mado)', 4280: 'Dragon Knight (Dragon)',
-    4281: 'Imperial Guard (Gryphon)',
-
-    // Expanded 4th Classes
-    4302: 'Sky Emperor', 4303: 'Soul Ascetic', 4304: 'Shinkiro', 4305: 'Shiranui',
-    4306: 'Night Watch', 4307: 'Hyper Novice', 4308: 'Spirit Handler',
-    4316: 'Sky Emperor (Mounted)',
+const getCardName = (id) => {
+    if (!id || id <= 0 || id === 254 || id === 255) return null;
+    return props.cardNames?.[id] || null;
 };
 
-const getJobName = (classId) => JOB_NAMES[classId] ?? `Class ${classId}`;
+const formatSex   = (s) => s === 'M' ? __('Male') : __('Female');
+const formatState = (s) => s === 0 ? __('Active') : __('Blocked');
 
-// --- INVENTARIO EXPANDIDO ---
-const expandedInventory = ref({});
-const toggleInventory = (charId) => {
-    expandedInventory.value[charId] = !expandedInventory.value[charId];
+// --- MODALES ---
+
+// Activity Logs
+const logsModal = ref(false);
+
+// Change Password
+const changePasswordModal = ref(false);
+const passwordForm = useForm({ current_password: '', password: '', password_confirmation: '' });
+const openChangePasswordModal  = () => { changePasswordModal.value = true; };
+const closeChangePasswordModal = () => {
+    changePasswordModal.value = false;
+    passwordForm.reset(); passwordForm.clearErrors();
+};
+const submitChangePassword = () => {
+    passwordForm.put(route('game-accounts.password.update', props.gameAccount.account_id), {
+        preserveScroll: true,
+        onSuccess: () => closeChangePasswordModal(),
+    });
 };
 
-// --- MODAL RESET POSICIÓN ---
-const resetPosModal    = ref(false);
-const selectedCharPos  = ref(null);
-const resetPosForm     = useForm({ password: '' });
-
-const openResetPosModal = (char) => {
-    selectedCharPos.value = char;
-    resetPosModal.value   = true;
+// Change Gender
+const genderModal = ref(false);
+const genderForm  = useForm({ password: '' });
+const openGenderModal  = () => { genderModal.value = true; };
+const closeGenderModal = () => {
+    genderModal.value = false;
+    genderForm.reset(); genderForm.clearErrors();
 };
+const submitGender = () => {
+    genderForm.put(route('game-accounts.gender', props.gameAccount.account_id), {
+        preserveScroll: true,
+        onSuccess: () => closeGenderModal(),
+    });
+};
+
+// Character detail
+const charModal = ref(null);
+const openCharModal  = (char) => { charModal.value = char; };
+const closeCharModal = () => { charModal.value = null; };
+
+// Reset Position
+const resetPosModal = ref(false);
+const selectedPos   = ref(null);
+const resetPosForm  = useForm({ password: '' });
+const openResetPosModal = (char) => { selectedPos.value = char; resetPosModal.value = true; };
 const closeResetPosModal = () => {
-    resetPosModal.value = false;
-    selectedCharPos.value = null;
-    resetPosForm.reset();
-    resetPosForm.clearErrors();
+    resetPosModal.value = false; selectedPos.value = null;
+    resetPosForm.reset(); resetPosForm.clearErrors();
 };
-const confirmResetPosition = () => {
-    resetPosForm.put(route('characters.reset-position', selectedCharPos.value.char_id), {
+const confirmResetPos = () => {
+    resetPosForm.put(route('characters.reset-position', selectedPos.value.char_id), {
         preserveScroll: true,
         onSuccess: () => closeResetPosModal(),
     });
 };
 
-// --- MODAL RESET LOOK ---
-const resetLookModal   = ref(false);
-const selectedCharLook = ref(null);
-const resetLookForm    = useForm({ password: '' });
-
-const openResetLookModal = (char) => {
-    selectedCharLook.value = char;
-    resetLookModal.value   = true;
-};
+// Reset Look
+const resetLookModal = ref(false);
+const selectedLook   = ref(null);
+const resetLookForm  = useForm({ password: '' });
+const openResetLookModal = (char) => { selectedLook.value = char; resetLookModal.value = true; };
 const closeResetLookModal = () => {
-    resetLookModal.value = false;
-    selectedCharLook.value = null;
-    resetLookForm.reset();
-    resetLookForm.clearErrors();
+    resetLookModal.value = false; selectedLook.value = null;
+    resetLookForm.reset(); resetLookForm.clearErrors();
 };
 const confirmResetLook = () => {
-    resetLookForm.put(route('characters.reset-look', selectedCharLook.value.char_id), {
+    resetLookForm.put(route('characters.reset-look', selectedLook.value.char_id), {
         preserveScroll: true,
         onSuccess: () => closeResetLookModal(),
     });
 };
-
-// --- HELPERS ---
-const formatZeny = (n) => Number(n || 0).toLocaleString();
-const barPercent = (cur, max) => max > 0 ? Math.min(100, Math.round((cur / max) * 100)) : 0;
-const formatMap  = (map) => map ? map.replace('.gat', '') : '—';
 </script>
 
 <template>
-    <Head :title="__('Account Details')" />
+    <Head :title="`${gameAccount.userid} — ${__('Account Details')}`" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
-
+    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
         <Header />
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
 
-            <!-- Flash messages -->
-            <div v-if="flashSuccess" class="flex items-center gap-3 px-5 py-4 rounded-xl bg-rapanel-success/10 border border-rapanel-success/30 text-rapanel-success text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <!-- Flash -->
+            <div v-if="flashSuccess" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-success/10 border border-rapanel-success/30 text-rapanel-success text-sm font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 {{ flashSuccess }}
             </div>
-            <div v-if="flashError" class="flex items-center gap-3 px-5 py-4 rounded-xl bg-rapanel-danger/10 border border-rapanel-danger/30 text-rapanel-danger text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
+            <div v-if="flashError" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-danger/10 border border-rapanel-danger/30 text-rapanel-danger text-sm font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9.303 3.376c.864 1.505-.15 3.374-1.95 3.374H2.647c-1.8 0-2.815-1.869-1.951-3.374L10.049 4.126c.9-1.56 3.002-1.56 3.902 0L21.303 16.126z"/></svg>
                 {{ flashError }}
             </div>
 
-            <!-- Encabezado de la cuenta -->
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl p-6 shadow-xl">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <Link
-                            :href="route('dashboard')"
-                            class="flex items-center justify-center w-9 h-9 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white dark:hover:bg-rapanel-blue text-rapanel-text-light dark:text-rapanel-text-dark transition-all"
-                            :title="__('Back to Dashboard')"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                            </svg>
+            <!-- ===== SECCIÓN 1: DETALLES DE CUENTA ===== -->
+            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
+
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
+                    <div class="flex items-center gap-3">
+                        <Link :href="route('dashboard')" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
                         </Link>
                         <div>
-                            <p class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold mb-0.5">{{ __('Account Details') }}</p>
-                            <h1 class="text-2xl font-bold text-rapanel-blue tracking-wide">{{ gameAccount.userid }}</h1>
+                            <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
+                            <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ gameAccount.userid }}</h1>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-3 text-xs">
-                        <div class="bg-rapanel-navy-50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-lg px-4 py-2">
-                            <span class="text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold">ID</span>
-                            <p class="font-mono font-bold text-rapanel-navy-900 dark:text-white mt-0.5">{{ gameAccount.account_id }}</p>
+                    <!-- Menú de acciones -->
+                    <div class="flex flex-wrap items-center gap-2">
+
+                        <!-- Ver Actividad -->
+                        <button @click="logsModal = true"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"/></svg>
+                            {{ __('Actions') }}
+                        </button>
+
+                        <!-- Cambiar Contraseña -->
+                        <button @click="openChangePasswordModal" :disabled="isAccountOnline"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
+                            :class="isAccountOnline
+                                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                                : 'bg-rapanel-gold/10 text-rapanel-gold border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-rapanel-navy-900'"
+                            :title="isAccountOnline ? __('Character must be offline') : ''"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+                            {{ __('Change Password') }}
+                        </button>
+
+                        <!-- Cambiar Género -->
+                        <button @click="openGenderModal" :disabled="isAccountOnline"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
+                            :class="isAccountOnline
+                                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                                : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500 hover:text-white'"
+                            :title="isAccountOnline ? __('Character must be offline') : ''"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                            {{ __('Change Gender') }}
+                        </button>
+
+                        <!-- Separador vertical -->
+                        <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
+
+                        <!-- Eliminar Cuenta -->
+                        <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
+
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="p-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <div v-for="info in [
+                        { label: __('Username'),    value: gameAccount.userid },
+                        { label: __('Account ID'),  value: gameAccount.account_id },
+                        { label: __('Email'),       value: gameAccount.email },
+                        { label: __('Gender'),      value: formatSex(gameAccount.sex) },
+                        { label: __('Group ID'),    value: gameAccount.group_id ?? 0 },
+                        { label: __('State'),       value: formatState(gameAccount.state) },
+                        { label: __('Login Count'), value: formatNum(gameAccount.logincount) },
+                        { label: __('Last Login'),  value: gameAccount.lastlogin || __('Never') },
+                        { label: __('Last IP'),     value: gameAccount.last_ip || __('Unknown') },
+                        { label: __('Birthdate'),   value: gameAccount.birthdate || '—' },
+                    ]" :key="info.label"
+                        class="flex flex-col gap-1 bg-rapanel-navy-50 dark:bg-black/20 rounded-xl px-4 py-3 border border-rapanel-navy-100 dark:border-gray-700/30"
+                    >
+                        <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ info.label }}</span>
+                        <span class="font-semibold text-rapanel-navy-900 dark:text-white text-sm leading-tight truncate">{{ info.value }}</span>
+                    </div>
+                </div>
+
+                <!-- Bank Zeny + Cash Points + VIP (fila unificada, proporcional) -->
+                <div v-if="bankEnabled || cashPointsEnabled || (vipEnabled && vipStatus)" class="px-5 pb-5 flex flex-wrap gap-3">
+
+                    <!-- Bank Zeny -->
+                    <div v-if="bankEnabled"
+                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/10 border border-rapanel-gold/30"
+                    >
+                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-gold/20 shrink-0">
+                            <img src="/data/gameaccount/bank.png" class="w-6 h-6 object-contain" alt="" />
                         </div>
-                        <div class="bg-rapanel-navy-50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-lg px-4 py-2">
-                            <span class="text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold">{{ __('Last Login') }}</span>
-                            <p class="font-mono font-bold text-rapanel-navy-900 dark:text-white mt-0.5">{{ gameAccount.lastlogin || __('Never') }}</p>
+                        <div class="min-w-0">
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-gold/70">{{ __('Bank Zeny') }}</p>
+                            <p class="font-bold text-sm text-rapanel-gold truncate">{{ formatNum(bankZeny) }} z</p>
                         </div>
-                        <div class="bg-rapanel-navy-50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-lg px-4 py-2">
-                            <span class="text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold">{{ __('Status') }}</span>
-                            <div class="mt-0.5">
-                                <span v-if="gameAccount.state === 0" class="inline-flex items-center gap-1 text-rapanel-success font-bold">
-                                    <span class="w-1.5 h-1.5 bg-rapanel-success rounded-full animate-pulse"></span>{{ __('Active') }}
-                                </span>
-                                <span v-else class="inline-flex items-center gap-1 text-rapanel-danger font-bold">
-                                    <span class="w-1.5 h-1.5 bg-rapanel-danger rounded-full"></span>{{ __('Blocked') }}
-                                </span>
+                    </div>
+
+                    <!-- Cash Points -->
+                    <div v-if="cashPointsEnabled"
+                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/10 border border-rapanel-blue/30"
+                    >
+                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-blue/20 shrink-0">
+                            <img src="/data/gameaccount/cashpoints.png" class="w-6 h-6 object-contain" alt="" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue/70">{{ __('Cash Points') }}</p>
+                            <p class="font-bold text-sm text-rapanel-blue truncate">{{ formatNum(cashPoints) }}</p>
+                        </div>
+                    </div>
+
+                    <!-- VIP -->
+                    <div v-if="vipEnabled && vipStatus"
+                        class="flex-1 min-w-0 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-violet-500/10 border border-violet-500/30"
+                    >
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-violet-500/20 shrink-0">
+                                <img src="/data/gameaccount/vip.png" class="w-6 h-6 object-contain" alt="" />
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[9px] uppercase tracking-widest font-extrabold text-violet-400/70">VIP</p>
+                                <p class="font-bold text-sm truncate"
+                                    :class="vipStatus.active ? 'text-violet-400' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'"
+                                >{{ vipStatus.label }}</p>
                             </div>
                         </div>
+                        <div v-if="vipStatus.expires" class="text-right shrink-0">
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-violet-400/60">
+                                {{ vipStatus.active ? __('VIP Expires') : __('VIP Expired on') }}
+                            </p>
+                            <p class="text-xs font-semibold"
+                                :class="vipStatus.active ? 'text-rapanel-success' : 'text-rapanel-danger'"
+                            >{{ vipStatus.expires }}</p>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <!-- Sección personajes -->
+            <!-- ===== SECCIÓN 2: PERSONAJES ===== -->
             <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <h3 class="text-lg font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
-                        {{ __('Characters') }}
-                        <span class="ml-2 text-sm font-normal text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">({{ characters.length }})</span>
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                        {{ __('Characters on') }} <span class="text-rapanel-blue">{{ serverName }}</span>
                     </h3>
                 </div>
 
-                <!-- Sin personajes -->
-                <div v-if="characters.length === 0" class="px-6 py-16 text-center text-rapanel-text-light/40 dark:text-gray-500 italic">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                    </svg>
+                <div v-if="characters.length === 0" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-gray-500 italic text-sm">
                     {{ __('No characters found.') }}
                 </div>
 
-                <!-- Lista de personajes -->
-                <div v-else class="divide-y divide-rapanel-navy-100 dark:divide-gray-700">
-                    <div v-for="char in characters" :key="char.char_id" class="p-6">
+                <div v-else class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                            <tr>
+                                <th class="px-4 py-3">{{ __('Slot') }}</th>
+                                <th class="px-4 py-3">{{ __('Character Name') }}</th>
+                                <th class="px-4 py-3">{{ __('Job Class') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Base Lv') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Job Lv') }}</th>
+                                <th class="px-4 py-3 text-right">{{ __('Zeny') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Guild') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Status') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Reset Look') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Reset Position') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
+                            <tr v-for="char in characters" :key="char.char_id" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                                <td class="px-4 py-3 text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 font-mono">{{ char.char_num + 1 }}</td>
+                                <td class="px-4 py-3">
+                                    <button @click="openCharModal(char)" class="font-bold text-rapanel-blue hover:underline hover:text-rapanel-blue/80 transition-colors text-left">
+                                        {{ char.name }}
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ getJobName(char.class) }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ char.base_level }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ char.job_level }}</td>
+                                <td class="px-4 py-3 text-right font-mono text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(char.zeny) }} z</td>
+                                <td class="px-4 py-3 text-center text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="char.guild_name" />
+                                        <span>{{ char.guild_name || '—' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span v-if="char.online > 0" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20">
+                                        <span class="w-1.5 h-1.5 bg-rapanel-success rounded-full animate-pulse"></span>{{ __('Online') }}
+                                    </span>
+                                    <span v-else class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-400/10 text-gray-400 border border-gray-400/20">
+                                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>{{ __('Offline') }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button @click="openResetLookModal(char)" :disabled="char.online > 0"
+                                        class="text-xs px-2.5 py-1 rounded-lg font-bold transition-all"
+                                        :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-danger/10 text-rapanel-danger border border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white dark:bg-rapanel-gold/10 dark:text-rapanel-gold dark:border-rapanel-gold/20 dark:hover:bg-rapanel-gold dark:hover:text-rapanel-navy-900'"
+                                    >{{ __('Reset Look') }}</button>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button @click="openResetPosModal(char)" :disabled="char.online > 0"
+                                        class="text-xs px-2.5 py-1 rounded-lg font-bold transition-all"
+                                        :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white'"
+                                    >{{ __('Reset Position') }}</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-rapanel-navy-50 dark:bg-black/30 border-t-2 border-rapanel-navy-100 dark:border-gray-700">
+                            <tr>
+                                <td colspan="5" class="px-4 py-2 text-right text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</td>
+                                <td class="px-4 py-2 text-right font-mono font-bold text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</td>
+                                <td colspan="4"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
 
-                        <!-- Cabecera del personaje -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-rapanel-blue/10 border border-rapanel-blue/20 font-bold text-rapanel-blue text-lg">
-                                    {{ char.char_num + 1 }}
-                                </div>
-                                <div>
-                                    <h4 class="text-lg font-bold text-rapanel-navy-900 dark:text-white">{{ char.name }}</h4>
-                                    <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ getJobName(char.class) }}</p>
-                                </div>
-                                <span v-if="char.online > 0" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20">
-                                    <span class="w-1.5 h-1.5 bg-rapanel-success rounded-full animate-pulse"></span> {{ __('Online') }}
-                                </span>
-                                <span v-else class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-500/10 text-gray-400 border border-gray-500/20">
-                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span> {{ __('Offline') }}
-                                </span>
-                            </div>
-                            <!-- Acciones -->
-                            <div class="flex gap-2">
-                                <button
-                                    @click="openResetPosModal(char)"
-                                    :disabled="char.online > 0"
-                                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all focus:outline-none"
-                                    :class="char.online > 0
-                                        ? 'opacity-40 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400'
-                                        : 'bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white'"
-                                    :title="char.online > 0 ? __('Character must be offline') : __('Reset Position')"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                                    </svg>
-                                    {{ __('Reset Position') }}
-                                </button>
-                                <button
-                                    @click="openResetLookModal(char)"
-                                    :disabled="char.online > 0"
-                                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all focus:outline-none"
-                                    :class="char.online > 0
-                                        ? 'opacity-40 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400'
-                                        : 'bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-rapanel-navy-900'"
-                                    :title="char.online > 0 ? __('Character must be offline') : __('Reset Look')"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
-                                    </svg>
-                                    {{ __('Reset Look') }}
-                                </button>
-                            </div>
-                        </div>
+            <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
+            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                        {{ __('Storage Items of') }} <span class="text-rapanel-blue uppercase">{{ gameAccount.userid }}</span>
+                        <span class="ml-2 text-xs font-normal text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">({{ storageItems.length }})</span>
+                    </h3>
+                </div>
 
-                        <!-- Cuerpo: stats + info + inventario -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div v-if="storageItems.length === 0" class="px-6 py-10 text-center text-rapanel-text-light/40 dark:text-gray-500 italic text-sm">
+                    {{ __('No storage items found.') }}
+                </div>
 
-                            <!-- Stats -->
-                            <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl p-4 space-y-3">
-                                <p class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Stats') }}</p>
-                                <div class="grid grid-cols-3 gap-2 text-center">
-                                    <div v-for="stat in [
-                                        { label: 'STR', value: char.str },
-                                        { label: 'AGI', value: char.agi },
-                                        { label: 'VIT', value: char.vit },
-                                        { label: 'INT', value: char.int },
-                                        { label: 'DEX', value: char.dex },
-                                        { label: 'LUK', value: char.luk },
-                                    ]" :key="stat.label"
-                                        class="bg-white dark:bg-rapanel-navy-800 rounded-lg py-2 px-1 border border-rapanel-navy-100 dark:border-gray-700/30"
-                                    >
-                                        <p class="text-[10px] font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ stat.label }}</p>
-                                        <p class="text-base font-bold text-rapanel-navy-900 dark:text-white">{{ stat.value ?? 0 }}</p>
-                                    </div>
-                                </div>
-                                <!-- HP/SP -->
-                                <div class="space-y-2 pt-1">
-                                    <div>
-                                        <div class="flex justify-between text-xs mb-1">
-                                            <span class="font-bold text-rapanel-danger">HP</span>
-                                            <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ (char.hp || 0).toLocaleString() }} / {{ (char.max_hp || 0).toLocaleString() }}</span>
-                                        </div>
-                                        <div class="h-2 bg-rapanel-navy-100 dark:bg-black/30 rounded-full overflow-hidden">
-                                            <div class="h-full bg-rapanel-danger rounded-full transition-all" :style="{ width: barPercent(char.hp, char.max_hp) + '%' }"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-xs mb-1">
-                                            <span class="font-bold text-rapanel-blue">SP</span>
-                                            <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ (char.sp || 0).toLocaleString() }} / {{ (char.max_sp || 0).toLocaleString() }}</span>
-                                        </div>
-                                        <div class="h-2 bg-rapanel-navy-100 dark:bg-black/30 rounded-full overflow-hidden">
-                                            <div class="h-full bg-rapanel-blue rounded-full transition-all" :style="{ width: barPercent(char.sp, char.max_sp) + '%' }"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Info general -->
-                            <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl p-4 space-y-3">
-                                <p class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('General') }}</p>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Base Level') }}</span>
-                                        <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ char.base_level }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Job Level') }}</span>
-                                        <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ char.job_level }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Status Points') }}</span>
-                                        <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ char.status_point ?? 0 }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Skill Points') }}</span>
-                                        <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ char.skill_point ?? 0 }}</span>
-                                    </div>
-                                    <div class="border-t border-rapanel-navy-100 dark:border-gray-700/30 pt-2 flex justify-between">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Zeny') }}</span>
-                                        <span class="font-bold text-rapanel-gold">{{ formatZeny(char.zeny) }} z</span>
-                                    </div>
-                                    <div class="border-t border-rapanel-navy-100 dark:border-gray-700/30 pt-2">
-                                        <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 text-xs block mb-1">{{ __('Location') }}</span>
-                                        <span class="font-mono font-bold text-rapanel-navy-900 dark:text-white text-sm">{{ formatMap(char.last_map) }}</span>
-                                        <span class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 ml-1">({{ char.last_x }}, {{ char.last_y }})</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Inventario -->
-                            <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl overflow-hidden">
-                                <button
-                                    @click="toggleInventory(char.char_id)"
-                                    class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-rapanel-navy-100/50 dark:hover:bg-black/20 transition-colors"
-                                >
-                                    <p class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
-                                        {{ __('Inventory') }}
-                                        <span class="ml-1 text-rapanel-blue">({{ char.inventory.length }})</span>
-                                    </p>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
-                                        class="w-4 h-4 text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 transition-transform"
-                                        :class="expandedInventory[char.char_id] ? 'rotate-180' : ''"
-                                    >
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                    </svg>
-                                </button>
-
-                                <div v-if="expandedInventory[char.char_id]" class="max-h-64 overflow-y-auto">
-                                    <div v-if="char.inventory.length === 0" class="px-4 py-6 text-center text-xs text-rapanel-text-light/40 dark:text-gray-500 italic">
-                                        {{ __('No items found.') }}
-                                    </div>
-                                    <table v-else class="w-full text-xs">
-                                        <thead class="sticky top-0 bg-rapanel-navy-100 dark:bg-black/40">
-                                            <tr>
-                                                <th class="px-3 py-2 text-left font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Item') }}</th>
-                                                <th class="px-3 py-2 text-center font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">x</th>
-                                                <th class="px-3 py-2 text-center font-bold uppercase tracking-widest text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Slot') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                            <tr v-for="(item, idx) in char.inventory" :key="idx"
-                                                class="hover:bg-rapanel-navy-100/30 dark:hover:bg-black/20"
-                                            >
-                                                <td class="px-3 py-2">
-                                                    <span class="font-medium text-rapanel-navy-900 dark:text-white">{{ item.name_english }}</span>
-                                                    <span v-if="item.refine > 0" class="ml-1 text-rapanel-gold font-bold">+{{ item.refine }}</span>
-                                                    <span v-if="!item.identify" class="ml-1 text-gray-400 italic">({{ __('Unidentified') }})</span>
-                                                </td>
-                                                <td class="px-3 py-2 text-center text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ item.amount }}</td>
-                                                <td class="px-3 py-2 text-center">
-                                                    <span v-if="item.equip > 0" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20">
-                                                        {{ __('Equipped') }}
-                                                    </span>
-                                                    <span v-else class="text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Bag') }}</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
+                <div v-else class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="sticky top-0 z-10 bg-rapanel-navy-100 dark:bg-black/30 dark:backdrop-blur-md text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                            <tr>
+                                <th class="px-3 py-2 text-center">ID</th>
+                                <th class="px-3 py-2 w-10">{{ __('Icon') }}</th>
+                                <th class="px-3 py-2">{{ __('Item Name') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Amount') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Identified') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Broken') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Slot 1') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Slot 2') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Slot 3') }}</th>
+                                <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                            <tr v-for="(item, idx) in storageItems" :key="idx" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
+                                <td class="px-3 py-1.5 text-center font-mono text-[11px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
+                                <td class="px-3 py-1.5 text-center">
+                                    <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto" :alt="item.name_english" />
+                                </td>
+                                <td class="px-3 py-1.5">
+                                    <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
+                                    <span class="font-medium text-rapanel-navy-900 dark:text-white">{{ itemLabel(item) }}</span>
+                                </td>
+                                <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
+                                <td class="px-3 py-1.5 text-center">
+                                    <span :class="item.identify ? 'text-rapanel-success' : 'text-rapanel-danger'" class="font-bold">{{ item.identify ? __('Yes') : __('No') }}</span>
+                                </td>
+                                <td class="px-3 py-1.5 text-center">
+                                    <span v-if="item.attribute > 0" class="font-bold text-rapanel-danger">{{ __('Yes') }}</span>
+                                    <span v-else class="text-rapanel-text-light/30 dark:text-rapanel-text-dark/30">{{ __('No') }}</span>
+                                </td>
+                                <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 italic">
+                                    <span v-if="getCardName(item[slot])" class="text-rapanel-blue not-italic font-medium">{{ getCardName(item[slot]) }}</span>
+                                    <span v-else>{{ __('None') }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </main>
 
-        <!-- Modal: Reset Posición -->
-        <Modal :show="resetPosModal" @close="closeResetPosModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800 transition-colors duration-300">
+        <!-- ===== CHARACTER DETAIL OVERLAY ===== -->
+        <CharacterDetail
+            :char="charModal"
+            :card-names="cardNames"
+            @close="closeCharModal"
+            @reset-look="openResetLookModal"
+            @reset-position="openResetPosModal"
+        />
+
+        <!-- ===== MODAL: ACTIVITY LOGS ===== -->
+        <ViewActivityLogs :show="logsModal" :account="gameAccount" @close="logsModal = false" />
+
+        <!-- ===== MODAL: CHANGE PASSWORD ===== -->
+        <Modal :show="changePasswordModal" @close="closeChangePasswordModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
-                    {{ __('Reset Position') }}
+                    {{ __('Change Password for') }} <span class="text-rapanel-gold">{{ gameAccount.userid }}</span>
                 </h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
-                    {{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedCharPos?.name }}</span>
-                </p>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
-                    {{ __('This will teleport the character to the default spawn point. Confirm with your master password.') }}
+                    {{ __('Enter a new password for this game account. For security, we request your main web panel account password.') }}
                 </p>
-                <form @submit.prevent="confirmResetPosition" class="space-y-5">
+                <form @submit.prevent="submitChangePassword" class="space-y-4">
                     <div>
-                        <InputLabel for="reset_pos_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
-                        <TextInput
-                            id="reset_pos_password"
-                            v-model="resetPosForm.password"
-                            type="password"
-                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
-                            required autofocus
-                        />
-                        <InputError class="mt-2" :message="resetPosForm.errors.password" />
-                        <InputError class="mt-2" :message="resetPosForm.errors.error" />
+                        <InputLabel for="cp_new_password" :value="__('New Game Password')" />
+                        <TextInput id="cp_new_password" v-model="passwordForm.password" type="password"
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900"
+                            :placeholder="__('Minimum 4 characters')" required autofocus />
+                        <InputError class="mt-1" :message="passwordForm.errors.password" />
                     </div>
-                    <div class="flex justify-end gap-3 mt-6">
-                        <SecondaryButton @click="closeResetPosModal">{{ __('Cancel') }}</SecondaryButton>
-                        <PrimaryButton :disabled="resetPosForm.processing" :class="{ 'opacity-25': resetPosForm.processing }">
-                            {{ __('Confirm Reset') }}
+                    <div>
+                        <InputLabel for="cp_confirm_password" :value="__('Confirm New Password')" />
+                        <TextInput id="cp_confirm_password" v-model="passwordForm.password_confirmation" type="password"
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900" required />
+                        <InputError class="mt-1" :message="passwordForm.errors.password_confirmation" />
+                    </div>
+                    <div>
+                        <InputLabel for="cp_current_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="cp_current_password" v-model="passwordForm.current_password" type="password"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
+                            :placeholder="__('Your web panel password')" required />
+                        <InputError class="mt-1" :message="passwordForm.errors.current_password" />
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <SecondaryButton @click="closeChangePasswordModal">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton :disabled="passwordForm.processing" :class="{ 'opacity-25': passwordForm.processing }">
+                            {{ __('Save') }}
                         </PrimaryButton>
                     </div>
                 </form>
             </div>
         </Modal>
 
-        <!-- Modal: Reset Look -->
-        <Modal :show="resetLookModal" @close="closeResetLookModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800 transition-colors duration-300">
+        <!-- ===== MODAL: CHANGE GENDER ===== -->
+        <Modal :show="genderModal" @close="closeGenderModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
-                    {{ __('Reset Look') }}
+                    {{ __('Change Gender') }}
                 </h2>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
-                    {{ __('Character') }}: <span class="font-bold text-rapanel-gold">{{ selectedCharLook?.name }}</span>
+                    {{ __('Account') }}: <span class="font-bold text-rapanel-blue">{{ gameAccount.userid }}</span>
+                    &nbsp;|&nbsp; {{ __('Current Gender') }}: <span class="font-bold text-purple-400">{{ formatSex(gameAccount.sex) }}</span>
+                    &nbsp;→&nbsp; <span class="font-bold text-rapanel-gold">{{ gameAccount.sex === 'M' ? __('Female') : __('Male') }}</span>
                 </p>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
-                    {{ __('This will reset the character\'s appearance (hair, color, outfit) to default values. Confirm with your master password.') }}
+                    {{ __('All characters must be offline. Confirm with your master password.') }}
                 </p>
+                <form @submit.prevent="submitGender" class="space-y-5">
+                    <div>
+                        <InputLabel for="gender_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="gender_password" v-model="genderForm.password" type="password"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
+                            required autofocus />
+                        <InputError class="mt-2" :message="genderForm.errors.password" />
+                        <InputError class="mt-2" :message="genderForm.errors.error" />
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <SecondaryButton @click="closeGenderModal">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton :disabled="genderForm.processing" :class="{ 'opacity-25': genderForm.processing }">
+                            {{ __('Confirm Gender Change') }}
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- ===== MODAL: RESET POSITION ===== -->
+        <Modal :show="resetPosModal" @close="closeResetPosModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Position') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPos?.name }}</span></p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will teleport the character to the default spawn point. Confirm with your master password.') }}</p>
+                <form @submit.prevent="confirmResetPos" class="space-y-5">
+                    <div>
+                        <InputLabel for="rpos_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="rpos_pw" v-model="resetPosForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" required autofocus />
+                        <InputError class="mt-2" :message="resetPosForm.errors.password" />
+                        <InputError class="mt-2" :message="resetPosForm.errors.error" />
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <SecondaryButton @click="closeResetPosModal">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton :disabled="resetPosForm.processing" :class="{ 'opacity-25': resetPosForm.processing }">{{ __('Confirm Reset') }}</PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- ===== MODAL: RESET LOOK ===== -->
+        <Modal :show="resetLookModal" @close="closeResetLookModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Look') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-gold">{{ selectedLook?.name }}</span></p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will reset the character\'s appearance (hair, color, outfit) to default values. Confirm with your master password.') }}</p>
                 <form @submit.prevent="confirmResetLook" class="space-y-5">
                     <div>
-                        <InputLabel for="reset_look_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
-                        <TextInput
-                            id="reset_look_password"
-                            v-model="resetLookForm.password"
-                            type="password"
-                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
-                            required autofocus
-                        />
+                        <InputLabel for="rlook_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="rlook_pw" v-model="resetLookForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" required autofocus />
                         <InputError class="mt-2" :message="resetLookForm.errors.password" />
                         <InputError class="mt-2" :message="resetLookForm.errors.error" />
                     </div>
-                    <div class="flex justify-end gap-3 mt-6">
+                    <div class="flex justify-end gap-3">
                         <SecondaryButton @click="closeResetLookModal">{{ __('Cancel') }}</SecondaryButton>
-                        <PrimaryButton :disabled="resetLookForm.processing" :class="{ 'opacity-25': resetLookForm.processing }">
-                            {{ __('Confirm Reset') }}
-                        </PrimaryButton>
+                        <PrimaryButton :disabled="resetLookForm.processing" :class="{ 'opacity-25': resetLookForm.processing }">{{ __('Confirm Reset') }}</PrimaryButton>
                     </div>
                 </form>
             </div>

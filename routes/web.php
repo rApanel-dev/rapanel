@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\GameAccountController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuildController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -80,10 +81,18 @@ Route::middleware('auth')->group(function () {
     // Detalle de cuenta de juego
     Route::get('/game-accounts/{account_id}', [GameAccountController::class, 'show'])->name('game-accounts.show');
 
+    // Cambio de género de cuenta de juego
+    Route::put('/game-accounts/{account_id}/gender', [GameAccountController::class, 'changeGender'])->name('game-accounts.gender');
+
     // Acciones de personaje
     Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
     Route::put('/characters/{char_id}/reset-look', [CharacterController::class, 'resetLook'])->name('characters.reset-look');
 });
+
+// Emblema de guild (público, sin auth)
+Route::get('/guild-emblem/{guild_id}', [GuildController::class, 'emblem'])
+    ->where('guild_id', '[0-9]+')
+    ->name('guild.emblem');
 
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'es', 'pt', 'fr'])) {

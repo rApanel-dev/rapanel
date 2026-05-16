@@ -41,6 +41,10 @@ return [
         'reset_map'    => env('RA_RESET_MAP', 'prontera'),
         'reset_x'      => env('RA_RESET_X', 150),
         'reset_y'      => env('RA_RESET_Y', 180),
+        'server_name'  => env('RA_SERVER_NAME', 'Ragnarok Online'),
+        'vip_enabled'        => env('RA_VIP_ENABLED', false),
+        'bank_enabled'       => env('RA_BANK_ENABLED', false),
+        'cashpoints_enabled' => env('RA_CASHPOINTS_ENABLED', false),
     ],
 
 ];

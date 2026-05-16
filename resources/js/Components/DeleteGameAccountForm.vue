@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 
 const props = defineProps({
-    account: Object,
+    account:  Object,
+    disabled: { type: Boolean, default: false },
 });
 
 const page = usePage();
@@ -48,13 +49,17 @@ const deleteAccount = () => {
 
 <template>
     <div>
-        <button 
-            @click="openModal"
-            class="p-0.5 text-rapanel-danger hover:opacity-80 hover:text-white rounded-lg transition-all focus:outline-none"
-            :title="__('Delete Account')"
+        <button
+            @click="!disabled && openModal()"
+            :disabled="disabled"
+            class="flex items-center justify-center w-8 h-8 rounded-lg border transition-all"
+            :class="disabled
+                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                : 'bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white'"
+            :title="disabled ? __('Character must be offline') : __('Delete Game Account')"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
         </button>
 

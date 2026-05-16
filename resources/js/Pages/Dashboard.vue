@@ -8,8 +8,6 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
-import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 import ClaimAccountModal from '@/Components/ClaimAccountModal.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
@@ -36,6 +34,9 @@ const page = usePage();
 const __ = (key) => {
     return page.props.translations?.[key] || key;
 };
+
+const flashSuccess = computed(() => page.props.flash?.success);
+const flashError   = computed(() => page.props.flash?.error);
 
 // --- ESTADO PARA CREAR CUENTA ---
 const creatingGameAccount = ref(false);
@@ -70,50 +71,6 @@ const openClaimModal = () => {
     isClaimModalOpen.value = true;
 };
 
-// --- ESTADO PARA CAMBIAR CONTRASEÑA ---
-const changingPasswordFor = ref(null);
-
-const passwordForm = useForm({
-    current_password: '',
-    password: '',
-    password_confirmation: '',
-});
-
-const openChangePasswordModal = (account) => {
-    changingPasswordFor.value = account;
-};
-
-const closeChangePasswordModal = () => {
-    changingPasswordFor.value = null;
-    passwordForm.reset();
-    passwordForm.clearErrors();
-};
-
-const updatePassword = () => {
-    if (!changingPasswordFor.value) return;
-
-    // Usamos account_id que es la llave primaria en rAthena
-    passwordForm.put(route('game-accounts.password.update', changingPasswordFor.value.account_id), {
-        preserveScroll: true,
-        onSuccess: () => closeChangePasswordModal(),
-        onError: () => {
-            if (passwordForm.errors.password) {
-                passwordForm.reset('password', 'password_confirmation');
-            }
-            if (passwordForm.errors.current_password) {
-                passwordForm.reset('current_password');
-            }
-        },
-    });
-};
-
-const showingLogsModal = ref(false);
-const selectedAccountForLogs = ref(null);
-
-const openLogsModal = (account) => {
-    selectedAccountForLogs.value = account;
-    showingLogsModal.value = true;
-};
 </script>
 
 <template>
@@ -123,8 +80,17 @@ const openLogsModal = (account) => {
         
         <Header />
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+
+            <div v-if="flashSuccess" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-success/10 border border-rapanel-success/30 text-rapanel-success text-sm font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ flashSuccess }}
+            </div>
+            <div v-if="flashError" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-danger/10 border border-rapanel-danger/30 text-rapanel-danger text-sm font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9.303 3.376c.864 1.505-.15 3.374-1.95 3.374H2.647c-1.8 0-2.815-1.869-1.951-3.374L10.049 4.126c.9-1.56 3.002-1.56 3.902 0L21.303 16.126z"/></svg>
+                {{ flashError }}
+            </div>
+
             <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl p-6 md:p-10 shadow-xl">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
@@ -233,42 +199,16 @@ const openLogsModal = (account) => {
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <div class="flex items-center justify-center gap-1">
-                                        <Link
-                                            :href="route('game-accounts.show', account.account_id)"
-                                            class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-500 bg-rapanel-navy-100 hover:bg-rapanel-blue hover:text-white dark:text-gray-400 dark:hover:text-white dark:hover:bg-rapanel-blue transition-all focus:outline-none"
-                                            :title="__('View Details')"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        </Link>
-
-                                        <button 
-                                            @click="openChangePasswordModal(account)"
-                                            class="flex items-center justify-center w-7 h-7 rounded-lg text-rapanel-gold bg-rapanel-gold/10 hover:bg-rapanel-gold hover:text-rapanel-navy-900 transition-all focus:outline-none" 
-                                            :title="__('Change Password')"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-                                            </svg>
-                                        </button>
-
-                                        <button 
-                                            @click="openLogsModal(account)"
-                                            class="flex items-center justify-center w-7 h-7 rounded-lg text-purple-500 bg-purple-500/10 hover:bg-purple-500 hover:text-white transition-all focus:outline-none" 
-                                            :title="__('View Activity')"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                        </button>
-
-                                        <div class="w-7 h-7 flex items-center justify-center rounded-lg bg-rapanel-danger/10 hover:bg-rapanel-danger hover:text-white group transition-all">
-                                            <DeleteGameAccountForm :account="account" />
-                                        </div>
-                                    </div>
+                                    <Link
+                                        :href="route('game-accounts.show', account.account_id)"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        {{ __('View Details') }}
+                                    </Link>
                                 </td>
                             </tr>
                             <tr v-if="gameAccountsCount === 0">
@@ -319,56 +259,6 @@ const openLogsModal = (account) => {
             </div>
         </Modal>
 
-        <Modal :show="!!changingPasswordFor" @close="closeChangePasswordModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800 transition-colors duration-300">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
-                    {{ __('Change Password for') }} <span class="text-rapanel-blue underline">{{ changingPasswordFor?.userid }}</span>
-                </h2>
-                
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
-                    {{ __('For security reasons, please confirm your master account password.') }}
-                </p>
-
-                <form @submit.prevent="updatePassword" class="space-y-6">
-                    <div>
-                        <InputLabel for="new_password" :value="__('New Game Password')" />
-                        <TextInput id="new_password" v-model="passwordForm.password" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900" required />
-                        <InputError class="mt-2" :message="passwordForm.errors.password" />
-                    </div>
-
-                    <div>
-                        <InputLabel for="password_confirmation" :value="__('Confirm New Password')" />
-                        <TextInput id="password_confirmation" v-model="passwordForm.password_confirmation" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900" required />
-                        <InputError class="mt-2" :message="passwordForm.errors.password_confirmation" />
-                    </div>
-
-                    <div class="pt-6 border-t border-rapanel-navy-100 dark:border-gray-700">
-                        <InputLabel for="current_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
-                        <TextInput
-                            id="current_password"
-                            v-model="passwordForm.current_password"
-                            type="password"
-                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
-                            required
-                            :placeholder="__('Your web panel password')"
-                        />
-                        <InputError class="mt-2" :message="passwordForm.errors.current_password" />
-                    </div>
-
-                    <div class="flex justify-end mt-8 gap-3">
-                        <SecondaryButton @click="closeChangePasswordModal">{{ __('Cancel') }}</SecondaryButton>
-                        <PrimaryButton :class="{ 'opacity-25': passwordForm.processing }" :disabled="passwordForm.processing">
-                            {{ __('Update Password') }}
-                        </PrimaryButton>
-                    </div>
-                </form>
-            </div>
-        </Modal>
-        <ViewActivityLogs 
-            :show="showingLogsModal" 
-            :account="selectedAccountForLogs" 
-            @close="showingLogsModal = false" 
-        />
         <ClaimAccountModal 
             :show="isClaimModalOpen" 
             @close="isClaimModalOpen = false" 
