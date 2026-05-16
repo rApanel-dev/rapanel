@@ -40,6 +40,9 @@ class GuildController extends Controller
                 return null;
             }
 
+            // rAthena uses #ff00ff as the chroma-key transparency color — replace with alpha
+            $img = $this->applyMagentaTransparency($img);
+
             ob_start();
             imagepng($img);
             $png = ob_get_clean();
@@ -55,6 +58,45 @@ class GuildController extends Controller
         return response(base64_decode($b64), 200)
             ->header('Content-Type', 'image/png')
             ->header('Cache-Control', 'public, max-age=300');
+    }
+
+    /**
+     * Converts every #ff00ff pixel to fully transparent.
+     * rAthena guild emblems use magenta as their chroma-key transparency color.
+     */
+    private function applyMagentaTransparency(\GdImage $src): \GdImage
+    {
+        $w = imagesx($src);
+        $h = imagesy($src);
+
+        // Work on a truecolor canvas so we can store alpha values
+        $dst = imagecreatetruecolor($w, $h);
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+
+        // Fill with full transparency before copying
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefill($dst, 0, 0, $transparent);
+
+        // Copy pixels, replacing magenta with transparency
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                $color = imagecolorat($src, $x, $y);
+                $r = ($color >> 16) & 0xFF;
+                $g = ($color >> 8)  & 0xFF;
+                $b =  $color        & 0xFF;
+
+                if ($r === 255 && $g === 0 && $b === 255) {
+                    imagesetpixel($dst, $x, $y, $transparent);
+                } else {
+                    $alpha = ($color >> 24) & 0x7F;
+                    imagesetpixel($dst, $x, $y, imagecolorallocatealpha($dst, $r, $g, $b, $alpha));
+                }
+            }
+        }
+
+        imagedestroy($src);
+        return $dst;
     }
 
     /**

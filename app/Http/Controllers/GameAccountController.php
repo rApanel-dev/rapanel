@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GameAccount;
 use App\Models\Character;
 use App\Models\ActionLog;
+use App\Models\DeletedAccountLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -467,7 +468,6 @@ class GameAccountController extends Controller
 
     public function destroy(Request $request, $account_id)
     {
-        // 1. Validar la contraseña maestra por seguridad
         $request->validate([
             'password' => ['required', 'string'],
         ]);
@@ -476,41 +476,46 @@ class GameAccountController extends Controller
             return back()->withErrors(['password' => __('The provided password does not match our records.')]);
         }
 
-        // 2. Buscar la cuenta asegurando que le pertenece
         $gameAccount = GameAccount::where('account_id', $account_id)
             ->where('master_id', auth()->id())
-            ->first();
+            ->firstOrFail();
 
-        if (!$gameAccount) {
-            return back()->withErrors(['error' => __('Account not found or unauthorized.')]);
-        }
+        $originalUserid = $gameAccount->userid;
+        // 'del_' (4) + account_id (máx 10 dígitos) = máx 14 chars — seguro bajo el límite de rAthena (23)
+        $newUserid = 'del_' . $gameAccount->account_id;
 
-        // 3. Proceso de Desactivación
-        // Renombramos a 'del_timestamp_username' para liberar el nombre original
-        $newName = 'del_' . time() . '_' . $gameAccount->userid;
-        
-        // Limitamos a 23 caracteres (máximo de rAthena en userid)
-        $newName = substr($newName, 0, 23);
+        // Transacción externa en rAthena: si el registro en el panel falla, el update de rAthena hace rollback
+        DB::connection($gameAccount->getConnectionName())->transaction(function () use ($gameAccount, $newUserid, $originalUserid, $account_id, $request) {
 
-        $gameAccount->update([
-            'userid'    => $newName,
-            'master_id' => null, // O 0, según tu base de datos
-            'state'     => 5,    // Estado de desactivación
-        ]);
+            $gameAccount->update([
+                'userid'    => $newUserid,
+                'master_id' => null,
+                'state'     => 5,
+            ]);
 
-        // 4. Registrar en Auditoría
-        ActionLog::create([
-            'user_id'    => auth()->id(),
-            'category'   => 'GAME_ACCOUNT',
-            'action'     => 'game_account_deactivated',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'account_id' => (int) $account_id,
-                'previous_username' => $gameAccount->getOriginal('userid'),
-                'new_status' => 'Deactivated and Unlinked'
-            ]
-        ]);
+            // Transacción interna en el panel: historial dedicado + auditoría general
+            DB::connection('mysql')->transaction(function () use ($originalUserid, $account_id, $request) {
+
+                DeletedAccountLog::create([
+                    'account_id'      => (int) $account_id,
+                    'original_userid' => $originalUserid,
+                    'web_user_id'     => auth()->id(),
+                ]);
+
+                ActionLog::create([
+                    'user_id'    => auth()->id(),
+                    'category'   => 'GAME_ACCOUNT',
+                    'action'     => 'game_account_deactivated',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'metadata'   => [
+                        'account_id'        => (int) $account_id,
+                        'previous_username' => $originalUserid,
+                        'new_status'        => 'Deactivated and Unlinked',
+                    ],
+                ]);
+            });
+        });
 
         return redirect()->route('dashboard')->with('success', __('Account de-linked successfully. It will no longer appear in your dashboard.'));
     }
