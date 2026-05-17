@@ -11,7 +11,6 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import CharacterDetail from '@/Pages/GameAccount/Partials/CharacterDetail.vue';
 import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
 import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
 
 const props = defineProps({
@@ -162,57 +161,68 @@ const confirmResetLook = () => {
             <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
 
                 <!-- Header -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <div class="flex items-center gap-3">
-                        <Link :href="route('dashboard')" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
-                        </Link>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
-                            <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ gameAccount.userid }}</h1>
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+                        <!-- Título + botón eliminar (móvil: mismo row) -->
+                        <div class="flex items-center justify-between sm:justify-start gap-3">
+                            <div class="flex items-center gap-3">
+                                <Link :href="route('dashboard')" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                                </Link>
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
+                                    <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ gameAccount.userid }}</h1>
+                                </div>
+                            </div>
+                            <!-- Eliminar Cuenta: solo en móvil, esquina derecha del título -->
+                            <div class="sm:hidden">
+                                <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
+                            </div>
                         </div>
-                    </div>
-                    <!-- Menú de acciones -->
-                    <div class="flex flex-wrap items-center gap-2">
 
-                        <!-- Ver Actividad -->
-                        <button @click="logsModal = true"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"/></svg>
-                            {{ __('Actions') }}
-                        </button>
+                        <!-- Menú de acciones -->
+                        <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
 
-                        <!-- Cambiar Contraseña -->
-                        <button @click="openChangePasswordModal" :disabled="isAccountOnline"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
-                            :class="isAccountOnline
-                                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
-                                : 'bg-rapanel-gold/10 text-rapanel-gold border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-rapanel-navy-900'"
-                            :title="isAccountOnline ? __('Character must be offline') : ''"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
-                            {{ __('Change Password') }}
-                        </button>
+                            <!-- Ver Actividad -->
+                            <button @click="logsModal = true"
+                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"/></svg>
+                                {{ __('Actions') }}
+                            </button>
 
-                        <!-- Cambiar Género -->
-                        <button @click="openGenderModal" :disabled="isAccountOnline"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
-                            :class="isAccountOnline
-                                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
-                                : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500 hover:text-white'"
-                            :title="isAccountOnline ? __('Character must be offline') : ''"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-                            {{ __('Change Gender') }}
-                        </button>
+                            <!-- Cambiar Contraseña -->
+                            <button @click="openChangePasswordModal" :disabled="isAccountOnline"
+                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto"
+                                :class="isAccountOnline
+                                    ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                                    : 'bg-rapanel-gold/10 text-rapanel-gold border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-rapanel-navy-900'"
+                                :title="isAccountOnline ? __('Character must be offline') : ''"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+                                {{ __('Change Password') }}
+                            </button>
 
-                        <!-- Separador vertical -->
-                        <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
+                            <!-- Cambiar Género -->
+                            <button @click="openGenderModal" :disabled="isAccountOnline"
+                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto"
+                                :class="isAccountOnline
+                                    ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                                    : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500 hover:text-white'"
+                                :title="isAccountOnline ? __('Character must be offline') : ''"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                                {{ __('Change Gender') }}
+                            </button>
 
-                        <!-- Eliminar Cuenta -->
-                        <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
+                            <!-- Separador + Eliminar: solo en escritorio -->
+                            <div class="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
+                            <div class="hidden sm:block">
+                                <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
+                            </div>
 
+                        </div>
                     </div>
                 </div>
 
@@ -238,7 +248,7 @@ const confirmResetLook = () => {
                 </div>
 
                 <!-- Bank Zeny + Cash Points + VIP (fila unificada, proporcional) -->
-                <div v-if="bankEnabled || cashPointsEnabled || (vipEnabled && vipStatus)" class="px-5 pb-5 flex flex-wrap gap-3">
+                <div v-if="bankEnabled || cashPointsEnabled || (vipEnabled && vipStatus)" class="px-5 pb-5 flex flex-col sm:flex-row gap-3">
 
                     <!-- Bank Zeny -->
                     <div v-if="bankEnabled"
@@ -330,7 +340,17 @@ const confirmResetLook = () => {
                                         {{ char.name }}
                                     </button>
                                 </td>
-                                <td class="px-4 py-3 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ getJobName(char.class) }}</td>
+                                <td class="px-4 py-3 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
+                                    <div class="flex items-center gap-1.5">
+                                        <img
+                                            :src="`/data/gameaccount/job_icons/icon_jobs_${char.class}.png`"
+                                            @error="onImgError"
+                                            class="w-5 h-5 object-contain shrink-0"
+                                            :alt="getJobName(char.class)"
+                                        />
+                                        {{ getJobName(char.class) }}
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ char.base_level }}</td>
                                 <td class="px-4 py-3 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ char.job_level }}</td>
                                 <td class="px-4 py-3 text-right font-mono text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(char.zeny) }} z</td>

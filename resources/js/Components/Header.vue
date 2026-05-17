@@ -72,8 +72,19 @@ const currentMenuItems = computed(() => {
                             </MenuButton>
 
                             <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-                                <MenuItems class="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 shadow-2xl py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                                    
+                                <MenuItems class="absolute right-0 mt-2 w-52 origin-top-right rounded-md bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 shadow-2xl py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+
+                                    <!-- Admin Panel link (admins only) -->
+                                    <template v-if="$page.props.auth.user?.role === 'Admin'">
+                                        <MenuItem v-slot="{ active }">
+                                            <Link :href="safeRoute('admin.dashboard')" :class="[active ? 'bg-rapanel-gold/10 dark:bg-rapanel-gold/10' : '', 'flex items-center gap-2 px-4 py-2 text-sm font-bold text-rapanel-gold transition']">
+                                                <span class="text-[10px] bg-rapanel-gold text-rapanel-navy-900 px-1.5 py-0.5 rounded font-black uppercase tracking-widest">Admin</span>
+                                                Panel
+                                            </Link>
+                                        </MenuItem>
+                                        <div class="border-t border-rapanel-navy-100 dark:border-white/10 my-1"></div>
+                                    </template>
+
                                     <MenuItem v-slot="{ active }">
                                         <Link :href="safeRoute('dashboard')" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-blue dark:text-rapanel-blue', 'block px-4 py-2 text-sm font-bold transition']">
                                             {{ __('Master Account') }}
@@ -93,7 +104,7 @@ const currentMenuItems = computed(() => {
                                             {{ __('Logout') }}
                                         </Link>
                                     </MenuItem>
-                                    
+
                                 </MenuItems>
                             </transition>
                         </Menu>
@@ -204,6 +215,12 @@ const currentMenuItems = computed(() => {
                             <div class="text-rapanel-text-light dark:text-white font-bold mb-4">{{ $page.props.auth.user.name }}</div>
 
                             <div class="flex flex-col gap-2 mb-4">
+                                <Link v-if="$page.props.auth.user?.role === 'Admin'"
+                                    :href="safeRoute('admin.dashboard')"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-bold text-rapanel-gold bg-rapanel-gold/10 dark:bg-rapanel-gold/10 hover:bg-rapanel-gold/20 transition">
+                                    <span class="text-[10px] bg-rapanel-gold text-rapanel-navy-900 px-1.5 py-0.5 rounded font-black uppercase tracking-widest">Admin</span>
+                                    Panel
+                                </Link>
                                 <Link :href="safeRoute('dashboard')" class="block px-3 py-2 rounded-md text-sm font-bold text-rapanel-blue dark:text-rapanel-blue bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
                                     {{ __('Master Account') }}
                                 </Link>

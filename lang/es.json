@@ -234,5 +234,16 @@
     "No VIP": "Sin VIP",
     "VIP Expired": "VIP Expirado",
     "VIP Expires": "Expira el",
-    "VIP Expired on": "Expiró el"
+    "VIP Expired on": "Expiró el",
+    "Profile & Identification": "Perfil e Identificación",
+    "Vitality & Progress": "Vitalidad y Progreso",
+    "Combat Statistics": "Estadísticas de Combate",
+    "Social & Community": "Social y Comunidad",
+    "World & Economy": "Mundo y Economía",
+    "Save Map": "Mapa de Guardado",
+    "Family": "Familia",
+    "Guild Level": "Nivel del Gremio",
+    "Base EXP": "EXP Base",
+    "Job EXP": "EXP de Trabajo",
+    "Deaths": "Muertes"
 }

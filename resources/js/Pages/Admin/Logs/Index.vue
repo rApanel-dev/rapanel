@@ -1,0 +1,136 @@
+<script setup>
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { Link, router } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+
+const props = defineProps({
+    logs:       Object,
+    categories: Array,
+    filters:    Object,
+});
+
+const search   = ref(props.filters?.search   ?? '');
+const category = ref(props.filters?.category ?? '');
+
+const safeRoute = (name, params) => { try { return route(name, params); } catch { return '#'; } };
+
+let debounce;
+const applyFilters = () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+        router.get(safeRoute('admin.logs.index'), {
+            search:   search.value   || undefined,
+            category: category.value || undefined,
+        }, { preserveState: true, replace: true });
+    }, 300);
+};
+watch([search, category], applyFilters);
+
+const formatDate = (d) => d ? new Date(d).toLocaleString() : '—';
+
+const actionColor = (action) => {
+    if (action?.includes('password')) return 'text-amber-500 dark:text-amber-400';
+    if (action?.includes('delete') || action?.includes('deactivated')) return 'text-red-500 dark:text-red-400';
+    if (action?.includes('created') || action?.includes('linked')) return 'text-green-500 dark:text-green-400';
+    if (action?.includes('gender') || action?.includes('reset')) return 'text-purple-500 dark:text-purple-400';
+    return 'text-blue-500 dark:text-blue-400';
+};
+</script>
+
+<template>
+    <AdminLayout>
+        <div class="space-y-5">
+
+            <div>
+                <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">Action Logs</h1>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-white/50 mt-1">{{ logs.total }} total entries</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4 flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
+                    <input v-model="search" type="text" placeholder="Search by user, action, or category…"
+                        class="w-full pl-9 pr-3 py-2 text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg text-rapanel-text-light dark:text-white placeholder-rapanel-text-light/30 focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                </div>
+
+                <select v-model="category"
+                    class="text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue">
+                    <option value="">All categories</option>
+                    <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Date</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">User</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">Category</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Action</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
+                            <tr v-if="!logs.data?.length">
+                                <td colspan="5" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">No logs found.</td>
+                            </tr>
+                            <tr v-for="log in logs.data" :key="log.id"
+                                class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                <td class="px-4 py-3 text-xs text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap">
+                                    {{ formatDate(log.created_at) }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <template v-if="log.user">
+                                        <Link :href="safeRoute('admin.users.show', log.user.id)"
+                                            class="font-semibold text-rapanel-blue hover:underline">
+                                            {{ log.user.name }}
+                                        </Link>
+                                    </template>
+                                    <span v-else class="text-rapanel-text-light/50 dark:text-white/40">Deleted user</span>
+                                </td>
+                                <td class="px-4 py-3 text-xs text-rapanel-text-light/60 dark:text-white/50 hidden md:table-cell">
+                                    {{ log.category }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span :class="[actionColor(log.action), 'text-xs font-semibold']">
+                                        {{ log.action }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 font-mono text-xs text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">
+                                    {{ log.ip_address ?? '—' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="logs.last_page > 1"
+                    class="flex items-center justify-between px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                    <span class="text-xs text-rapanel-text-light/50 dark:text-white/40">
+                        {{ logs.from }}–{{ logs.to }} of {{ logs.total }}
+                    </span>
+                    <div class="flex gap-1">
+                        <template v-for="link in logs.links" :key="link.label">
+                            <Link v-if="link.url" :href="link.url" v-html="link.label"
+                                :class="[
+                                    link.active
+                                        ? 'bg-rapanel-blue text-white'
+                                        : 'bg-white dark:bg-rapanel-navy-700 text-rapanel-text-light/70 dark:text-white/70 hover:bg-rapanel-navy-100 dark:hover:bg-white/10',
+                                    'px-3 py-1.5 rounded text-xs font-medium border border-rapanel-navy-100 dark:border-white/10 transition'
+                                ]" />
+                            <span v-else v-html="link.label"
+                                class="px-3 py-1.5 rounded text-xs text-rapanel-text-light/30 dark:text-white/20" />
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </AdminLayout>
+</template>

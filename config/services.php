@@ -45,6 +45,7 @@ return [
         'vip_enabled'        => env('RA_VIP_ENABLED', false),
         'bank_enabled'       => env('RA_BANK_ENABLED', false),
         'cashpoints_enabled' => env('RA_CASHPOINTS_ENABLED', false),
+        'log_path'           => env('RA_LOG_PATH', null),
     ],
 
 ];
