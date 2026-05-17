@@ -24,6 +24,7 @@
         "@headlessui/vue": "^1.7.23",
         "@heroicons/vue": "^2.2.0",
         "axios": "^1.16.0",
+        "jsvectormap": "^1.7.0",
         "vue-country-flag-next": "^2.3.2"
     }
 }

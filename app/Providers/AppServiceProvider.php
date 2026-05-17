@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Events\Login;
 use App\Listeners\UpdateUserLoginDetails;
+use App\Listeners\WarmGeoCache;
 use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,9 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
         
-        Event::listen(
-            Login::class,
-            UpdateUserLoginDetails::class
-        );
+        Event::listen(Login::class, UpdateUserLoginDetails::class);
+        Event::listen(Login::class, WarmGeoCache::class);
     }
 }

@@ -3,8 +3,9 @@ import { ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     HomeIcon,
-    UsersIcon,
+    UserCircleIcon,
     ComputerDesktopIcon,
+    UserGroupIcon,
     ClipboardDocumentListIcon,
     CommandLineIcon,
     ArrowLeftIcon,
@@ -19,11 +20,12 @@ const page = usePage();
 const sidebarOpen = ref(false);
 
 const navigation = [
-    { name: 'Dashboard',     route: 'admin.dashboard',           icon: HomeIcon },
-    { name: 'Users',         route: 'admin.users.index',         icon: UsersIcon },
-    { name: 'Game Accounts', route: 'admin.game-accounts.index', icon: ComputerDesktopIcon },
-    { name: 'Action Logs',   route: 'admin.logs.index',          icon: ClipboardDocumentListIcon },
-    { name: 'Console',       route: 'admin.console.index',       icon: CommandLineIcon },
+    { name: 'Dashboard',       route: 'admin.dashboard',           icon: HomeIcon,                  group: null },
+    { name: 'Master Accounts', route: 'admin.users.index',         icon: UserCircleIcon,             group: 'Accounts' },
+    { name: 'Login Accounts',  route: 'admin.game-accounts.index', icon: ComputerDesktopIcon,        group: 'Accounts' },
+    { name: 'Characters',      route: 'admin.characters.index',    icon: UserGroupIcon,              group: 'Accounts' },
+    { name: 'Action Logs',     route: 'admin.logs.index',          icon: ClipboardDocumentListIcon,  group: 'System' },
+    { name: 'Console',         route: 'admin.console.index',       icon: CommandLineIcon,            group: 'System' },
 ];
 
 const isActive = (routeName) => {
@@ -98,19 +100,42 @@ const safeRoute = (name) => {
                 'fixed lg:static inset-y-0 left-0 z-20 w-60 bg-rapanel-navy-900 dark:bg-rapanel-navy-950 flex flex-col transition-transform duration-200 ease-in-out border-r border-white/5',
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             ]" style="top: 3.5rem;">
-                <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-                    <template v-for="item in navigation" :key="item.name">
+                <nav class="flex-1 px-3 py-4 overflow-y-auto">
+                    <!-- Dashboard (no group) -->
+                    <template v-for="item in navigation.filter(i => !i.group)" :key="item.name">
                         <Link :href="safeRoute(item.route)"
                             @click="sidebarOpen = false"
                             :class="[
                                 isActive(item.route)
                                     ? 'bg-rapanel-blue text-white shadow-md'
                                     : 'text-white/50 hover:bg-white/10 hover:text-white',
-                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition'
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition mb-1'
                             ]">
                             <component :is="item.icon" class="w-5 h-5 shrink-0" />
                             {{ item.name }}
                         </Link>
+                    </template>
+
+                    <!-- Grouped items -->
+                    <template v-for="groupName in ['Accounts', 'System']" :key="groupName">
+                        <div class="mt-5 mb-1.5 px-3">
+                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/25">{{ groupName }}</span>
+                        </div>
+                        <div class="space-y-0.5">
+                            <template v-for="item in navigation.filter(i => i.group === groupName)" :key="item.name">
+                                <Link :href="safeRoute(item.route)"
+                                    @click="sidebarOpen = false"
+                                    :class="[
+                                        isActive(item.route)
+                                            ? 'bg-rapanel-blue text-white shadow-md'
+                                            : 'text-white/50 hover:bg-white/10 hover:text-white',
+                                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition'
+                                    ]">
+                                    <component :is="item.icon" class="w-5 h-5 shrink-0" />
+                                    {{ item.name }}
+                                </Link>
+                            </template>
+                        </div>
                     </template>
                 </nav>
 

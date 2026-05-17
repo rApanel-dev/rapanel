@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\GameAccountAdminController;
 use App\Http\Controllers\Admin\LogAdminController;
 use App\Http\Controllers\Admin\ConsoleController;
+use App\Http\Controllers\Admin\CharacterAdminController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -105,7 +106,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/users/{user}/status', [AdminUserController::class, 'updateStatus'])->name('users.status');
     Route::get('/game-accounts', [GameAccountAdminController::class, 'index'])->name('game-accounts.index');
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
-    Route::get('/console',       [ConsoleController::class,       'index'])->name('console.index');
+    Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
+    Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
 });
 
 // Emblema de guild (público, sin auth)
