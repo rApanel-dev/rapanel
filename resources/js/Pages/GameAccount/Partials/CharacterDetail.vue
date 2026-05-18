@@ -31,15 +31,15 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
             leave-to-class="opacity-0"
         >
             <div v-if="char" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-rapanel-navy-900/80 backdrop-blur-sm">
-                <div class="relative w-full max-w-7xl max-h-[92vh] overflow-y-auto bg-white dark:bg-rapanel-navy-800 rounded-xl shadow-2xl ring-1 ring-rapanel-navy-100 dark:ring-gray-700/50">
+                <div class="relative w-full max-w-7xl max-h-[92vh] overflow-y-auto bg-white dark:bg-rapanel-navy-900/95 dark:backdrop-blur-xl rounded-xl shadow-2xl ring-1 ring-rapanel-navy-100 dark:ring-white/10">
 
                     <!-- Header -->
-                    <div class="sticky top-0 z-10 px-6 py-4 bg-white dark:bg-rapanel-navy-800 border-b border-rapanel-navy-100 dark:border-gray-700 rounded-t-xl">
+                    <div class="sticky top-0 z-10 px-6 py-4 bg-white dark:bg-rapanel-navy-900/95 dark:backdrop-blur-xl border-b border-rapanel-navy-100 dark:border-white/10 rounded-t-xl">
                         <!-- Fila superior: título + botones desktop / título + cerrar móvil -->
                         <div class="flex items-center justify-between gap-2">
                             <div>
                                 <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Character') }}</p>
-                                <h2 class="text-lg font-bold text-rapanel-blue uppercase tracking-wide">{{ char.name }}</h2>
+                                <h2 class="text-lg font-display font-bold text-rapanel-blue uppercase tracking-wide">{{ char.name }}</h2>
                             </div>
                             <!-- Desktop: todos los botones en línea -->
                             <div class="hidden sm:flex items-center gap-2">
@@ -77,21 +77,21 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CHARACTER INFORMATION ===== -->
                         <section>
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
                                 {{ __('Character Information for') }} <span class="text-rapanel-blue">{{ char.name }}</span>
                             </h3>
 
                             <div class="space-y-3">
 
                                 <!-- 1. PERFIL E IDENTIFICACIÓN -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-50 dark:bg-white/5 dark:backdrop-blur-sm rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Profile & Identification') }}</p>
                                     <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                                         <!-- Job Icon + Name + Class -->
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
                                             <img :src="`/data/gameaccount/job_icons/icon_jobs_${char.class ?? 0}.png`" @error="onImgError" class="w-12 h-12 object-contain shrink-0" :alt="getJobName(char.class ?? 0)" />
                                             <div class="min-w-0">
-                                                <h4 class="font-bold text-rapanel-blue text-base leading-tight truncate">{{ char.name }}</h4>
+                                                <h4 class="font-display font-bold text-rapanel-blue text-base leading-tight truncate">{{ char.name }}</h4>
                                                 <p class="text-sm text-rapanel-navy-900 dark:text-white font-medium truncate">{{ getJobName(char.class ?? 0) }}</p>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
                                 <!-- 2. VITALIDAD Y PROGRESO -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-50 dark:bg-white/5 dark:backdrop-blur-sm rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Vitality & Progress') }}</p>
                                     <!-- HP + SP bars -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -171,7 +171,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 </div>
 
                                 <!-- 3. ESTADÍSTICAS DE COMBATE -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30 flex flex-col">
+                                <div class="bg-rapanel-navy-50 dark:bg-white/5 dark:backdrop-blur-sm rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 flex flex-col">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Combat Statistics') }}</p>
                                     <!-- Stats base: 6 columnas -->
                                     <div class="grid grid-cols-6 gap-2 mb-3">
@@ -208,7 +208,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
                                 <!-- 4. MUNDO Y ECONOMÍA -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-50 dark:bg-white/5 dark:backdrop-blur-sm rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('World & Economy') }}</p>
                                     <div class="flex flex-col gap-2">
 
@@ -257,7 +257,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 </div>
 
                                 <!-- 5. SOCIAL Y COMUNIDAD -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-50 dark:bg-white/5 dark:backdrop-blur-sm rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Social & Community') }}</p>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
@@ -268,7 +268,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                                 <span v-else class="w-2 h-2 rounded-full bg-rapanel-blue shrink-0"></span>
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue">{{ __('Guild') }}</span>
                                             </div>
-                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/30 bg-white dark:bg-rapanel-navy-800/50">
+                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-white/10 bg-white dark:bg-white/5">
                                                 <div v-for="item in [
                                                     { label: __('Guild Name'),     value: char.guild_name     || __('None') },
                                                     { label: __('Guild Level'),    value: char.guild_level    ?? '—' },
@@ -287,7 +287,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                                 <span class="w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-purple-400">{{ __('Family') }}</span>
                                             </div>
-                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/30 bg-white dark:bg-rapanel-navy-800/50">
+                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-white/10 bg-white dark:bg-white/5">
                                                 <div v-for="item in [
                                                     { label: __('Partner'), value: char.partner_name || __('None') },
                                                     { label: __('Child'),   value: char.child_name   || __('None') },
@@ -313,10 +313,10 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- OTHER PARTY MEMBERS -->
                             <section v-if="char.party_name && char.party_members?.length > 0">
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                     {{ __('Other Party Members of') }} <span class="text-rapanel-blue uppercase">{{ char.party_name }}</span>
                                 </h3>
-                                <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
                                     <table class="w-full text-xs text-left">
                                         <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
@@ -328,7 +328,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                            <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
+                                            <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-white/5 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/10">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ m.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-2">
@@ -356,14 +356,14 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- FRIENDS -->
                             <section>
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                     {{ __('Friends of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                     <span class="ml-1 font-normal">({{ char.friends?.length ?? 0 }})</span>
                                 </h3>
                                 <div v-if="!char.friends?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4">
                                     {{ char.name }} {{ __('has no friends.') }}
                                 </div>
-                                <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
                                     <table class="w-full text-xs text-left">
                                         <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
@@ -375,7 +375,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                            <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
+                                            <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-white/5 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/10">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ f.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-1.5">
@@ -398,12 +398,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== INVENTORY ITEMS ===== -->
                         <section>
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                 {{ __('Inventory Items of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30 overflow-x-auto">
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
                                 <table class="w-full text-xs text-left">
                                     <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                         <tr>
@@ -420,7 +420,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                     </thead>
                                     <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
                                         <tr v-for="(item, idx) in char.inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20"
+                                            class="bg-white dark:bg-white/5 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/10"
                                             :class="{ 'bg-rapanel-blue/5': item.equip > 0 }"
                                         >
                                             <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
@@ -449,12 +449,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CART INVENTORY ===== -->
                         <section v-if="isCartClass(char.class)">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                 {{ __('Cart Inventory Items of') }} <span class="text-rapanel-gold uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.cart_inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.cart_inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No cart items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30 overflow-x-auto">
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
                                 <table class="w-full text-xs text-left">
                                     <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                         <tr>
@@ -471,7 +471,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                     </thead>
                                     <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
                                         <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20"
+                                            class="bg-white dark:bg-white/5 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/10"
                                         >
                                             <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
                                             <td class="px-2 py-1.5 text-center">

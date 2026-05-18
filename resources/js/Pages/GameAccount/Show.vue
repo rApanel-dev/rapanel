@@ -167,7 +167,7 @@ const confirmResetLook = () => {
                                 </Link>
                                 <div>
                                     <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
-                                    <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:bg-gradient-to-r dark:from-white dark:to-rapanel-blue/70 dark:bg-clip-text dark:text-transparent">{{ gameAccount.userid }}</h1>
+                                    <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark">{{ gameAccount.userid }}</h1>
                                 </div>
                             </div>
                             <!-- Eliminar Cuenta: solo en móvil, esquina derecha del título -->

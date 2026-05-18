@@ -92,7 +92,7 @@ const openClaimModal = () => {
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
-                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:bg-gradient-to-r dark:from-white dark:to-rapanel-blue/70 dark:bg-clip-text dark:text-transparent uppercase tracking-widest">
+                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-widest">
                             {{ __('Master Account') }}
                         </h1>
                         <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm">
