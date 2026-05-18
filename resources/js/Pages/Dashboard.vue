@@ -80,7 +80,7 @@ const openClaimModal = () => {
 <template>
     <Head :title="__('Master Account')" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
+    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-gradient-to-br dark:from-slate-950 dark:to-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
         
         <Header />
 
@@ -88,11 +88,11 @@ const openClaimModal = () => {
 
             <FlashMessages :success="flashSuccess" :error="flashError" />
 
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl p-6 md:p-10 shadow-xl">
+            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
-                        <h1 class="text-2xl font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-widest">
+                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:bg-gradient-to-r dark:from-white dark:to-rapanel-blue/70 dark:bg-clip-text dark:text-transparent uppercase tracking-widest">
                             {{ __('Master Account') }}
                         </h1>
                         <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm">
@@ -134,9 +134,9 @@ const openClaimModal = () => {
                 
             </div>
 
-            <div class="mt-8 bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <h3 class="text-lg font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
+            <div class="mt-8 bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+                    <h3 class="text-lg font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
                         {{ __('My Game Accounts') }}
                     </h3>
                 </div>

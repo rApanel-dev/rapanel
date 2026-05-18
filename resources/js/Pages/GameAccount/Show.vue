@@ -12,6 +12,8 @@ import CharacterDetail from '@/Pages/GameAccount/Partials/CharacterDetail.vue';
 import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
 import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
+import FlashMessages from '@/Components/FlashMessages.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
 
 const props = defineProps({
     gameAccount: Object,
@@ -142,26 +144,19 @@ const confirmResetLook = () => {
 <template>
     <Head :title="`${gameAccount.userid} — ${__('Account Details')}`" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
+    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-gradient-to-br dark:from-slate-950 dark:to-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
         <Header />
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
 
             <!-- Flash -->
-            <div v-if="flashSuccess" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-success/10 border border-rapanel-success/30 text-rapanel-success text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ flashSuccess }}
-            </div>
-            <div v-if="flashError" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-danger/10 border border-rapanel-danger/30 text-rapanel-danger text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9.303 3.376c.864 1.505-.15 3.374-1.95 3.374H2.647c-1.8 0-2.815-1.869-1.951-3.374L10.049 4.126c.9-1.56 3.002-1.56 3.902 0L21.303 16.126z"/></svg>
-                {{ flashError }}
-            </div>
+            <FlashMessages :success="flashSuccess" :error="flashError" />
 
             <!-- ===== SECCIÓN 1: DETALLES DE CUENTA ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
+            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
 
                 <!-- Header -->
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                         <!-- Título + botón eliminar (móvil: mismo row) -->
@@ -172,7 +167,7 @@ const confirmResetLook = () => {
                                 </Link>
                                 <div>
                                     <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
-                                    <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ gameAccount.userid }}</h1>
+                                    <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:bg-gradient-to-r dark:from-white dark:to-rapanel-blue/70 dark:bg-clip-text dark:text-transparent">{{ gameAccount.userid }}</h1>
                                 </div>
                             </div>
                             <!-- Eliminar Cuenta: solo en móvil, esquina derecha del título -->
@@ -240,7 +235,7 @@ const confirmResetLook = () => {
                         { label: __('Last IP'),     value: gameAccount.last_ip || __('Unknown') },
                         { label: __('Birthdate'),   value: gameAccount.birthdate || '—' },
                     ]" :key="info.label"
-                        class="flex flex-col gap-1 bg-rapanel-navy-50 dark:bg-black/20 rounded-xl px-4 py-3 border border-rapanel-navy-100 dark:border-gray-700/30"
+                        class="flex flex-col gap-1 bg-rapanel-navy-50 dark:bg-black/30 dark:backdrop-blur-sm rounded-xl px-4 py-3 border border-rapanel-navy-100 dark:border-white/10"
                     >
                         <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ info.label }}</span>
                         <span class="font-semibold text-rapanel-navy-900 dark:text-white text-sm leading-tight truncate">{{ info.value }}</span>
@@ -305,9 +300,9 @@ const confirmResetLook = () => {
             </div>
 
             <!-- ===== SECCIÓN 2: PERSONAJES ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
-                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Characters on') }} <span class="text-rapanel-blue">{{ serverName }}</span>
                     </h3>
                 </div>
@@ -361,12 +356,11 @@ const confirmResetLook = () => {
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <span v-if="char.online > 0" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20">
-                                        <span class="w-1.5 h-1.5 bg-rapanel-success rounded-full animate-pulse"></span>{{ __('Online') }}
-                                    </span>
-                                    <span v-else class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-400/10 text-gray-400 border border-gray-400/20">
-                                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>{{ __('Offline') }}
-                                    </span>
+                                    <StatusBadge
+                                        :variant="char.online > 0 ? 'success' : 'neutral'"
+                                        :label="char.online > 0 ? __('Online') : __('Offline')"
+                                        :dot="true"
+                                    />
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <button @click="openResetLookModal(char)" :disabled="char.online > 0"
@@ -394,9 +388,9 @@ const confirmResetLook = () => {
             </div>
 
             <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
-                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Storage Items of') }} <span class="text-rapanel-blue uppercase">{{ gameAccount.userid }}</span>
                         <span class="ml-2 text-xs font-normal text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">({{ storageItems.length }})</span>
                     </h3>

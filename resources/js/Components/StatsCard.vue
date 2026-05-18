@@ -9,10 +9,10 @@ defineProps({
 
 <template>
     <div :class="[
-        'rounded-xl p-5 border shadow-sm transition-transform hover:scale-[1.02]',
+        'rounded-xl p-5 border shadow-sm transition-all duration-200 hover:scale-[1.02]',
         muted
-            ? 'bg-rapanel-navy-50/50 dark:bg-black/20 border-rapanel-navy-100 dark:border-gray-700/30'
-            : 'bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/10',
+            ? 'bg-rapanel-navy-50/50 dark:bg-black/30 dark:backdrop-blur-sm border-rapanel-navy-100 dark:border-white/10'
+            : 'bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border-rapanel-navy-100 dark:border-white/10 dark:shadow-black/20',
     ]">
         <div :class="['flex items-center mb-3', $slots.icon ? 'justify-between' : 'justify-start']">
             <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">{{ label }}</span>

@@ -14,7 +14,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans:    ['Figtree',   ...defaultTheme.fontFamily.sans],
+                display: ['Rajdhani',  ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 // Identidad Visual rApanel
