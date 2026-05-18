@@ -26,8 +26,8 @@ export default {
                     900: '#0f172a', // Background Dark
                 },
                 'rapanel-text': {
-                    light: '#1d283a', // Texto Claro
-                    dark: '#E2E8F0',  // Texto Oscuro
+                    light: '#1d283a', // Tema Claro
+                    dark: '#E2E8F0',  // Tema Oscuro
                 },
                 'rapanel-blue': '#4A90E2', // Kafra Blue (Primario)
                 'rapanel-gold': '#F1C40F', // Emperium Gold (Acento)
@@ -35,6 +35,7 @@ export default {
                 // ESTADOS Y ALERTAS
                 'rapanel-success': '#2ECC71', // Heal Green (Éxito / Online)
                 'rapanel-danger': '#E74C3C',  // MVP Red (Error / Eliminar)
+                'rapanel-purple': '#a855f7',  // Mystic Purple (VIP / Gender)
             },
         },
     },

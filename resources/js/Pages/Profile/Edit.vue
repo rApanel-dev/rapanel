@@ -5,6 +5,7 @@ import UpdateProfileInformationForm from './Partials/UpdateProfileInformationFor
 import { Head, usePage } from '@inertiajs/vue3';
 import Header from '@/Components/Header.vue';
 import BgMain from '@/Components/BgMain.vue';
+import Footer from '@/Components/Footer.vue';
 
 defineProps({
     mustVerifyEmail: { type: Boolean },
@@ -31,7 +32,7 @@ const __ = (key) => page.props.translations?.[key] || key;
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
@@ -39,14 +40,16 @@ const __ = (key) => page.props.translations?.[key] || key;
                     />
                 </div>
 
-                <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <UpdatePasswordForm class="max-w-xl" />
                 </div>
 
-                <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 p-4 shadow-xl sm:rounded-lg sm:p-8">
                     <DeleteUserForm class="max-w-xl" />
                 </div>
             </div>
         </main>
     </div>
+
+    <Footer />
 </template>

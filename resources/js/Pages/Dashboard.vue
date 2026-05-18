@@ -14,6 +14,7 @@ import StatsCard from '@/Components/StatsCard.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import EmptyState from '@/Components/EmptyState.vue';
 import BgMain from '@/Components/BgMain.vue';
+import Footer from '@/Components/Footer.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
 const props = defineProps({
@@ -90,7 +91,7 @@ const openClaimModal = () => {
 
             <FlashMessages :success="flashSuccess" :error="flashError" />
 
-            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
+            <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
@@ -136,8 +137,8 @@ const openClaimModal = () => {
                 
             </div>
 
-            <div class="mt-8 bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+            <div class="mt-8 bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
                     <h3 class="text-lg font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
                         {{ __('My Game Accounts') }}
                     </h3>
@@ -145,7 +146,7 @@ const openClaimModal = () => {
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
-                        <thead class="bg-rapanel-navy-50 dark:bg-black/40 text-rapanel-text-light/80 dark:text-rapanel-text-dark uppercase text-xs font-bold">
+                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-rapanel-text-light/80 dark:text-rapanel-text-dark uppercase text-xs font-bold">
                             <tr>
                                 <th class="px-6 py-4">{{ __('Account') }}</th>
                                 <th class="px-6 py-4">{{ __('Gender') }}</th>
@@ -217,17 +218,17 @@ const openClaimModal = () => {
                 <form @submit.prevent="createAccount" class="space-y-5">
                     <div>
                         <InputLabel for="userid" :value="__('Username')" />
-                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-gray-700" required autofocus />
+                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required autofocus />
                         <InputError class="mt-2" :message="form.errors.userid" />
                     </div>
                     <div>
                         <InputLabel for="user_pass" :value="__('Password')" />
-                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-gray-700" required />
+                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required />
                         <InputError class="mt-2" :message="form.errors.user_pass" />
                     </div>
                     <div>
                         <InputLabel for="sex" :value="__('Gender')" />
-                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-gray-700 bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
+                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-gray-700 bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
                             <option value="M">{{ __('Male') }}</option>
                             <option value="F">{{ __('Female') }}</option>
                         </select>
@@ -241,9 +242,11 @@ const openClaimModal = () => {
             </div>
         </Modal>
 
-        <ClaimAccountModal 
-            :show="isClaimModalOpen" 
-            @close="isClaimModalOpen = false" 
+        <ClaimAccountModal
+            :show="isClaimModalOpen"
+            @close="isClaimModalOpen = false"
         />
     </div>
+
+    <Footer />
 </template>

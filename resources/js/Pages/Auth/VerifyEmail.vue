@@ -1,14 +1,15 @@
 <script setup>
 import { computed } from 'vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import MainLayout from '@/Layouts/MainLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
-    status: {
-        type: String,
-    },
+    status: { type: String },
 });
+
+const page = usePage();
+const __ = (key) => page.props.translations?.[key] || key;
 
 const form = useForm({});
 
@@ -16,46 +17,64 @@ const submit = () => {
     form.post(route('verification.send'));
 };
 
-const verificationLinkSent = computed(
-    () => props.status === 'verification-link-sent',
-);
+const verificationLinkSent = computed(() => props.status === 'verification-link-sent');
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Email Verification" />
+    <Head :title="__('Email Verification')" />
 
-        <div class="mb-4 text-sm text-gray-600">
-            Thanks for signing up! Before getting started, could you verify your
-            email address by clicking on the link we just emailed to you? If you
-            didn't receive the email, we will gladly send you another.
-        </div>
+    <MainLayout :show-bg="true">
+        <div class="flex items-center justify-center px-4 py-12">
+            <div class="w-full max-w-4xl min-h-[620px] flex overflow-hidden rounded-2xl shadow-2xl border border-rapanel-navy-100 dark:border-white/10">
 
-        <div
-            class="mb-4 text-sm font-medium text-green-600"
-            v-if="verificationLinkSent"
-        >
-            A new verification link has been sent to the email address you
-            provided during registration.
-        </div>
+                <!-- Left: artwork -->
+                <div class="hidden md:block w-5/12 shrink-0">
+                    <img src="/images/register.jpg" class="w-full h-full object-cover" alt="" />
+                </div>
 
-        <form @submit.prevent="submit">
-            <div class="mt-4 flex items-center justify-between">
-                <PrimaryButton
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Resend Verification Email
-                </PrimaryButton>
+                <!-- Right: content -->
+                <div class="flex-1 bg-white dark:bg-rapanel-navy-900 px-8 py-10 flex flex-col justify-center">
 
-                <Link
-                    :href="route('logout')"
-                    method="post"
-                    as="button"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >Log Out</Link
-                >
+                    <!-- Header -->
+                    <div class="mb-7">
+                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide">
+                            {{ __('Email Verification') }}
+                        </h1>
+                        <p class="mt-1.5 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+                            {{ __('Thanks for signing up! Please verify your email address by clicking the link we sent you. If you did not receive the email, we will send another.') }}
+                        </p>
+                    </div>
+
+                    <!-- Success message -->
+                    <div v-if="verificationLinkSent" class="mb-5 px-4 py-3 rounded-lg bg-rapanel-success/10 border border-rapanel-success/30 text-sm font-medium text-rapanel-success">
+                        {{ __('A new verification link has been sent to your email address.') }}
+                    </div>
+
+                    <form @submit.prevent="submit" class="space-y-4">
+                        <div class="pt-1 space-y-3">
+                            <PrimaryButton
+                                class="w-full justify-center uppercase tracking-widest"
+                                :class="{ 'opacity-25': form.processing }"
+                                :disabled="form.processing"
+                            >
+                                {{ __('Resend Verification Email') }}
+                            </PrimaryButton>
+
+                            <p class="text-center text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+                                {{ __('Wrong account?') }}
+                                <Link
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                    class="text-rapanel-blue font-semibold hover:underline ms-1"
+                                >
+                                    {{ __('Log Out') }}
+                                </Link>
+                            </p>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
-    </GuestLayout>
+        </div>
+    </MainLayout>
 </template>

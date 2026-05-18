@@ -8,8 +8,8 @@ defineProps({
 </script>
 
 <template>
-    <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
-        <div v-if="title || $slots.header" class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/10 dark:bg-black/10">
+    <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+        <div v-if="title || $slots.header" class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800">
             <slot name="header">
                 <h3 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ title }}</h3>
             </slot>
@@ -22,7 +22,7 @@ defineProps({
         </div>
 
         <div v-if="paginator && paginator.last_page > 1"
-            class="flex items-center justify-between px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-black/10">
+            class="flex items-center justify-between px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800">
             <span class="text-xs text-rapanel-text-light/50 dark:text-white/40">
                 {{ paginator.from }}–{{ paginator.to }} of {{ paginator.total }}
             </span>

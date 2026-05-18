@@ -1,7 +1,6 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import Footer from '@/Components/Footer.vue';
 
 const props = defineProps({ news: Object });
 
@@ -50,7 +49,7 @@ const sideTypeBadge = (type) => {
                     </div>
 
                     <!-- Card wrapper -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 sm:p-8">
+                    <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 sm:p-8">
 
                         <!-- Type badge + date -->
                         <div class="flex flex-wrap items-center gap-3 mb-4">
@@ -93,7 +92,7 @@ const sideTypeBadge = (type) => {
                 <aside class="w-full lg:w-72 shrink-0 space-y-4">
 
                     <!-- Server Status -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-5">
+                    <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-5">
                         <h3 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-4">
                             {{ __('Server Status') }}
                         </h3>
@@ -112,7 +111,7 @@ const sideTypeBadge = (type) => {
 
                     <!-- Latest News -->
                     <div v-if="$page.props.latestNews?.length"
-                         class="bg-white dark:bg-rapanel-navy-800 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+                         class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 border-b border-rapanel-navy-100 dark:border-white/10">
                             <h3 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30">
                                 {{ __('Latest News') }}
@@ -149,6 +148,5 @@ const sideTypeBadge = (type) => {
             </div>
         </div>
 
-        <Footer />
     </MainLayout>
 </template>

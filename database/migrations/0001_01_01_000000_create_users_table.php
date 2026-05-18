@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('last_ip', 45)->nullable();
             $table->timestamp('last_login')->nullable();
             $table->string('country')->default('CL');
+            $table->date('birthdate')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 

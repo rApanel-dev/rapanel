@@ -15,6 +15,8 @@ import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useR
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import BgMain from '@/Components/BgMain.vue';
+import ActionButton from '@/Components/ActionButton.vue';
+import Footer from '@/Components/Footer.vue';
 
 const props = defineProps({
     gameAccount: Object,
@@ -155,10 +157,10 @@ const confirmResetLook = () => {
             <FlashMessages :success="flashSuccess" :error="flashError" />
 
             <!-- ===== SECCIÓN 1: DETALLES DE CUENTA ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+            <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
 
                 <!-- Header -->
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                         <!-- Título + botón eliminar (móvil: mismo row) -->
@@ -182,36 +184,30 @@ const confirmResetLook = () => {
                         <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
 
                             <!-- Ver Actividad -->
-                            <button @click="logsModal = true"
-                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white"
-                            >
+                            <ActionButton variant="blue" @click="logsModal = true" class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"/></svg>
                                 {{ __('Actions') }}
-                            </button>
+                            </ActionButton>
 
                             <!-- Cambiar Contraseña -->
-                            <button @click="openChangePasswordModal" :disabled="isAccountOnline"
-                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto"
-                                :class="isAccountOnline
-                                    ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
-                                    : 'bg-rapanel-gold/10 text-rapanel-gold border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-rapanel-navy-900'"
+                            <ActionButton variant="gold" @click="openChangePasswordModal"
+                                :disabled="isAccountOnline"
                                 :title="isAccountOnline ? __('Character must be offline') : ''"
+                                class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
                                 {{ __('Change Password') }}
-                            </button>
+                            </ActionButton>
 
                             <!-- Cambiar Género -->
-                            <button @click="openGenderModal" :disabled="isAccountOnline"
-                                class="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all w-full sm:w-auto"
-                                :class="isAccountOnline
-                                    ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
-                                    : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500 hover:text-white'"
+                            <ActionButton variant="purple" @click="openGenderModal"
+                                :disabled="isAccountOnline"
                                 :title="isAccountOnline ? __('Character must be offline') : ''"
+                                class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
                                 {{ __('Change Gender') }}
-                            </button>
+                            </ActionButton>
 
                             <!-- Separador + Eliminar: solo en escritorio -->
                             <div class="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
@@ -237,7 +233,7 @@ const confirmResetLook = () => {
                         { label: __('Last IP'),     value: gameAccount.last_ip || __('Unknown') },
                         { label: __('Birthdate'),   value: gameAccount.birthdate || '—' },
                     ]" :key="info.label"
-                        class="flex flex-col gap-1 bg-rapanel-navy-50 dark:bg-black/30 dark:backdrop-blur-sm rounded-xl px-4 py-3 border border-rapanel-navy-100 dark:border-white/10"
+                        class="flex flex-col gap-1 bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl px-4 py-3 border border-rapanel-navy-100 dark:border-white/10"
                     >
                         <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ info.label }}</span>
                         <span class="font-semibold text-rapanel-navy-900 dark:text-white text-sm leading-tight truncate">{{ info.value }}</span>
@@ -249,7 +245,7 @@ const confirmResetLook = () => {
 
                     <!-- Bank Zeny -->
                     <div v-if="bankEnabled"
-                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/10 border border-rapanel-gold/30"
+                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/20 dark:bg-rapanel-gold/10 border border-rapanel-gold/40 dark:border-rapanel-gold/30"
                     >
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-gold/20 shrink-0">
                             <img src="/data/gameaccount/bank.png" class="w-6 h-6 object-contain" alt="" />
@@ -262,7 +258,7 @@ const confirmResetLook = () => {
 
                     <!-- Cash Points -->
                     <div v-if="cashPointsEnabled"
-                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/10 border border-rapanel-blue/30"
+                        class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/20 dark:bg-rapanel-blue/10 border border-rapanel-blue/40 dark:border-rapanel-blue/30"
                     >
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-blue/20 shrink-0">
                             <img src="/data/gameaccount/cashpoints.png" class="w-6 h-6 object-contain" alt="" />
@@ -275,21 +271,21 @@ const confirmResetLook = () => {
 
                     <!-- VIP -->
                     <div v-if="vipEnabled && vipStatus"
-                        class="flex-1 min-w-0 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-violet-500/10 border border-violet-500/30"
+                        class="flex-1 min-w-0 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-rapanel-purple/20 dark:bg-rapanel-purple/10 border border-rapanel-purple/40 dark:border-rapanel-purple/30"
                     >
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-violet-500/20 shrink-0">
+                            <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-purple/20 shrink-0">
                                 <img src="/data/gameaccount/vip.png" class="w-6 h-6 object-contain" alt="" />
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[9px] uppercase tracking-widest font-extrabold text-violet-400/70">VIP</p>
+                                <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-purple/70">VIP</p>
                                 <p class="font-bold text-sm truncate"
-                                    :class="vipStatus.active ? 'text-violet-400' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'"
+                                    :class="vipStatus.active ? 'text-rapanel-purple' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'"
                                 >{{ vipStatus.label }}</p>
                             </div>
                         </div>
                         <div v-if="vipStatus.expires" class="text-right shrink-0">
-                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-violet-400/60">
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-purple/60">
                                 {{ vipStatus.active ? __('VIP Expires') : __('VIP Expired on') }}
                             </p>
                             <p class="text-xs font-semibold"
@@ -302,8 +298,8 @@ const confirmResetLook = () => {
             </div>
 
             <!-- ===== SECCIÓN 2: PERSONAJES ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
-                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+            <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
                     <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Characters on') }} <span class="text-rapanel-blue">{{ serverName }}</span>
                     </h3>
@@ -315,7 +311,7 @@ const confirmResetLook = () => {
 
                 <div v-else class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                             <tr>
                                 <th class="px-4 py-3">{{ __('Slot') }}</th>
                                 <th class="px-4 py-3">{{ __('Character Name') }}</th>
@@ -362,23 +358,22 @@ const confirmResetLook = () => {
                                         :variant="char.online > 0 ? 'success' : 'neutral'"
                                         :label="char.online > 0 ? __('Online') : __('Offline')"
                                         :dot="true"
+                                        size="sm"
                                     />
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <button @click="openResetLookModal(char)" :disabled="char.online > 0"
-                                        class="text-xs px-2.5 py-1 rounded-lg font-bold transition-all"
-                                        :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-danger/10 text-rapanel-danger border border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white dark:bg-rapanel-gold/10 dark:text-rapanel-gold dark:border-rapanel-gold/20 dark:hover:bg-rapanel-gold dark:hover:text-rapanel-navy-900'"
-                                    >{{ __('Reset Look') }}</button>
+                                    <ActionButton variant="reset-look" size="sm" @click="openResetLookModal(char)" :disabled="char.online > 0">
+                                        {{ __('Reset Look') }}
+                                    </ActionButton>
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <button @click="openResetPosModal(char)" :disabled="char.online > 0"
-                                        class="text-xs px-2.5 py-1 rounded-lg font-bold transition-all"
-                                        :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white'"
-                                    >{{ __('Reset Position') }}</button>
+                                    <ActionButton variant="blue" size="sm" @click="openResetPosModal(char)" :disabled="char.online > 0">
+                                        {{ __('Reset Position') }}
+                                    </ActionButton>
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot class="bg-rapanel-navy-50 dark:bg-black/30 border-t-2 border-rapanel-navy-100 dark:border-gray-700">
+                        <tfoot class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-t-2 border-rapanel-navy-100 dark:border-gray-700">
                             <tr>
                                 <td colspan="5" class="px-4 py-2 text-right text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</td>
                                 <td class="px-4 py-2 text-right font-mono font-bold text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</td>
@@ -390,8 +385,8 @@ const confirmResetLook = () => {
             </div>
 
             <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
-            <div class="bg-white dark:bg-rapanel-navy-800/60 dark:backdrop-blur-md border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
-                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50/30 dark:bg-black/20">
+            <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
                     <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Storage Items of') }} <span class="text-rapanel-blue uppercase">{{ gameAccount.userid }}</span>
                         <span class="ml-2 text-xs font-normal text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">({{ storageItems.length }})</span>
@@ -404,7 +399,7 @@ const confirmResetLook = () => {
 
                 <div v-else class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full text-xs text-left">
-                        <thead class="sticky top-0 z-10 bg-rapanel-navy-100 dark:bg-black/30 dark:backdrop-blur-md text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                        <thead class="sticky top-0 z-10 bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                             <tr>
                                 <th class="px-3 py-2 text-center">ID</th>
                                 <th class="px-3 py-2 w-10">{{ __('Icon') }}</th>
@@ -473,20 +468,20 @@ const confirmResetLook = () => {
                     <div>
                         <InputLabel for="cp_new_password" :value="__('New Game Password')" />
                         <TextInput id="cp_new_password" v-model="passwordForm.password" type="password"
-                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900"
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800"
                             :placeholder="__('Minimum 4 characters')" required autofocus />
                         <InputError class="mt-1" :message="passwordForm.errors.password" />
                     </div>
                     <div>
                         <InputLabel for="cp_confirm_password" :value="__('Confirm New Password')" />
                         <TextInput id="cp_confirm_password" v-model="passwordForm.password_confirmation" type="password"
-                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900" required />
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800" required />
                         <InputError class="mt-1" :message="passwordForm.errors.password_confirmation" />
                     </div>
                     <div>
                         <InputLabel for="cp_current_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
                         <TextInput id="cp_current_password" v-model="passwordForm.current_password" type="password"
-                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800"
                             :placeholder="__('Your web panel password')" required />
                         <InputError class="mt-1" :message="passwordForm.errors.current_password" />
                     </div>
@@ -508,7 +503,7 @@ const confirmResetLook = () => {
                 </h2>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
                     {{ __('Account') }}: <span class="font-bold text-rapanel-blue">{{ gameAccount.userid }}</span>
-                    &nbsp;|&nbsp; {{ __('Current Gender') }}: <span class="font-bold text-purple-400">{{ formatSex(gameAccount.sex) }}</span>
+                    &nbsp;|&nbsp; {{ __('Current Gender') }}: <span class="font-bold text-rapanel-purple">{{ formatSex(gameAccount.sex) }}</span>
                     &nbsp;→&nbsp; <span class="font-bold text-rapanel-gold">{{ gameAccount.sex === 'M' ? __('Female') : __('Male') }}</span>
                 </p>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
@@ -518,7 +513,7 @@ const confirmResetLook = () => {
                     <div>
                         <InputLabel for="gender_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
                         <TextInput id="gender_password" v-model="genderForm.password" type="password"
-                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800"
                             required autofocus />
                         <InputError class="mt-2" :message="genderForm.errors.password" />
                         <InputError class="mt-2" :message="genderForm.errors.error" />
@@ -542,7 +537,7 @@ const confirmResetLook = () => {
                 <form @submit.prevent="confirmResetPos" class="space-y-5">
                     <div>
                         <InputLabel for="rpos_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
-                        <TextInput id="rpos_pw" v-model="resetPosForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" required autofocus />
+                        <TextInput id="rpos_pw" v-model="resetPosForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800" required autofocus />
                         <InputError class="mt-2" :message="resetPosForm.errors.password" />
                         <InputError class="mt-2" :message="resetPosForm.errors.error" />
                     </div>
@@ -563,7 +558,7 @@ const confirmResetLook = () => {
                 <form @submit.prevent="confirmResetLook" class="space-y-5">
                     <div>
                         <InputLabel for="rlook_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
-                        <TextInput id="rlook_pw" v-model="resetLookForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" required autofocus />
+                        <TextInput id="rlook_pw" v-model="resetLookForm.password" type="password" class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800" required autofocus />
                         <InputError class="mt-2" :message="resetLookForm.errors.password" />
                         <InputError class="mt-2" :message="resetLookForm.errors.error" />
                     </div>
@@ -576,4 +571,6 @@ const confirmResetLook = () => {
         </Modal>
 
     </div>
+
+    <Footer />
 </template>

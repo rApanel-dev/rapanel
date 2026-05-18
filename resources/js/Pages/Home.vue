@@ -1,7 +1,6 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import Footer from '@/Components/Footer.vue';
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
@@ -379,7 +378,6 @@ const scrollTo = (id) => {
             </section>
         </div>
 
-        <Footer />
 
     </MainLayout>
 </template>
