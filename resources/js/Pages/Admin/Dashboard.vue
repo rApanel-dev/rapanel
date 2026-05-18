@@ -8,6 +8,8 @@ import {
     WifiIcon,
     ShieldExclamationIcon,
 } from '@heroicons/vue/24/outline';
+import PageHeader from '@/Components/PageHeader.vue';
+import StatsCard from '@/Components/StatsCard.vue';
 
 const props = defineProps({
     stats:        Object,
@@ -41,57 +43,46 @@ const barWidth = (count) => {
     <AdminLayout>
         <div class="space-y-6">
 
-            <!-- Page title -->
-            <div>
-                <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">Admin Dashboard</h1>
-                <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-1">Server overview and player distribution</p>
-            </div>
+            <PageHeader title="Admin Dashboard" description="Server overview and player distribution" />
 
             <!-- Stats grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">Master Accounts</span>
-                        <UsersIcon class="w-5 h-5 text-rapanel-blue" />
-                    </div>
-                    <div class="text-3xl font-black text-rapanel-text-light dark:text-white">{{ stats.total_users }}</div>
-                    <div class="flex gap-3 mt-2 text-xs">
-                        <span class="text-rapanel-success font-semibold">{{ stats.active_users }} active</span>
-                        <span class="text-rapanel-danger font-semibold">{{ stats.banned_users }} banned</span>
-                    </div>
-                </div>
+                <StatsCard label="Master Accounts" :value="stats.total_users">
+                    <template #icon><UsersIcon class="w-5 h-5 text-rapanel-blue" /></template>
+                    <template #footer>
+                        <div class="flex gap-3 text-xs">
+                            <span class="text-rapanel-success font-semibold">{{ stats.active_users }} active</span>
+                            <span class="text-rapanel-danger font-semibold">{{ stats.banned_users }} banned</span>
+                        </div>
+                    </template>
+                </StatsCard>
 
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">Admins</span>
-                        <ShieldExclamationIcon class="w-5 h-5 text-rapanel-gold" />
-                    </div>
-                    <div class="text-3xl font-black text-rapanel-text-light dark:text-white">{{ stats.admin_users }}</div>
-                    <div class="text-xs text-rapanel-text-light/40 dark:text-white/40 mt-2">Panel administrators</div>
-                </div>
+                <StatsCard label="Admins" :value="stats.admin_users">
+                    <template #icon><ShieldExclamationIcon class="w-5 h-5 text-rapanel-gold" /></template>
+                    <template #footer>
+                        <div class="text-xs text-rapanel-text-light/40 dark:text-white/40">Panel administrators</div>
+                    </template>
+                </StatsCard>
 
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">Login Accounts</span>
-                        <ComputerDesktopIcon class="w-5 h-5 text-purple-400" />
-                    </div>
-                    <div class="text-3xl font-black text-rapanel-text-light dark:text-white">{{ stats.total_game_accounts }}</div>
-                    <div class="text-xs text-rapanel-success font-semibold mt-2">{{ stats.active_game_accounts }} active</div>
-                </div>
+                <StatsCard label="Login Accounts" :value="stats.total_game_accounts">
+                    <template #icon><ComputerDesktopIcon class="w-5 h-5 text-purple-400" /></template>
+                    <template #footer>
+                        <div class="text-xs text-rapanel-success font-semibold">{{ stats.active_game_accounts }} active</div>
+                    </template>
+                </StatsCard>
 
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">Players Online</span>
-                        <WifiIcon class="w-5 h-5 text-rapanel-success" />
-                    </div>
-                    <div class="text-3xl font-black text-rapanel-text-light dark:text-white">{{ $page.props.serverStatus.players }}</div>
-                    <div :class="$page.props.serverStatus.online ? 'text-rapanel-success' : 'text-rapanel-danger'"
-                        class="text-xs font-semibold flex items-center gap-1 mt-2">
-                        <span :class="[$page.props.serverStatus.online ? 'bg-rapanel-success animate-pulse' : 'bg-rapanel-danger', 'w-1.5 h-1.5 rounded-full']"></span>
-                        {{ $page.props.serverStatus.online ? 'Server Online' : 'Server Offline' }}
-                    </div>
-                </div>
+                <StatsCard label="Players Online" :value="$page.props.serverStatus.players">
+                    <template #icon><WifiIcon class="w-5 h-5 text-rapanel-success" /></template>
+                    <template #footer>
+                        <div :class="$page.props.serverStatus.online ? 'text-rapanel-success' : 'text-rapanel-danger'"
+                            class="text-xs font-semibold flex items-center gap-1">
+                            <span :class="[$page.props.serverStatus.online ? 'bg-rapanel-success animate-pulse' : 'bg-rapanel-danger', 'w-1.5 h-1.5 rounded-full']"></span>
+                            {{ $page.props.serverStatus.online ? 'Server Online' : 'Server Offline' }}
+                        </div>
+                    </template>
+                </StatsCard>
+
             </div>
 
             <!-- World Map + Top Countries -->
