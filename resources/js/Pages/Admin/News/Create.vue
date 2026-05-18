@@ -106,7 +106,7 @@ const submit = () => {
 
                 <!-- Toggles -->
                 <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm flex flex-wrap gap-6">
-                    <label v-for="(field, label) in { is_published: 'Published', is_pinned: 'Pinned', allow_comments: 'Allow Comments' }"
+                    <label v-for="(label, field) in { is_published: 'Published', is_pinned: 'Pinned', allow_comments: 'Allow Comments' }"
                            :key="field" class="flex items-center gap-2.5 cursor-pointer select-none">
                         <button type="button" @click="form[field] = !form[field]"
                                 :class="['relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none',

@@ -48,8 +48,8 @@ class HandleInertiaRequests extends Middleware
                 return News::published()
                     ->orderByDesc('is_pinned')
                     ->orderByDesc('id')
-                    ->limit(3)
-                    ->get(['id', 'title', 'slug', 'type', 'featured_image', 'body', 'created_at'])
+                    ->limit(5)
+                    ->get(['id', 'title', 'slug', 'type', 'featured_image', 'body', 'created_at', 'is_pinned'])
                     ->map(fn ($n) => [
                         'id'             => $n->id,
                         'slug'           => $n->slug,
@@ -59,7 +59,9 @@ class HandleInertiaRequests extends Middleware
                         'featured_image' => $n->featured_image ? asset('storage/' . $n->featured_image) : null,
                         'excerpt'        => $n->excerpt,
                         'created_at'     => $n->created_at?->diffForHumans(),
-                    ]);
+                        'is_pinned'      => (bool) $n->is_pinned,
+                    ])
+                    ->toArray();
             }),
 
             'discordStatus' => Cache::remember('discord_widget_status', 300, function () {

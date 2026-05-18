@@ -101,7 +101,7 @@ class NewsController extends Controller
 
         Cache::forget('home_latest_news');
 
-        return redirect()->route('admin.news.edit', $news->id)
+        return redirect()->route('admin.news.index')
             ->with('success', __('News updated successfully.'));
     }
 

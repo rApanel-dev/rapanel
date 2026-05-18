@@ -123,11 +123,19 @@ const scrollTo = (id) => {
                                   class="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-white/10 shrink-0">
 
                                 <!-- Thumbnail -->
-                                <div class="shrink-0 w-16 h-12 rounded-lg overflow-hidden border border-white/15 bg-white/10">
+                                <div class="relative shrink-0 w-16 h-12 rounded-lg overflow-hidden border border-white/15 bg-white/10">
                                     <img v-if="item.featured_image"
                                          :src="item.featured_image" :alt="item.title"
                                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                                     <div v-else class="w-full h-full flex items-center justify-center text-white/20 text-lg">📰</div>
+                                    <!-- Pin indicator -->
+                                    <div v-if="item.is_pinned"
+                                         class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-rapanel-danger flex items-center justify-center shadow-sm"
+                                         title="Pinned">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="white" class="w-2.5 h-2.5">
+                                            <path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a5.927 5.927 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182a.5.5 0 0 1-.707-.707l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a5.927 5.927 0 0 1 1.013.16l3.134-3.133a2.773 2.773 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146z"/>
+                                        </svg>
+                                    </div>
                                 </div>
 
                                 <!-- Content -->
