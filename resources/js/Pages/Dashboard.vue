@@ -13,6 +13,7 @@ import FlashMessages from '@/Components/FlashMessages.vue';
 import StatsCard from '@/Components/StatsCard.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import EmptyState from '@/Components/EmptyState.vue';
+import BgMain from '@/Components/BgMain.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
 const props = defineProps({
@@ -80,7 +81,8 @@ const openClaimModal = () => {
 <template>
     <Head :title="__('Master Account')" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-gradient-to-br dark:from-slate-950 dark:to-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
+    <div class="min-h-screen text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
+        <BgMain />
         
         <Header />
 

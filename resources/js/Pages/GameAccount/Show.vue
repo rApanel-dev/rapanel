@@ -14,6 +14,7 @@ import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
+import BgMain from '@/Components/BgMain.vue';
 
 const props = defineProps({
     gameAccount: Object,
@@ -144,7 +145,8 @@ const confirmResetLook = () => {
 <template>
     <Head :title="`${gameAccount.userid} — ${__('Account Details')}`" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-gradient-to-br dark:from-slate-950 dark:to-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
+    <div class="min-h-screen text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
+        <BgMain />
         <Header />
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
