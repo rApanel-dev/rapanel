@@ -1,14 +1,13 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link, router, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
 import {
     PlusIcon,
-    EyeIcon,
     PencilSquareIcon,
     TrashIcon,
     CheckCircleIcon,
     XCircleIcon,
+    EyeIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -16,13 +15,12 @@ const props = defineProps({
     filters: Object,
 });
 
-const page = usePage();
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
 
 const typeBadgeClass = (type) => {
     if (type === 1) return 'bg-rapanel-blue/20 text-rapanel-blue border-rapanel-blue/30';
     if (type === 2) return 'bg-rapanel-gold/20 text-rapanel-gold border-rapanel-gold/30';
-    return 'bg-white/10 text-white/70 border-white/20';
+    return 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/60 border-gray-200 dark:border-white/20';
 };
 
 const confirmDelete = (id) => {
@@ -96,6 +94,16 @@ const confirmDelete = (id) => {
                                 <td class="px-4 py-3 text-xs text-rapanel-text-light/50 dark:text-white/40">{{ item.created_at }}</td>
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a v-if="item.is_published"
+                                           :href="safeRoute('news.show', item.slug)"
+                                           target="_blank"
+                                           title="View published news"
+                                           class="p-1.5 rounded hover:bg-rapanel-navy-100 dark:hover:bg-white/10 text-rapanel-text-light/60 dark:text-white/50 hover:text-rapanel-success transition">
+                                            <EyeIcon class="w-4 h-4" />
+                                        </a>
+                                        <span v-else class="p-1.5 text-rapanel-text-light/20 dark:text-white/20 cursor-not-allowed" title="Publish to preview">
+                                            <EyeIcon class="w-4 h-4" />
+                                        </span>
                                         <Link :href="safeRoute('admin.news.edit', { news: item.id })"
                                               class="p-1.5 rounded hover:bg-rapanel-navy-100 dark:hover:bg-white/10 text-rapanel-text-light/60 dark:text-white/50 hover:text-rapanel-blue transition">
                                             <PencilSquareIcon class="w-4 h-4" />
