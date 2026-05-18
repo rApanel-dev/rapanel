@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    'discord' => [
+        'bot_token'  => env('DISCORD_BOT_TOKEN'),
+        'server_id'  => env('DISCORD_SERVER_ID'),
+        'invite_url' => env('DISCORD_INVITE_URL', '#'),
+    ],
+
     'ra' => [
         'use_md5'      => env('RA_USE_MD5_PASSWORDS', false),
         'max_accounts' => env('RA_MAX_GAME_ACCOUNTS', 3),

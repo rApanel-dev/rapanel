@@ -12,6 +12,7 @@ import {
     Bars3Icon,
     XMarkIcon,
     ShieldCheckIcon,
+    NewspaperIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -24,6 +25,7 @@ const navigation = [
     { name: 'Master Accounts', route: 'admin.users.index',         icon: UserCircleIcon,             group: 'Accounts' },
     { name: 'Login Accounts',  route: 'admin.game-accounts.index', icon: ComputerDesktopIcon,        group: 'Accounts' },
     { name: 'Characters',      route: 'admin.characters.index',    icon: UserGroupIcon,              group: 'Accounts' },
+    { name: 'News',            route: 'admin.news.index',          icon: NewspaperIcon,              group: 'Content' },
     { name: 'Action Logs',     route: 'admin.logs.index',          icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',         route: 'admin.console.index',       icon: CommandLineIcon,            group: 'System' },
 ];
@@ -117,7 +119,7 @@ const safeRoute = (name) => {
                     </template>
 
                     <!-- Grouped items -->
-                    <template v-for="groupName in ['Accounts', 'System']" :key="groupName">
+                    <template v-for="groupName in ['Accounts', 'Content', 'System']" :key="groupName">
                         <div class="mt-5 mb-1.5 px-3">
                             <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/25">{{ groupName }}</span>
                         </div>

@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\News;
 use Illuminate\Http\Request;
-use Inertia\Middleware;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -39,6 +41,31 @@ class HandleInertiaRequests extends Middleware
 
             'locale' => \App::getLocale(),
 
+            'serverName'      => config('services.ra.server_name', 'rApanel'),
+            'discordServerId' => config('services.discord.server_id'),
+
+            'latestNews' => Cache::remember('home_latest_news', 120, function () {
+                return News::published()
+                    ->orderByDesc('is_pinned')
+                    ->orderByDesc('id')
+                    ->limit(3)
+                    ->get(['id', 'title', 'slug', 'type', 'featured_image', 'body', 'created_at'])
+                    ->map(fn ($n) => [
+                        'id'             => $n->id,
+                        'slug'           => $n->slug,
+                        'title'          => $n->title,
+                        'type'           => $n->type,
+                        'type_label'     => News::typeLabel($n->type),
+                        'featured_image' => $n->featured_image ? asset('storage/' . $n->featured_image) : null,
+                        'excerpt'        => $n->excerpt,
+                        'created_at'     => $n->created_at?->diffForHumans(),
+                    ]);
+            }),
+
+            'discordStatus' => Cache::remember('discord_widget_status', 300, function () {
+                return $this->fetchDiscordStatus();
+            }),
+
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),
@@ -70,6 +97,39 @@ class HandleInertiaRequests extends Middleware
      * Obtiene el conteo de jugadores desde la DB
      * (De momento devuelve 0 hasta que configuremos tu conexión a la DB de rAthena)
      */
+
+    private function fetchDiscordStatus(): array
+    {
+        $token    = config('services.discord.bot_token');
+        $serverId = config('services.discord.server_id');
+        $invite   = config('services.discord.invite_url', '#');
+
+        $base = ['invite_url' => $invite, 'members' => null, 'online' => null, 'name' => null];
+
+        if (! $token || ! $serverId) {
+            return $base;
+        }
+
+        try {
+            $response = Http::withToken($token, 'Bot')
+                ->timeout(3)
+                ->get("https://discord.com/api/v10/guilds/{$serverId}?with_counts=true");
+
+            if ($response->ok()) {
+                $data = $response->json();
+                return array_merge($base, [
+                    'name'    => $data['name'] ?? null,
+                    'members' => $data['approximate_member_count'] ?? null,
+                    'online'  => $data['approximate_presence_count'] ?? null,
+                    'icon'    => isset($data['icon'])
+                        ? "https://cdn.discordapp.com/icons/{$serverId}/{$data['icon']}.png"
+                        : null,
+                ]);
+            }
+        } catch (\Exception) {}
+
+        return $base;
+    }
 
     private function getOnlinePlayersCount(): int
     {

@@ -10,12 +10,14 @@ use App\Http\Controllers\GameAccountController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuildController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\GameAccountAdminController;
 use App\Http\Controllers\Admin\LogAdminController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CharacterAdminController;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -108,7 +110,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
     Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
+    Route::resource('news', AdminNewsController::class)->except(['show']);
 });
+
+// Noticias públicas
+Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
 
 // Emblema de guild (público, sin auth)
 Route::get('/guild-emblem/{guild_id}', [GuildController::class, 'emblem'])
