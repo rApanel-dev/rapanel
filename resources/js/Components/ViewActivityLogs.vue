@@ -41,9 +41,9 @@ const formatDate = (date) => new Date(date).toLocaleString(undefined, {
 
 <template>
     <Modal :show="show" @close="emit('close')">
-        <div class="bg-white dark:bg-rapanel-navy-800 p-6">
+        <div class="bg-white dark:bg-rapanel-navy-900 p-6">
             <h2 class="text-lg font-medium text-rapanel-text-light dark:text-rapanel-text-dark mb-4">
-                {{ __('Activity Log for') }} {{ account?.userid }}
+                {{ __('Activity Log for') }} <span class="font-bold text-rapanel-blue">{{ account?.userid }}</span>
             </h2>
 
             <div v-if="isLogsLoading" class="py-8 text-center text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\ActionLog;
 use App\Models\Character;
+use App\Models\CharacterPreference;
 use App\Models\GameAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class CharacterController extends Controller
@@ -107,5 +109,119 @@ class CharacterController extends Controller
         ]);
 
         return back()->with('success', __('Look reset successfully.'));
+    }
+
+    public function changeSlot(Request $request, int $charId)
+    {
+        $request->validate([
+            'password' => ['required', 'string'],
+            'slot'     => ['required', 'integer', 'min:0'],
+        ]);
+
+        if (!Hash::check($request->password, Auth::user()->password)) {
+            return back()->withErrors(['password' => __('The provided password does not match our records.')]);
+        }
+
+        $char = $this->getOwnedCharacter($charId);
+
+        if (!$char) {
+            return back()->withErrors(['error' => __('Character not found or unauthorized.')]);
+        }
+
+        if ($char->online > 0) {
+            return back()->withErrors(['error' => __('Cannot change slot while the character is online.')]);
+        }
+
+        $maxSlots   = (int) GameAccount::where('account_id', $char->account_id)->value('character_slots');
+        $targetSlot = (int) $request->slot;
+
+        if ($targetSlot < 0 || $targetSlot >= $maxSlots) {
+            return back()->withErrors(['error' => __('Invalid slot selected.')]);
+        }
+
+        if ($targetSlot === (int) $char->char_num) {
+            return back()->with('success', __('Slot changed successfully.'));
+        }
+
+        $targetChar = DB::connection('mysql_main')
+            ->table('char')
+            ->where('account_id', $char->account_id)
+            ->where('char_num', $targetSlot)
+            ->first();
+
+        if ($targetChar && $targetChar->online > 0) {
+            return back()->withErrors(['error' => __('The target slot is occupied by a character that is online.')]);
+        }
+
+        DB::connection('mysql_main')->transaction(function () use ($char, $targetChar, $targetSlot) {
+            if ($targetChar) {
+                DB::connection('mysql_main')->statement(
+                    "UPDATE `char` SET char_num = CASE
+                        WHEN char_id = ? THEN ?
+                        WHEN char_id = ? THEN ?
+                    END WHERE char_id IN (?, ?)",
+                    [$char->char_id, $targetSlot, $targetChar->char_id, $char->char_num, $char->char_id, $targetChar->char_id]
+                );
+            } else {
+                DB::connection('mysql_main')->table('char')
+                    ->where('char_id', $char->char_id)
+                    ->update(['char_num' => $targetSlot]);
+            }
+        });
+
+        ActionLog::create([
+            'user_id'    => Auth::id(),
+            'category'   => 'CHARACTER',
+            'action'     => 'character_slot_changed',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => [
+                'char_id'      => $charId,
+                'char_name'    => $char->name,
+                'from_slot'    => $char->char_num,
+                'to_slot'      => $targetSlot,
+                'swapped_with' => $targetChar?->name,
+            ],
+        ]);
+
+        return back()->with('success', __('Slot changed successfully.'));
+    }
+
+    public function updatePreferences(Request $request, int $charId)
+    {
+        $request->validate([
+            'password'           => ['required', 'string'],
+            'hide_from_rankings' => ['boolean'],
+        ]);
+
+        if (!Hash::check($request->password, Auth::user()->password)) {
+            return back()->withErrors(['password' => __('The provided password does not match our records.')]);
+        }
+
+        $char = $this->getOwnedCharacter($charId);
+
+        if (!$char) {
+            return back()->withErrors(['error' => __('Character not found or unauthorized.')]);
+        }
+
+        CharacterPreference::updateOrCreate(
+            ['char_id' => $charId],
+            ['hide_from_rankings' => (bool) $request->boolean('hide_from_rankings')]
+        );
+
+        ActionLog::create([
+            'user_id'    => Auth::id(),
+            'category'   => 'CHARACTER',
+            'action'     => 'character_preferences_updated',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => [
+                'char_id'            => $charId,
+                'char_name'          => $char->name,
+                'hide_from_rankings' => (bool) $request->boolean('hide_from_rankings'),
+            ],
+        ]);
+
+        return back()->with('success', __('Character preferences saved.'));
     }
 }

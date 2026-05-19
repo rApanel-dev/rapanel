@@ -64,7 +64,7 @@ const deleteAccount = () => {
         </button>
 
         <Modal :show="confirmingAccountDeletion" @close="closeModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800 border border-rapanel-danger/30 rounded-lg text-left">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900 border border-rapanel-danger/30 rounded-lg text-left">
                 
                 <div v-if="step === 1">
                     <h2 class="text-lg font-medium text-rapanel-danger">

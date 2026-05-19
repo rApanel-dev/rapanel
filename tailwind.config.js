@@ -20,22 +20,24 @@ export default {
             colors: {
                 // Identidad Visual rApanel
                 'rapanel-navy': {
-                    50: '#f8fafc',  // Background Claro
-                    100: '#e2e8f0', // Bordes Claros
-                    800: '#1e293b', // Superficie Dark (Cards)
-                    900: '#0f172a', // Background Dark
+                    50:  '#f8fafc',  // Background Claro
+                    100: '#e2e8f0',  // Bordes Claros
+                    600: '#475569',  // Borde Dark (hover)
+                    700: '#334155',  // Superficie Dark Media (botones)
+                    800: '#1e293b',  // Superficie Dark (Cards)
+                    900: '#0f172a',  // Background Dark
                 },
                 'rapanel-text': {
                     light: '#1d283a', // Tema Claro
                     dark: '#E2E8F0',  // Tema Oscuro
                 },
-                'rapanel-blue': '#4A90E2', // Kafra Blue (Primario)
-                'rapanel-gold': '#F1C40F', // Emperium Gold (Acento)
-                
+                'rapanel-blue':   { DEFAULT: '#4A90E2', dark: '#1e3a5f' }, // Kafra Blue (Primario)
+
                 // ESTADOS Y ALERTAS
-                'rapanel-success': '#2ECC71', // Heal Green (Éxito / Online)
-                'rapanel-danger': '#E74C3C',  // MVP Red (Error / Eliminar)
-                'rapanel-purple': '#a855f7',  // Mystic Purple (VIP / Gender)
+                'rapanel-success': { DEFAULT: '#2ECC71', dark: '#14532d' }, // Heal Green
+                'rapanel-danger':  { DEFAULT: '#E74C3C', dark: '#7f1d1d' }, // MVP Red
+                'rapanel-gold':    { DEFAULT: '#F1C40F', dark: '#78350f' }, // Emperium Gold
+                'rapanel-purple':  { DEFAULT: '#a855f7', dark: '#581c87' }, // Mystic Purple (VIP / Gender)
             },
         },
     },

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CharacterPreference;
 use App\Models\GameAccount;
 use App\Models\Character;
 use App\Models\ActionLog;
@@ -74,7 +75,7 @@ class GameAccountController extends Controller
             [$accountId]
         );
 
-        $charIds   = array_column($characters, 'char_id');
+        $charIds = array_column($characters, 'char_id');
         $partyIds  = array_values(array_unique(array_filter(array_column($characters, 'party_id'))));
 
         $inventoryByChar   = [];
@@ -265,6 +266,13 @@ class GameAccountController extends Controller
             return $arr;
         }, $characters);
 
+        $charPreferences = [];
+        if (!empty($charIds)) {
+            foreach (CharacterPreference::whereIn('char_id', $charIds)->get() as $pref) {
+                $charPreferences[$pref->char_id] = ['hide_from_rankings' => $pref->hide_from_rankings];
+            }
+        }
+
         return Inertia::render('GameAccount/Show', [
             'gameAccount'        => $gameAccount,
             'serverName'         => config('services.ra.server_name', 'Ragnarok Online'),
@@ -276,6 +284,7 @@ class GameAccountController extends Controller
             'characters'         => $enrichedChars,
             'storageItems'       => $storageItems,
             'cardNames'          => $cardNames,
+            'charPreferences'    => $charPreferences,
         ]);
     }
 

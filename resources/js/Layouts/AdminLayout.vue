@@ -13,6 +13,8 @@ import {
     XMarkIcon,
     ShieldCheckIcon,
     NewspaperIcon,
+    ArrowDownTrayIcon,
+    TagIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -25,7 +27,9 @@ const navigation = [
     { name: 'Master Accounts', route: 'admin.users.index',         icon: UserCircleIcon,             group: 'Accounts' },
     { name: 'Login Accounts',  route: 'admin.game-accounts.index', icon: ComputerDesktopIcon,        group: 'Accounts' },
     { name: 'Characters',      route: 'admin.characters.index',    icon: UserGroupIcon,              group: 'Accounts' },
-    { name: 'News',            route: 'admin.news.index',          icon: NewspaperIcon,              group: 'Content' },
+    { name: 'News',               route: 'admin.news.index',                icon: NewspaperIcon,       group: 'Content' },
+    { name: 'Downloads',          route: 'admin.downloads.index',           icon: ArrowDownTrayIcon,   group: 'Content' },
+    { name: 'Download Categories', route: 'admin.download-categories.index', icon: TagIcon,             group: 'Content' },
     { name: 'Action Logs',     route: 'admin.logs.index',          icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',         route: 'admin.console.index',       icon: CommandLineIcon,            group: 'System' },
 ];

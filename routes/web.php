@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\LogAdminController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CharacterAdminController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
+use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -26,8 +29,10 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// RUTAS FALTANTES DEL MENÚ PÚBLICO
-Route::get('/downloads', function() { return Inertia::render('Home'); })->name('downloads');
+// Downloads públicas
+Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads');
+Route::get('/downloads/{download:slug}', [DownloadController::class, 'show'])->name('downloads.show');
+Route::get('/downloads/{download:slug}/get', [DownloadController::class, 'download'])->name('downloads.get');
 Route::get('/donations', function() { return Inertia::render('Home'); })->name('donations');
 
 // Rutas de Información
@@ -95,6 +100,8 @@ Route::middleware('auth')->group(function () {
     // Acciones de personaje
     Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
     Route::put('/characters/{char_id}/reset-look', [CharacterController::class, 'resetLook'])->name('characters.reset-look');
+    Route::put('/characters/{char_id}/slot', [CharacterController::class, 'changeSlot'])->name('characters.change-slot');
+    Route::put('/characters/{char_id}/preferences', [CharacterController::class, 'updatePreferences'])->name('characters.preferences');
 });
 
 // ==========================================
@@ -111,6 +118,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
     Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
     Route::resource('news', AdminNewsController::class)->except(['show']);
+    Route::resource('downloads', AdminDownloadController::class)->except(['show']);
+    Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
 });
 
 // Noticias públicas
