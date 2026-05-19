@@ -9,6 +9,12 @@ import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ClaimAccountModal from '@/Components/ClaimAccountModal.vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
+import StatsCard from '@/Components/StatsCard.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
+import EmptyState from '@/Components/EmptyState.vue';
+import BgMain from '@/Components/BgMain.vue';
+import Footer from '@/Components/Footer.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
 const props = defineProps({
@@ -76,26 +82,20 @@ const openClaimModal = () => {
 <template>
     <Head :title="__('Master Account')" />
 
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased transition-colors duration-300">
+    <div class="min-h-screen text-rapanel-text-light dark:text-rapanel-text-dark font-sans antialiased">
+        <BgMain />
         
         <Header />
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
 
-            <div v-if="flashSuccess" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-success/10 border border-rapanel-success/30 text-rapanel-success text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ flashSuccess }}
-            </div>
-            <div v-if="flashError" class="flex items-center gap-3 px-5 py-3 rounded-xl bg-rapanel-danger/10 border border-rapanel-danger/30 text-rapanel-danger text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9.303 3.376c.864 1.505-.15 3.374-1.95 3.374H2.647c-1.8 0-2.815-1.869-1.951-3.374L10.049 4.126c.9-1.56 3.002-1.56 3.902 0L21.303 16.126z"/></svg>
-                {{ flashError }}
-            </div>
+            <FlashMessages :success="flashSuccess" :error="flashError" />
 
-            <div class="bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl p-6 md:p-10 shadow-xl">
+            <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
-                        <h1 class="text-2xl font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-widest">
+                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-widest">
                             {{ __('Master Account') }}
                         </h1>
                         <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm">
@@ -130,32 +130,23 @@ const openClaimModal = () => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl p-5 transition-transform hover:scale-[1.02]">
-                        <div class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold mb-2">{{ __('Game Accounts') }}</div>
-                        <div class="text-3xl font-bold text-rapanel-navy-900 dark:text-white">{{ gameAccountsCount }} / {{ maxAccounts }}</div>
-                    </div>
-                    <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl p-5 transition-transform hover:scale-[1.02]">
-                        <div class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold mb-2">{{ __('Vote Points') }}</div>
-                        <div class="text-3xl font-bold text-rapanel-gold">0</div>
-                    </div>
-                    <div class="bg-rapanel-navy-50/50 dark:bg-black/20 border border-rapanel-navy-100 dark:border-gray-700/30 rounded-xl p-5 transition-transform hover:scale-[1.02]">
-                        <div class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 uppercase tracking-widest font-bold mb-2">{{ __('Cash Points') }}</div>
-                        <div class="text-3xl font-bold text-rapanel-success">0</div>
-                    </div>
+                    <StatsCard :label="__('Game Accounts')" :value="`${gameAccountsCount} / ${maxAccounts}`" muted />
+                    <StatsCard :label="__('Vote Points')" value="0" value-class="text-rapanel-gold" muted />
+                    <StatsCard :label="__('Cash Points')" value="0" value-class="text-rapanel-success" muted />
                 </div>
                 
             </div>
 
-            <div class="mt-8 bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-gray-700/50 rounded-xl shadow-xl overflow-hidden">
-                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-gray-700 bg-rapanel-navy-50/30 dark:bg-black/10">
-                    <h3 class="text-lg font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
+            <div class="mt-8 bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-5 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
+                    <h3 class="text-lg font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
                         {{ __('My Game Accounts') }}
                     </h3>
                 </div>
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
-                        <thead class="bg-rapanel-navy-50 dark:bg-black/40 text-rapanel-text-light/80 dark:text-rapanel-text-dark uppercase text-xs font-bold">
+                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-rapanel-text-light/80 dark:text-rapanel-text-dark uppercase text-xs font-bold">
                             <tr>
                                 <th class="px-6 py-4">{{ __('Account') }}</th>
                                 <th class="px-6 py-4">{{ __('Gender') }}</th>
@@ -189,14 +180,11 @@ const openClaimModal = () => {
                                     {{ account.created_at || __('Unknown') }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span v-if="account.state === 0" class="inline-flex items-center px-2.5 py-0.5 bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20 rounded-full text-xs font-bold uppercase tracking-tighter">
-                                        <span class="w-1.5 h-1.5 bg-rapanel-success rounded-full me-1.5 animate-pulse"></span>
-                                        {{ __('Active') }}
-                                    </span>
-                                    <span v-else class="inline-flex items-center px-2.5 py-0.5 bg-rapanel-danger/10 text-rapanel-danger border border-rapanel-danger/20 rounded-full text-xs font-bold uppercase tracking-tighter">
-                                        <span class="w-1.5 h-1.5 bg-rapanel-danger rounded-full me-1.5"></span>
-                                        {{ __('Blocked') }}
-                                    </span>
+                                    <StatusBadge
+                                        :variant="account.state === 0 ? 'success' : 'danger'"
+                                        :label="account.state === 0 ? __('Active') : __('Blocked')"
+                                        dot
+                                    />
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <Link
@@ -211,16 +199,11 @@ const openClaimModal = () => {
                                     </Link>
                                 </td>
                             </tr>
-                            <tr v-if="gameAccountsCount === 0">
-                                <td colspan="8" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-gray-500 italic">
-                                    <div class="flex flex-col items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                        {{ __('No game accounts found. Create or claim your first one above!') }}
-                                    </div>
-                                </td>
-                            </tr>
+                            <EmptyState
+                                v-if="gameAccountsCount === 0"
+                                :colspan="8"
+                                :message="__('No game accounts found. Create or claim your first one above!')"
+                            />
                         </tbody>
                     </table>
                 </div>
@@ -235,17 +218,17 @@ const openClaimModal = () => {
                 <form @submit.prevent="createAccount" class="space-y-5">
                     <div>
                         <InputLabel for="userid" :value="__('Username')" />
-                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-gray-700" required autofocus />
+                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required autofocus />
                         <InputError class="mt-2" :message="form.errors.userid" />
                     </div>
                     <div>
                         <InputLabel for="user_pass" :value="__('Password')" />
-                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-gray-700" required />
+                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required />
                         <InputError class="mt-2" :message="form.errors.user_pass" />
                     </div>
                     <div>
                         <InputLabel for="sex" :value="__('Gender')" />
-                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-gray-700 bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
+                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-gray-700 bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
                             <option value="M">{{ __('Male') }}</option>
                             <option value="F">{{ __('Female') }}</option>
                         </select>
@@ -259,9 +242,11 @@ const openClaimModal = () => {
             </div>
         </Modal>
 
-        <ClaimAccountModal 
-            :show="isClaimModalOpen" 
-            @close="isClaimModalOpen = false" 
+        <ClaimAccountModal
+            :show="isClaimModalOpen"
+            @close="isClaimModalOpen = false"
         />
     </div>
+
+    <Footer />
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import { getJobName, isCartClass, formatNum, formatMap, onImgError, itemLabel } from '@/Composables/useRoHelpers';
+import ActionButton from '@/Components/ActionButton.vue';
 
 const props = defineProps({
     char:      { type: Object, default: null },
@@ -31,26 +32,24 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
             leave-to-class="opacity-0"
         >
             <div v-if="char" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-rapanel-navy-900/80 backdrop-blur-sm">
-                <div class="relative w-full max-w-7xl max-h-[92vh] overflow-y-auto bg-white dark:bg-rapanel-navy-800 rounded-xl shadow-2xl ring-1 ring-rapanel-navy-100 dark:ring-gray-700/50">
+                <div class="relative w-full max-w-7xl max-h-[92vh] overflow-y-auto bg-white dark:bg-rapanel-navy-900 rounded-xl shadow-2xl ring-1 ring-rapanel-navy-100 dark:ring-white/10">
 
                     <!-- Header -->
-                    <div class="sticky top-0 z-10 px-6 py-4 bg-white dark:bg-rapanel-navy-800 border-b border-rapanel-navy-100 dark:border-gray-700 rounded-t-xl">
+                    <div class="sticky top-0 z-10 px-6 py-4 bg-white dark:bg-rapanel-navy-900 border-b border-rapanel-navy-100 dark:border-white/10 rounded-t-xl">
                         <!-- Fila superior: título + botones desktop / título + cerrar móvil -->
                         <div class="flex items-center justify-between gap-2">
                             <div>
                                 <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Character') }}</p>
-                                <h2 class="text-lg font-bold text-rapanel-blue uppercase tracking-wide">{{ char.name }}</h2>
+                                <h2 class="text-lg font-display font-bold text-rapanel-blue uppercase tracking-wide">{{ char.name }}</h2>
                             </div>
                             <!-- Desktop: todos los botones en línea -->
                             <div class="hidden sm:flex items-center gap-2">
-                                <button @click="emit('reset-look', char)" :disabled="char.online > 0"
-                                    class="text-xs px-3 py-1.5 rounded-lg font-bold transition-all"
-                                    :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-danger/10 text-rapanel-danger border border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white dark:bg-rapanel-gold/10 dark:text-rapanel-gold dark:border-rapanel-gold/20 dark:hover:bg-rapanel-gold dark:hover:text-rapanel-navy-900'"
-                                >{{ __('Reset Look') }}</button>
-                                <button @click="emit('reset-position', char)" :disabled="char.online > 0"
-                                    class="text-xs px-3 py-1.5 rounded-lg font-bold transition-all"
-                                    :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white'"
-                                >{{ __('Reset Position') }}</button>
+                                <ActionButton variant="reset-look" @click="emit('reset-look', char)" :disabled="char.online > 0">
+                                    {{ __('Reset Look') }}
+                                </ActionButton>
+                                <ActionButton variant="blue" @click="emit('reset-position', char)" :disabled="char.online > 0">
+                                    {{ __('Reset Position') }}
+                                </ActionButton>
                                 <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-danger hover:text-white transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
@@ -62,14 +61,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                         </div>
                         <!-- Móvil: Reset Look + Reset Position en 2 columnas -->
                         <div class="grid grid-cols-2 gap-2 mt-3 sm:hidden">
-                            <button @click="emit('reset-look', char)" :disabled="char.online > 0"
-                                class="text-xs px-3 py-2 rounded-lg font-bold transition-all text-center"
-                                :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-danger/10 text-rapanel-danger border border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white dark:bg-rapanel-gold/10 dark:text-rapanel-gold dark:border-rapanel-gold/20 dark:hover:bg-rapanel-gold dark:hover:text-rapanel-navy-900'"
-                            >{{ __('Reset Look') }}</button>
-                            <button @click="emit('reset-position', char)" :disabled="char.online > 0"
-                                class="text-xs px-3 py-2 rounded-lg font-bold transition-all text-center"
-                                :class="char.online > 0 ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white'"
-                            >{{ __('Reset Position') }}</button>
+                            <ActionButton variant="reset-look" @click="emit('reset-look', char)" :disabled="char.online > 0" class="justify-center py-2">
+                                {{ __('Reset Look') }}
+                            </ActionButton>
+                            <ActionButton variant="blue" @click="emit('reset-position', char)" :disabled="char.online > 0" class="justify-center py-2">
+                                {{ __('Reset Position') }}
+                            </ActionButton>
                         </div>
                     </div>
 
@@ -77,21 +74,21 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CHARACTER INFORMATION ===== -->
                         <section>
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
                                 {{ __('Character Information for') }} <span class="text-rapanel-blue">{{ char.name }}</span>
                             </h3>
 
                             <div class="space-y-3">
 
                                 <!-- 1. PERFIL E IDENTIFICACIÓN -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Profile & Identification') }}</p>
                                     <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                                         <!-- Job Icon + Name + Class -->
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
                                             <img :src="`/data/gameaccount/job_icons/icon_jobs_${char.class ?? 0}.png`" @error="onImgError" class="w-12 h-12 object-contain shrink-0" :alt="getJobName(char.class ?? 0)" />
                                             <div class="min-w-0">
-                                                <h4 class="font-bold text-rapanel-blue text-base leading-tight truncate">{{ char.name }}</h4>
+                                                <h4 class="font-display font-bold text-rapanel-blue text-base leading-tight truncate">{{ char.name }}</h4>
                                                 <p class="text-sm text-rapanel-navy-900 dark:text-white font-medium truncate">{{ getJobName(char.class ?? 0) }}</p>
                                             </div>
                                         </div>
@@ -103,7 +100,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                                 <span class="font-mono">{{ char.char_id }}</span>
                                             </span>
                                             <!-- Slot badge (violet) -->
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-violet-500/10 text-violet-400 border-violet-500/20">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-rapanel-purple/10 text-rapanel-purple border-rapanel-purple/20">
                                                 <span class="text-[9px] font-extrabold opacity-60 uppercase tracking-wider">{{ __('Slot') }}</span>
                                                 <span>{{ (char.char_num ?? 0) + 1 }}</span>
                                             </span>
@@ -124,7 +121,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
                                 <!-- 2. VITALIDAD Y PROGRESO -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Vitality & Progress') }}</p>
                                     <!-- HP + SP bars -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -171,7 +168,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 </div>
 
                                 <!-- 3. ESTADÍSTICAS DE COMBATE -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30 flex flex-col">
+                                <div class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10 flex flex-col">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Combat Statistics') }}</p>
                                     <!-- Stats base: 6 columnas -->
                                     <div class="grid grid-cols-6 gap-2 mb-3">
@@ -183,7 +180,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                             { l: 'DEX', v: char.dex },
                                             { l: 'LUK', v: char.luk },
                                         ]" :key="stat.l"
-                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800/60 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-gray-700/40 text-center"
+                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-gray-700/40 text-center"
                                         >
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ stat.l }}</span>
                                             <span class="font-bold text-rapanel-navy-900 dark:text-white text-base">{{ stat.v ?? 0 }}</span>
@@ -191,11 +188,11 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                     </div>
                                     <!-- Status Points + Skill Points -->
                                     <div class="grid grid-cols-2 gap-2 mt-auto">
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800/60 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Status Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.status_point ?? 0 }}</span>
                                         </div>
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800/60 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Skill Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.skill_point ?? 0 }}</span>
                                         </div>
@@ -208,12 +205,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
                                 <!-- 4. MUNDO Y ECONOMÍA -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('World & Economy') }}</p>
                                     <div class="flex flex-col gap-2">
 
                                         <!-- Zeny -->
-                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/10 border border-rapanel-gold/30">
+                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/20 dark:bg-rapanel-gold/10 border border-rapanel-gold/40 dark:border-rapanel-gold/30">
                                             <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-gold/20 shrink-0">
                                                 <img src="/data/gameaccount/bank.png" class="w-6 h-6 object-contain" alt="" />
                                             </div>
@@ -224,7 +221,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                         </div>
 
                                         <!-- Last Map + Position -->
-                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/10 border border-rapanel-blue/30">
+                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/20 dark:bg-rapanel-blue/10 border border-rapanel-blue/40 dark:border-rapanel-blue/30">
                                             <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-blue/20 shrink-0">
                                                 <img src="/data/gameaccount/lastmap.png" class="w-6 h-6 object-contain" alt="" />
                                             </div>
@@ -239,7 +236,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                         </div>
 
                                         <!-- Save Map + Save Position -->
-                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-success/10 border border-rapanel-success/30">
+                                        <div class="flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-success/20 dark:bg-rapanel-success/10 border border-rapanel-success/40 dark:border-rapanel-success/30">
                                             <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-success/20 shrink-0">
                                                 <img src="/data/gameaccount/savemap.png" class="w-6 h-6 object-contain" alt="" />
                                             </div>
@@ -257,18 +254,18 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 </div>
 
                                 <!-- 5. SOCIAL Y COMUNIDAD -->
-                                <div class="bg-rapanel-navy-50 dark:bg-black/20 rounded-xl p-4 border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 rounded-xl p-4 border border-rapanel-navy-100 dark:border-white/10">
                                     <p class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 mb-3">{{ __('Social & Community') }}</p>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                                         <!-- Sub-tarjeta Guild -->
-                                        <div class="rounded-xl border border-rapanel-blue/25 overflow-hidden">
+                                        <div class="rounded-xl border border-rapanel-blue/25 overflow-hidden flex flex-col">
                                             <div class="flex items-center gap-2 px-3 py-2 bg-rapanel-blue/10 border-b border-rapanel-blue/20">
                                                 <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" alt="" />
                                                 <span v-else class="w-2 h-2 rounded-full bg-rapanel-blue shrink-0"></span>
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue">{{ __('Guild') }}</span>
                                             </div>
-                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/30 bg-white dark:bg-rapanel-navy-800/50">
+                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-white/10 bg-white dark:bg-rapanel-navy-900 flex-1">
                                                 <div v-for="item in [
                                                     { label: __('Guild Name'),     value: char.guild_name     || __('None') },
                                                     { label: __('Guild Level'),    value: char.guild_level    ?? '—' },
@@ -282,12 +279,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                         </div>
 
                                         <!-- Sub-tarjeta Family -->
-                                        <div class="rounded-xl border border-purple-400/25 overflow-hidden">
-                                            <div class="flex items-center gap-2 px-3 py-2 bg-purple-400/10 border-b border-purple-400/20">
-                                                <span class="w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>
-                                                <span class="text-[9px] uppercase tracking-widest font-extrabold text-purple-400">{{ __('Family') }}</span>
+                                        <div class="rounded-xl border border-rapanel-purple/25 overflow-hidden flex flex-col">
+                                            <div class="flex items-center gap-2 px-3 py-2 bg-rapanel-purple/10 border-b border-rapanel-purple/20">
+                                                <span class="w-2 h-2 rounded-full bg-rapanel-purple shrink-0"></span>
+                                                <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-purple">{{ __('Family') }}</span>
                                             </div>
-                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/30 bg-white dark:bg-rapanel-navy-800/50">
+                                            <div class="divide-y divide-rapanel-navy-100 dark:divide-white/10 bg-white dark:bg-rapanel-navy-900 flex-1">
                                                 <div v-for="item in [
                                                     { label: __('Partner'), value: char.partner_name || __('None') },
                                                     { label: __('Child'),   value: char.child_name   || __('None') },
@@ -313,12 +310,12 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- OTHER PARTY MEMBERS -->
                             <section v-if="char.party_name && char.party_members?.length > 0">
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                     {{ __('Other Party Members of') }} <span class="text-rapanel-blue uppercase">{{ char.party_name }}</span>
                                 </h3>
-                                <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
                                     <table class="w-full text-xs text-left">
-                                        <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
                                                 <th class="px-3 py-2">{{ __('Character Name') }}</th>
                                                 <th class="px-3 py-2">{{ __('Job Class') }}</th>
@@ -328,7 +325,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                            <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
+                                            <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ m.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-2">
@@ -356,16 +353,16 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- FRIENDS -->
                             <section>
-                                <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                     {{ __('Friends of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                     <span class="ml-1 font-normal">({{ char.friends?.length ?? 0 }})</span>
                                 </h3>
                                 <div v-if="!char.friends?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4">
                                     {{ char.name }} {{ __('has no friends.') }}
                                 </div>
-                                <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30">
+                                <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
                                     <table class="w-full text-xs text-left">
-                                        <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
                                                 <th class="px-3 py-2">{{ __('Character Name') }}</th>
                                                 <th class="px-3 py-2">{{ __('Job Class') }}</th>
@@ -375,7 +372,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                            <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
+                                            <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ f.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-1.5">
@@ -398,14 +395,14 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== INVENTORY ITEMS ===== -->
                         <section>
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                 {{ __('Inventory Items of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30 overflow-x-auto">
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
                                 <table class="w-full text-xs text-left">
-                                    <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                    <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                         <tr>
                                             <th class="px-2 py-2 text-center">ID</th>
                                             <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
@@ -420,7 +417,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                     </thead>
                                     <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
                                         <tr v-for="(item, idx) in char.inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20"
+                                            class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800"
                                             :class="{ 'bg-rapanel-blue/5': item.equip > 0 }"
                                         >
                                             <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
@@ -449,14 +446,14 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CART INVENTORY ===== -->
                         <section v-if="isCartClass(char.class)">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
                                 {{ __('Cart Inventory Items of') }} <span class="text-rapanel-gold uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.cart_inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.cart_inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No cart items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-gray-700/30 overflow-x-auto">
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
                                 <table class="w-full text-xs text-left">
-                                    <thead class="bg-rapanel-navy-100 dark:bg-black/30 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                    <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                         <tr>
                                             <th class="px-2 py-2 text-center">ID</th>
                                             <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
@@ -471,7 +468,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                     </thead>
                                     <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
                                         <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20"
+                                            class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800"
                                         >
                                             <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
                                             <td class="px-2 py-1.5 text-center">

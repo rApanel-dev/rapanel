@@ -93,7 +93,7 @@ const deleteAccount = () => {
                     
                     <div class="mt-6">
                         <InputLabel :value="__('Account to Delete')" class="text-rapanel-text-light dark:text-rapanel-text-dark" />
-                        <div class="mt-1 block w-full px-3 py-2 bg-rapanel-navy-50 dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-rapanel-navy-800 rounded-md text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 select-none cursor-not-allowed">
+                        <div class="mt-1 block w-full px-3 py-2 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-800 rounded-md text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 select-none cursor-not-allowed">
                             {{ account.userid }}
                         </div>
                     </div>
@@ -104,7 +104,7 @@ const deleteAccount = () => {
                             id="password"
                             v-model="form.password"
                             type="password"
-                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-rapanel-navy-800 text-rapanel-text-light dark:text-white focus:ring-rapanel-danger focus:border-rapanel-danger"
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-rapanel-navy-800 text-rapanel-text-light dark:text-white focus:ring-rapanel-danger focus:border-rapanel-danger"
                             :placeholder="__('Master Account Password')"
                             @keyup.enter="deleteAccount"
                         />

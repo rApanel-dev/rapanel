@@ -57,7 +57,7 @@ const currentMenuItems = computed(() => {
                     
                     <div class="flex items-center gap-3 border-l border-rapanel-navy-100 dark:border-white/10 pl-4 h-8">
                         <template v-if="!$page.props.auth.user">
-                            <Link :href="safeRoute('login')" class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
+                            <Link :href="safeRoute('login')" class="text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
                                 {{ __('Login') }}
                             </Link>
                             <Link :href="safeRoute('register')" class="bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
@@ -117,7 +117,7 @@ const currentMenuItems = computed(() => {
                     
                     <LocaleSelector />
 
-                    <DisclosureButton class="inline-flex items-center justify-center p-2 rounded-md text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 focus:outline-none transition">
+                    <DisclosureButton class="inline-flex items-center justify-center p-2 rounded-md text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 focus:outline-none transition">
                         <span class="sr-only">Open main menu</span>
                         <Bars3Icon v-if="!open" class="block h-6 w-6" aria-hidden="true" />
                         <XMarkIcon v-else class="block h-6 w-6" aria-hidden="true" />
@@ -133,12 +133,12 @@ const currentMenuItems = computed(() => {
                     <div class="flex items-center space-x-1 py-2">
                         <template v-for="item in currentMenuItems" :key="item.name">
                             <Link v-if="!item.children" :href="safeRoute(item.route)"
-                                :class="[isUrl(item.route) ? 'text-rapanel-blue dark:text-white bg-rapanel-navy-50 dark:bg-white/10' : 'text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5', 'px-3 py-2 rounded-md text-sm font-medium transition whitespace-nowrap']">
+                                :class="[isUrl(item.route) ? 'text-rapanel-blue dark:text-white bg-rapanel-navy-50 dark:bg-white/10' : 'text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5', 'px-3 py-2 rounded-md text-sm font-medium transition whitespace-nowrap']">
                                 {{ __(item.name) }}
                             </Link>
 
                             <Menu v-else as="div" class="relative inline-block text-left">
-                                <MenuButton :class="['flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition whitespace-nowrap']">
+                                <MenuButton :class="['flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition whitespace-nowrap']">
                                     {{ __(item.name) }}
                                     <ChevronDownIcon class="w-4 h-4 opacity-30" />
                                 </MenuButton>
@@ -157,7 +157,7 @@ const currentMenuItems = computed(() => {
 
                     <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold ml-4 shrink-0">
                         <div class="flex items-center gap-2">
-                            <span class="text-rapanel-text-light/50 dark:text-white/30">{{ __('Server Status:') }}</span>
+                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
                             
                             <span v-if="$page.props.serverStatus.online" class="flex items-center gap-1.5 text-rapanel-success">
                                 <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
@@ -171,7 +171,7 @@ const currentMenuItems = computed(() => {
                         </div>
 
                         <div class="flex items-center gap-2 border-l border-rapanel-navy-100 dark:border-white/10 pl-6 h-4">
-                            <span class="text-rapanel-text-light/50 dark:text-white/30">{{ __('Players Online:') }}</span>
+                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Players Online:') }}</span>
                             <span class="text-rapanel-gold">{{ $page.props.serverStatus.players }}</span>
                         </div>
                     </div>
@@ -191,11 +191,11 @@ const currentMenuItems = computed(() => {
                         </Link>
 
                         <div v-else class="space-y-1">
-                            <div class="px-3 py-3 text-xs font-bold text-rapanel-text-light/50 dark:text-white/30 uppercase tracking-widest">
+                            <div class="px-3 py-3 text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark uppercase tracking-widest">
                                 {{ __(item.name) }}
                             </div>
                             <Link v-for="sub in item.children" :key="sub.name" :href="safeRoute(sub.route)"
-                                class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-rapanel-text-light/80 dark:text-rapanel-text-dark/80 hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                                 {{ __(sub.name) }}
                             </Link>
                         </div>
@@ -211,7 +211,7 @@ const currentMenuItems = computed(() => {
                             </Link>
                         </div>
                         <div v-else class="bg-rapanel-navy-50 dark:bg-white/5 p-4 rounded-lg border border-rapanel-navy-100 dark:border-white/5">
-                            <div class="text-[10px] text-rapanel-text-light/50 dark:text-white/30 uppercase font-bold mb-1 tracking-widest">{{ __('Logged in as') }}</div>
+                            <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark uppercase font-bold mb-1 tracking-widest">{{ __('Logged in as') }}</div>
                             <div class="text-rapanel-text-light dark:text-white font-bold mb-4">{{ $page.props.auth.user.name }}</div>
 
                             <div class="flex flex-col gap-2 mb-4">
@@ -236,7 +236,7 @@ const currentMenuItems = computed(() => {
 
                     <div class="mt-4 pt-4 border-t border-rapanel-navy-100 dark:border-white/10 space-y-3 px-2">
                         <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                            <span class="text-rapanel-text-light/70 dark:text-white/50">{{ __('Server Status:') }}</span>
+                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
                             <span v-if="$page.props.serverStatus.online" class="flex items-center gap-1.5 text-rapanel-success">
                                 <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
                                 {{ __('Online') }}
@@ -247,7 +247,7 @@ const currentMenuItems = computed(() => {
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                            <span class="text-rapanel-text-light/70 dark:text-white/50">{{ __('Players Online:') }}</span>
+                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Players Online:') }}</span>
                             <span class="text-rapanel-gold">{{ $page.props.serverStatus.players }}</span>
                         </div>
                     </div>

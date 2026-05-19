@@ -1,7 +1,6 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import Footer from '@/Components/Footer.vue';
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
@@ -25,7 +24,7 @@ const scrollTo = (id) => {
 
             <video autoplay loop muted playsinline
                    class="absolute inset-0 w-full h-full object-cover dark:filter dark:brightness-50">
-                <source src="/images/ez.mp4" type="video/mp4" />
+                <source src="/images/bg-rapanel.mp4" type="video/mp4" />
             </video>
 
             <!-- flex-col: content centered, button pinned to bottom -->
@@ -379,7 +378,6 @@ const scrollTo = (id) => {
             </section>
         </div>
 
-        <Footer />
 
     </MainLayout>
 </template>
