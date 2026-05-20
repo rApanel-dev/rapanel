@@ -9,6 +9,7 @@ import {
     XCircleIcon,
     EyeIcon,
 } from '@heroicons/vue/24/outline';
+import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
     news: Object,
@@ -34,25 +35,20 @@ const confirmDelete = (id) => {
     <AdminLayout>
         <div class="space-y-6">
 
-            <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">News</h1>
-                    <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-1">Manage news and announcements</p>
-                </div>
+            <PageHeader title="News" :description="`${news.total} total entries`">
                 <Link :href="safeRoute('admin.news.create')"
-                      class="flex items-center gap-2 px-4 py-2 bg-rapanel-blue text-white rounded-lg text-sm font-semibold hover:opacity-90 transition shadow">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-rapanel-blue text-white rounded-lg text-sm font-bold hover:opacity-90 transition shadow">
                     <PlusIcon class="w-4 h-4" />
                     Create News
                 </Link>
-            </div>
+            </PageHeader>
 
             <!-- Table -->
-            <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden shadow-sm">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                            <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-12">ID</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-28">Type</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-16">Image</th>

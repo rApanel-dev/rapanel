@@ -18,6 +18,11 @@ use App\Http\Controllers\Admin\LogAdminController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CharacterAdminController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
+use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
+use App\Http\Controllers\MvpCardController;
+use App\Http\Controllers\Admin\MvpCardAdminController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -26,15 +31,17 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// RUTAS FALTANTES DEL MENÚ PÚBLICO
-Route::get('/downloads', function() { return Inertia::render('Home'); })->name('downloads');
+// Downloads públicas
+Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads');
+Route::get('/downloads/{download:slug}', [DownloadController::class, 'show'])->name('downloads.show');
+Route::get('/downloads/{download:slug}/get', [DownloadController::class, 'download'])->name('downloads.get');
 Route::get('/donations', function() { return Inertia::render('Home'); })->name('donations');
 
 // Rutas de Información
 Route::prefix('info')->name('info.')->group(function() {
     Route::get('/wiki', function() { return Inertia::render('Home'); })->name('wiki');
     Route::get('/who-sell', function() { return Inertia::render('Home'); })->name('who-sell');
-    Route::get('/mvp-card', function() { return Inertia::render('Home'); })->name('mvp-card');
+    Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
     Route::get('/item-db', function() { return Inertia::render('Home'); })->name('item-db');
 });
 
@@ -95,6 +102,8 @@ Route::middleware('auth')->group(function () {
     // Acciones de personaje
     Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
     Route::put('/characters/{char_id}/reset-look', [CharacterController::class, 'resetLook'])->name('characters.reset-look');
+    Route::put('/characters/{char_id}/slot', [CharacterController::class, 'changeSlot'])->name('characters.change-slot');
+    Route::put('/characters/{char_id}/preferences', [CharacterController::class, 'updatePreferences'])->name('characters.preferences');
 });
 
 // ==========================================
@@ -102,15 +111,27 @@ Route::middleware('auth')->group(function () {
 // ==========================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/',              [AdminController::class,         'dashboard'])->name('dashboard');
-    Route::get('/users',         [AdminUserController::class,     'index'])->name('users.index');
-    Route::get('/users/{user}',  [AdminUserController::class,     'show'])->name('users.show');
-    Route::put('/users/{user}/role',   [AdminUserController::class, 'updateRole'])->name('users.role');
-    Route::put('/users/{user}/status', [AdminUserController::class, 'updateStatus'])->name('users.status');
-    Route::get('/game-accounts', [GameAccountAdminController::class, 'index'])->name('game-accounts.index');
+    Route::get('/users',                     [AdminUserController::class, 'index'])->name('users.index');
+    Route::put('/users/{user}',              [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}/mfa',       [AdminUserController::class, 'clearMfa'])->name('users.clear-mfa');
+    Route::put('/users/{user}/role',         [AdminUserController::class, 'updateRole'])->name('users.role');
+    Route::put('/users/{user}/status',       [AdminUserController::class, 'updateStatus'])->name('users.status');
+    Route::get('/game-accounts',                           [GameAccountAdminController::class, 'index'])->name('game-accounts.index');
+    Route::post('/game-accounts/{accountId}/ban',          [GameAccountAdminController::class, 'ban'])->name('game-accounts.ban');
+    Route::post('/game-accounts/{accountId}/unban',        [GameAccountAdminController::class, 'unban'])->name('game-accounts.unban');
+    Route::patch('/game-accounts/{accountId}/group',       [GameAccountAdminController::class, 'setGroup'])->name('game-accounts.group');
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
     Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
     Route::resource('news', AdminNewsController::class)->except(['show']);
+    Route::resource('downloads', AdminDownloadController::class)->except(['show']);
+    Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
+    Route::post('mvp-cards/sync', [MvpCardAdminController::class, 'sync'])->name('mvp-cards.sync');
+    Route::get('mvp-cards/{mvpCard}/holders', [MvpCardAdminController::class, 'holders'])->name('mvp-cards.holders');
+    Route::patch('mvp-cards/{mvpCard}/toggle', [MvpCardAdminController::class, 'toggle'])->name('mvp-cards.toggle');
+    Route::get('mvp-cards', [MvpCardAdminController::class, 'index'])->name('mvp-cards.index');
+    Route::post('mvp-cards', [MvpCardAdminController::class, 'store'])->name('mvp-cards.store');
+    Route::delete('mvp-cards/{mvpCard}', [MvpCardAdminController::class, 'destroy'])->name('mvp-cards.destroy');
 });
 
 // Noticias públicas

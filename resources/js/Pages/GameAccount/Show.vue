@@ -29,17 +29,30 @@ const props = defineProps({
     cashPointsEnabled: Boolean,
     bankZeny:          Number,
     cashPoints:        Number,
+    charPreferences:   { type: Object, default: () => ({}) },
 });
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
+
+const isAdmin = computed(() => page.props.auth?.user?.role === 'Admin');
+
+const backHref = computed(() => {
+    if (!isAdmin.value) return route('dashboard');
+    const myId = page.props.auth?.user?.id;
+    // Admin viendo su propia cuenta de juego
+    if (props.gameAccount.master_id === myId) return route('dashboard');
+    // Admin viendo la cuenta de juego de otro usuario → volver a su dashboard
+    if (props.gameAccount.master_id) return route('dashboard') + '?as=' + props.gameAccount.master_id;
+    // Cuenta sin master_id (desvinculada) → listado admin
+    return route('admin.game-accounts.index');
+});
 
 const flashSuccess = computed(() => page.props.flash?.success);
 const flashError   = computed(() => page.props.flash?.error);
 
 const totalZeny = computed(() => props.characters.reduce((sum, c) => sum + Number(c.zeny || 0), 0));
 
-// Bloquea acciones si la cuenta o algún personaje está online
 const isAccountOnline = computed(() => props.characters.some(c => c.online > 0));
 
 const vipStatus = computed(() => {
@@ -69,7 +82,7 @@ const getCardName = (id) => {
 };
 
 const formatSex   = (s) => s === 'M' ? __('Male') : __('Female');
-const formatState = (s) => s === 0 ? __('Active') : __('Blocked');
+const formatState = (s) => s === 0 ? __('Active') : __('Banned');
 
 // --- MODALES ---
 
@@ -142,6 +155,96 @@ const confirmResetLook = () => {
         onSuccess: () => closeResetLookModal(),
     });
 };
+
+// Change Slot
+const slotModal      = ref(false);
+const selectedSlotChar = ref(null);
+const targetSlot     = ref(null);
+const slotForm       = useForm({ password: '', slot: 0 });
+
+// character_slots en login ya tiene el valor correcto (9 normal, 15 VIP, etc.)
+const effectiveMaxSlots = computed(() => props.gameAccount?.character_slots ?? 9);
+
+const slotOccupancy = computed(() => {
+    const map = {};
+    for (const c of props.characters) {
+        map[c.char_num] = c;
+    }
+    return map;
+});
+
+const openSlotModal = (char) => {
+    selectedSlotChar.value = char;
+    targetSlot.value = null;
+    slotForm.reset(); slotForm.clearErrors();
+    slotModal.value = true;
+};
+const closeSlotModal = () => {
+    slotModal.value = false;
+    selectedSlotChar.value = null;
+    targetSlot.value = null;
+    slotForm.reset(); slotForm.clearErrors();
+};
+const selectTargetSlot = (slot) => {
+    if (slot === selectedSlotChar.value?.char_num) return;
+    const occupant = slotOccupancy.value[slot];
+    if (occupant && occupant.online > 0) return; // cannot swap with an online character
+    targetSlot.value = slot;
+    slotForm.slot = slot;
+};
+const confirmSlotChange = () => {
+    const newSlot = slotForm.slot;
+    slotForm.put(route('characters.change-slot', selectedSlotChar.value.char_id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            if (charModal.value?.char_id === selectedSlotChar.value?.char_id) {
+                charModal.value.char_num = newSlot;
+            }
+            closeSlotModal();
+        },
+    });
+};
+
+const slotButtonClass = (slot) => {
+    const isCurrent       = slot === selectedSlotChar.value?.char_num;
+    const isSelected      = slot === targetSlot.value;
+    const occupant        = slotOccupancy.value[slot];
+    const isOccupied      = occupant && !isCurrent;
+    const occupantOnline  = isOccupied && occupant.online > 0;
+
+    if (isCurrent)       return 'border-2 border-rapanel-blue/60 bg-rapanel-blue/20 dark:bg-rapanel-blue/20 text-rapanel-blue cursor-default';
+    if (isSelected)      return 'border-2 border-rapanel-blue bg-rapanel-blue text-white shadow-md';
+    if (occupantOnline)  return 'border-2 border-rapanel-danger/40 bg-rapanel-danger/10 text-rapanel-danger/50 cursor-not-allowed opacity-60';
+    if (isOccupied)      return 'border-2 border-rapanel-danger/60 bg-rapanel-danger/20 dark:bg-rapanel-danger/15 text-rapanel-danger hover:bg-rapanel-danger hover:text-white hover:border-rapanel-danger cursor-pointer transition-all';
+    return 'border-2 border-rapanel-success/50 bg-rapanel-success/20 dark:bg-rapanel-success/15 text-rapanel-success hover:bg-rapanel-success hover:text-rapanel-success-dark hover:border-rapanel-success cursor-pointer transition-all';
+};
+
+// Character Preferences
+const prefModal     = ref(false);
+const selectedPrefChar = ref(null);
+const prefForm      = useForm({ password: '', hide_from_rankings: false });
+
+const openPrefModal = (char) => {
+    selectedPrefChar.value = char;
+    const pref = props.charPreferences?.[char.char_id];
+    prefForm.hide_from_rankings = pref?.hide_from_rankings ?? false;
+    prefForm.clearErrors();
+    prefModal.value = true;
+};
+const closePrefModal = () => {
+    prefModal.value = false;
+    selectedPrefChar.value = null;
+    prefForm.reset(); prefForm.clearErrors();
+};
+const confirmPrefUpdate = () => {
+    prefForm.put(route('characters.preferences', selectedPrefChar.value.char_id), {
+        preserveScroll: true,
+        onSuccess: () => closePrefModal(),
+    });
+};
+
+const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
+
 </script>
 
 <template>
@@ -166,12 +269,19 @@ const confirmResetLook = () => {
                         <!-- Título + botón eliminar (móvil: mismo row) -->
                         <div class="flex items-center justify-between sm:justify-start gap-3">
                             <div class="flex items-center gap-3">
-                                <Link :href="route('dashboard')" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
+                                <Link :href="backHref" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
                                 </Link>
                                 <div>
                                     <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
-                                    <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark">{{ gameAccount.userid }}</h1>
+                                    <div class="flex items-center gap-2">
+                                        <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark">{{ gameAccount.userid }}</h1>
+                                        <StatusBadge
+                                            :variant="gameAccount.state === 0 ? 'success' : 'danger'"
+                                            :label="gameAccount.state === 0 ? __('Active') : __('Banned')"
+                                            size="sm"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <!-- Eliminar Cuenta: solo en móvil, esquina derecha del título -->
@@ -180,17 +290,17 @@ const confirmResetLook = () => {
                             </div>
                         </div>
 
-                        <!-- Menú de acciones -->
+                        <!-- Menú de acciones — colores por posición: gold, blue, purple, danger -->
                         <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
 
-                            <!-- Ver Actividad -->
-                            <ActionButton variant="blue" @click="logsModal = true" class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5">
+                            <!-- Ver Actividad (gold — 1°) -->
+                            <ActionButton variant="gold" @click="logsModal = true" class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"/></svg>
                                 {{ __('Actions') }}
                             </ActionButton>
 
-                            <!-- Cambiar Contraseña -->
-                            <ActionButton variant="gold" @click="openChangePasswordModal"
+                            <!-- Cambiar Contraseña (blue — 2°) -->
+                            <ActionButton variant="blue" @click="openChangePasswordModal"
                                 :disabled="isAccountOnline"
                                 :title="isAccountOnline ? __('Character must be offline') : ''"
                                 class="w-full sm:w-auto justify-center sm:justify-start py-2 sm:py-1.5"
@@ -199,7 +309,7 @@ const confirmResetLook = () => {
                                 {{ __('Change Password') }}
                             </ActionButton>
 
-                            <!-- Cambiar Género -->
+                            <!-- Cambiar Género (purple — 3°) -->
                             <ActionButton variant="purple" @click="openGenderModal"
                                 :disabled="isAccountOnline"
                                 :title="isAccountOnline ? __('Character must be offline') : ''"
@@ -209,7 +319,7 @@ const confirmResetLook = () => {
                                 {{ __('Change Gender') }}
                             </ActionButton>
 
-                            <!-- Separador + Eliminar: solo en escritorio -->
+                            <!-- Separador + Eliminar (danger): solo en escritorio -->
                             <div class="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
                             <div class="hidden sm:block">
                                 <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
@@ -240,10 +350,9 @@ const confirmResetLook = () => {
                     </div>
                 </div>
 
-                <!-- Bank Zeny + Cash Points + VIP (fila unificada, proporcional) -->
+                <!-- Bank Zeny + Cash Points + VIP -->
                 <div v-if="bankEnabled || cashPointsEnabled || (vipEnabled && vipStatus)" class="px-5 pb-5 flex flex-col sm:flex-row gap-3">
 
-                    <!-- Bank Zeny -->
                     <div v-if="bankEnabled"
                         class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-gold/20 dark:bg-rapanel-gold/10 border border-rapanel-gold/40 dark:border-rapanel-gold/30"
                     >
@@ -256,7 +365,6 @@ const confirmResetLook = () => {
                         </div>
                     </div>
 
-                    <!-- Cash Points -->
                     <div v-if="cashPointsEnabled"
                         class="flex-1 min-w-0 flex items-center gap-3 rounded-xl px-4 py-3 bg-rapanel-blue/20 dark:bg-rapanel-blue/10 border border-rapanel-blue/40 dark:border-rapanel-blue/30"
                     >
@@ -269,7 +377,6 @@ const confirmResetLook = () => {
                         </div>
                     </div>
 
-                    <!-- VIP -->
                     <div v-if="vipEnabled && vipStatus"
                         class="flex-1 min-w-0 flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-rapanel-purple/20 dark:bg-rapanel-purple/10 border border-rapanel-purple/40 dark:border-rapanel-purple/30"
                     >
@@ -300,7 +407,7 @@ const confirmResetLook = () => {
             <!-- ===== SECCIÓN 2: PERSONAJES ===== -->
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
-                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                    <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Characters on') }} <span class="text-rapanel-blue">{{ serverName }}</span>
                     </h3>
                 </div>
@@ -321,8 +428,7 @@ const confirmResetLook = () => {
                                 <th class="px-4 py-3 text-right">{{ __('Zeny') }}</th>
                                 <th class="px-4 py-3 text-center">{{ __('Guild') }}</th>
                                 <th class="px-4 py-3 text-center">{{ __('Status') }}</th>
-                                <th class="px-4 py-3 text-center">{{ __('Reset Look') }}</th>
-                                <th class="px-4 py-3 text-center">{{ __('Reset Position') }}</th>
+                                <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
@@ -361,15 +467,29 @@ const confirmResetLook = () => {
                                         size="sm"
                                     />
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    <ActionButton variant="reset-look" size="sm" @click="openResetLookModal(char)" :disabled="char.online > 0">
-                                        {{ __('Reset Look') }}
-                                    </ActionButton>
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <ActionButton variant="blue" size="sm" @click="openResetPosModal(char)" :disabled="char.online > 0">
-                                        {{ __('Reset Position') }}
-                                    </ActionButton>
+                                <!-- Actions column — orden: gold, blue, purple, navy -->
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <!-- Preferences (gold) -->
+                                        <ActionButton variant="gold" size="sm" @click="openPrefModal(char)"
+                                            :title="__('Character Preferences')"
+                                            :class="getCharPref(char.char_id)?.hide_from_rankings ? 'ring-1 ring-rapanel-gold' : ''"
+                                        >
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        </ActionButton>
+                                        <!-- Change Slot (blue) -->
+                                        <ActionButton variant="blue" size="sm" @click="openSlotModal(char)" :disabled="char.online > 0" :title="__('Change Slot')">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                                        </ActionButton>
+                                        <!-- Reset Look (purple) -->
+                                        <ActionButton variant="purple" size="sm" @click="openResetLookModal(char)" :disabled="char.online > 0" :title="__('Reset Look')">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/></svg>
+                                        </ActionButton>
+                                        <!-- Reset Position (navy) -->
+                                        <ActionButton variant="navy" size="sm" @click="openResetPosModal(char)" :disabled="char.online > 0" :title="__('Reset Position')">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                                        </ActionButton>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -377,7 +497,7 @@ const confirmResetLook = () => {
                             <tr>
                                 <td colspan="5" class="px-4 py-2 text-right text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</td>
                                 <td class="px-4 py-2 text-right font-mono font-bold text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</td>
-                                <td colspan="4"></td>
+                                <td colspan="3"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -387,7 +507,7 @@ const confirmResetLook = () => {
             <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
-                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                    <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Storage Items of') }} <span class="text-rapanel-blue uppercase">{{ gameAccount.userid }}</span>
                         <span class="ml-2 text-xs font-normal text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">({{ storageItems.length }})</span>
                     </h3>
@@ -450,6 +570,8 @@ const confirmResetLook = () => {
             @close="closeCharModal"
             @reset-look="openResetLookModal"
             @reset-position="openResetPosModal"
+            @open-preferences="openPrefModal"
+            @change-slot="openSlotModal"
         />
 
         <!-- ===== MODAL: ACTIVITY LOGS ===== -->
@@ -457,19 +579,27 @@ const confirmResetLook = () => {
 
         <!-- ===== MODAL: CHANGE PASSWORD ===== -->
         <Modal :show="changePasswordModal" @close="closeChangePasswordModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
-                    {{ __('Change Password for') }} <span class="text-rapanel-gold">{{ gameAccount.userid }}</span>
+                    {{ __('Change Password for') }} <span class="text-rapanel-blue">{{ gameAccount.userid }}</span>
                 </h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
-                    {{ __('Enter a new password for this game account. For security, we request your main web panel account password.') }}
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4 italic">
+                    {{ __('Enter a new password for this game account. For security, we request your master account password.') }}
                 </p>
+                <!-- Password rules -->
+                <ul class="mb-4 space-y-1 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 list-none">
+                    <li class="flex items-center gap-1.5"><span class="text-rapanel-gold font-bold">•</span> {{ __('pwd_rule_length') }}</li>
+                    <li class="flex items-center gap-1.5"><span class="text-rapanel-gold font-bold">•</span> {{ __('pwd_rule_uppercase') }}</li>
+                    <li class="flex items-center gap-1.5"><span class="text-rapanel-gold font-bold">•</span> {{ __('pwd_rule_lowercase') }}</li>
+                    <li class="flex items-center gap-1.5"><span class="text-rapanel-gold font-bold">•</span> {{ __('pwd_rule_number') }}</li>
+                    <li class="flex items-center gap-1.5"><span class="text-rapanel-gold font-bold">•</span> {{ __('pwd_rule_username') }}</li>
+                </ul>
                 <form @submit.prevent="submitChangePassword" class="space-y-4">
                     <div>
                         <InputLabel for="cp_new_password" :value="__('New Game Password')" />
                         <TextInput id="cp_new_password" v-model="passwordForm.password" type="password"
                             class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800"
-                            :placeholder="__('Minimum 4 characters')" required autofocus />
+                            required autofocus />
                         <InputError class="mt-1" :message="passwordForm.errors.password" />
                     </div>
                     <div>
@@ -482,7 +612,7 @@ const confirmResetLook = () => {
                         <InputLabel for="cp_current_password" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
                         <TextInput id="cp_current_password" v-model="passwordForm.current_password" type="password"
                             class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800"
-                            :placeholder="__('Your web panel password')" required />
+                            required />
                         <InputError class="mt-1" :message="passwordForm.errors.current_password" />
                     </div>
                     <div class="flex justify-end gap-3 pt-2">
@@ -497,7 +627,7 @@ const confirmResetLook = () => {
 
         <!-- ===== MODAL: CHANGE GENDER ===== -->
         <Modal :show="genderModal" @close="closeGenderModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
                     {{ __('Change Gender') }}
                 </h2>
@@ -530,7 +660,7 @@ const confirmResetLook = () => {
 
         <!-- ===== MODAL: RESET POSITION ===== -->
         <Modal :show="resetPosModal" @close="closeResetPosModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Position') }}</h2>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPos?.name }}</span></p>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will teleport the character to the default spawn point. Confirm with your master password.') }}</p>
@@ -551,9 +681,9 @@ const confirmResetLook = () => {
 
         <!-- ===== MODAL: RESET LOOK ===== -->
         <Modal :show="resetLookModal" @close="closeResetLookModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Look') }}</h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-gold">{{ selectedLook?.name }}</span></p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedLook?.name }}</span></p>
                 <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will reset the character\'s appearance (hair, color, outfit) to default values. Confirm with your master password.') }}</p>
                 <form @submit.prevent="confirmResetLook" class="space-y-5">
                     <div>
@@ -565,6 +695,99 @@ const confirmResetLook = () => {
                     <div class="flex justify-end gap-3">
                         <SecondaryButton @click="closeResetLookModal">{{ __('Cancel') }}</SecondaryButton>
                         <PrimaryButton :disabled="resetLookForm.processing" :class="{ 'opacity-25': resetLookForm.processing }">{{ __('Confirm Reset') }}</PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- ===== MODAL: CHANGE SLOT ===== -->
+        <Modal :show="slotModal" @close="closeSlotModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Change Slot') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
+                    {{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedSlotChar?.name }}</span>
+                    &nbsp;|&nbsp; {{ __('Current Slot') }}: <span class="font-bold text-rapanel-blue">{{ (selectedSlotChar?.char_num ?? 0) + 1 }}</span>
+                </p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4 italic">{{ __('Select a slot for this character. If the target slot is occupied, the characters will be swapped.') }}</p>
+
+                <!-- Slot picker -->
+                <div class="grid grid-cols-3 gap-2 mb-5">
+                    <button
+                        v-for="n in effectiveMaxSlots"
+                        :key="n - 1"
+                        type="button"
+                        @click="selectTargetSlot(n - 1)"
+                        :disabled="(n - 1) === selectedSlotChar?.char_num || (slotOccupancy[n - 1] && slotOccupancy[n - 1].online > 0)"
+                        :class="['rounded-lg px-3 py-2 flex flex-col items-center gap-0.5 text-center', slotButtonClass(n - 1)]"
+                    >
+                        <span class="text-xs font-bold leading-none">{{ __('Slot') }} {{ n }}</span>
+                        <span v-if="(n - 1) === selectedSlotChar?.char_num" class="text-[10px] leading-none opacity-70">{{ __('Current') }}</span>
+                        <span v-else-if="slotOccupancy[n - 1] && slotOccupancy[n - 1].online > 0" class="text-[10px] leading-none text-rapanel-danger/70">{{ __('Online') }}</span>
+                        <span v-else-if="slotOccupancy[n - 1]" class="text-[10px] leading-none truncate max-w-full">{{ slotOccupancy[n - 1].name }}</span>
+                        <span v-else class="text-[10px] leading-none opacity-50">{{ __('Empty') }}</span>
+                    </button>
+                </div>
+
+                <form v-if="targetSlot !== null" @submit.prevent="confirmSlotChange" class="space-y-4">
+                    <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                        {{ __('Moving to slot') }} <span class="font-bold text-rapanel-blue">{{ targetSlot + 1 }}</span>
+                        <span v-if="slotOccupancy[targetSlot]">
+                            &nbsp;— {{ __('Swapping with') }} <span class="font-bold text-rapanel-gold">{{ slotOccupancy[targetSlot].name }}</span>
+                        </span>
+                    </p>
+                    <div>
+                        <InputLabel for="slot_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="slot_pw" v-model="slotForm.password" type="password"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800"
+                            required autofocus />
+                        <InputError class="mt-2" :message="slotForm.errors.password" />
+                        <InputError class="mt-2" :message="slotForm.errors.error" />
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <SecondaryButton @click="closeSlotModal">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton :disabled="slotForm.processing" :class="{ 'opacity-25': slotForm.processing }">{{ __('Confirm Slot Change') }}</PrimaryButton>
+                    </div>
+                </form>
+                <div v-else class="flex justify-end">
+                    <SecondaryButton @click="closeSlotModal">{{ __('Cancel') }}</SecondaryButton>
+                </div>
+            </div>
+        </Modal>
+
+        <!-- ===== MODAL: CHARACTER PREFERENCES ===== -->
+        <Modal :show="prefModal" @close="closePrefModal">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Character Preferences') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4">
+                    {{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPrefChar?.name }}</span>
+                </p>
+                <form @submit.prevent="confirmPrefUpdate" class="space-y-5">
+                    <!-- Hide from Rankings toggle -->
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <div class="relative mt-0.5 shrink-0">
+                            <input type="checkbox" v-model="prefForm.hide_from_rankings" class="sr-only peer" />
+                            <div class="w-10 h-6 rounded-full border-2 transition-all
+                                border-rapanel-navy-100 dark:border-white/20 bg-rapanel-navy-100/50 dark:bg-rapanel-navy-700
+                                peer-checked:bg-rapanel-blue peer-checked:border-rapanel-blue"></div>
+                            <div class="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-rapanel-navy-900 dark:text-white">{{ __('Hide from Rankings') }}</p>
+                            <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mt-0.5">{{ __('This character will not appear in public ranking pages.') }}</p>
+                        </div>
+                    </label>
+
+                    <div>
+                        <InputLabel for="pref_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput id="pref_pw" v-model="prefForm.password" type="password"
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-800"
+                            required autofocus />
+                        <InputError class="mt-2" :message="prefForm.errors.password" />
+                        <InputError class="mt-2" :message="prefForm.errors.error" />
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <SecondaryButton @click="closePrefModal">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton :disabled="prefForm.processing" :class="{ 'opacity-25': prefForm.processing }">{{ __('Save Preferences') }}</PrimaryButton>
                     </div>
                 </form>
             </div>

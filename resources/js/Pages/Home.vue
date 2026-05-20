@@ -23,9 +23,12 @@ const scrollTo = (id) => {
         <section class="relative overflow-hidden h-[calc(100vh-5rem)] md:h-[calc(100vh-8.5rem)]">
 
             <video autoplay loop muted playsinline
-                   class="absolute inset-0 w-full h-full object-cover dark:filter dark:brightness-50">
+                   class="absolute inset-0 w-full h-full object-cover object-bottom">
                 <source src="/images/bg-rapanel.mp4" type="video/mp4" />
             </video>
+
+            <!-- Overlay: white tint on light, dark tint on dark -->
+            <div class="absolute inset-0 dark:bg-black/50"></div>
 
             <!-- flex-col: content centered, button pinned to bottom -->
             <div class="relative z-10 h-full flex flex-col">
@@ -37,12 +40,12 @@ const scrollTo = (id) => {
                              class="w-48 md:w-72 mb-6 drop-shadow-lg"
                              alt="Server title" />
 
-                        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white drop-shadow">
+                        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-rapanel-text-light dark:text-rapanel-text-dark drop-shadow">
                             {{ __('Welcome to') }}
                             <span class="text-rapanel-blue">rApanel</span>
                         </h1>
 
-                        <p class="mt-6 text-xl leading-8 text-gray-800 dark:text-white drop-shadow">
+                        <p class="mt-6 text-xl leading-8 text-rapanel-text-light dark:text-rapanel-text-dark drop-shadow">
                             {{ __('A classic Ragnarok Online experience, reimagined for a new era.') }}
                         </p>
 
@@ -84,7 +87,7 @@ const scrollTo = (id) => {
                 <source src="/images/about.mp4" type="video/mp4" />
             </video>
 
-            <div class="relative z-10 container mx-auto py-20 px-6">
+            <div class="relative z-10 container mx-auto py-10 px-6">
 
                 <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-white drop-shadow text-center mb-16">
                     {{ __('Stay Update') }}
@@ -198,7 +201,7 @@ const scrollTo = (id) => {
                 </div>
 
                 <!-- Next section button -->
-                <div class="flex justify-center pt-12 pb-10">
+                <div class="flex justify-center pt-6 pb-10">
                     <button @click="scrollTo('server-info')"
                             class="next-btn w-12 h-12 rounded-full flex items-center justify-center
                                    bg-white/20 hover:bg-white/35 border border-white/40
@@ -222,10 +225,10 @@ const scrollTo = (id) => {
                 <source src="/images/info.mp4" type="video/mp4" />
             </video>
 
-            <section class="relative z-10 container mx-auto py-16 px-6">
+            <section class="relative z-10 container mx-auto py-10 px-6">
 
                 <div class="flex items-center flex-col mb-16">
-                    <h1 class="mt-4 text-4xl sm:text-5xl font-bold tracking-tight text-white drop-shadow text-center">
+                    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-white drop-shadow text-center">
                         {{ __('Server Information') }}
                     </h1>
                 </div>

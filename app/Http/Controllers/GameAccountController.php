@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CharacterPreference;
 use App\Models\GameAccount;
 use App\Models\Character;
 use App\Models\ActionLog;
@@ -23,16 +24,19 @@ class GameAccountController extends Controller
         $selectCols = [
             'account_id', 'userid', 'sex', 'email', 'group_id', 'state',
             'logincount', 'lastlogin', 'last_ip', 'birthdate',
-            'character_slots', 'expiration_time', 'created_at',
+            'character_slots', 'expiration_time', 'created_at', 'master_id', 'unban_time',
         ];
         if ($vipEnabled) {
             $selectCols[] = 'vip_time';
         }
 
-        $gameAccount = GameAccount::where('account_id', $accountId)
-            ->where('master_id', Auth::id())
-            ->select($selectCols)
-            ->firstOrFail();
+        $query = GameAccount::where('account_id', $accountId)->select($selectCols);
+
+        if (Auth::user()->role !== 'Admin') {
+            $query->where('master_id', Auth::id());
+        }
+
+        $gameAccount = $query->firstOrFail();
 
         // --- PERSONAJES con guild, party, familia y death count ---
         $characters = DB::connection('mysql_main')->select(
@@ -74,7 +78,7 @@ class GameAccountController extends Controller
             [$accountId]
         );
 
-        $charIds   = array_column($characters, 'char_id');
+        $charIds = array_column($characters, 'char_id');
         $partyIds  = array_values(array_unique(array_filter(array_column($characters, 'party_id'))));
 
         $inventoryByChar   = [];
@@ -265,6 +269,13 @@ class GameAccountController extends Controller
             return $arr;
         }, $characters);
 
+        $charPreferences = [];
+        if (!empty($charIds)) {
+            foreach (CharacterPreference::whereIn('char_id', $charIds)->get() as $pref) {
+                $charPreferences[$pref->char_id] = ['hide_from_rankings' => $pref->hide_from_rankings];
+            }
+        }
+
         return Inertia::render('GameAccount/Show', [
             'gameAccount'        => $gameAccount,
             'serverName'         => config('services.ra.server_name', 'Ragnarok Online'),
@@ -276,20 +287,25 @@ class GameAccountController extends Controller
             'characters'         => $enrichedChars,
             'storageItems'       => $storageItems,
             'cardNames'          => $cardNames,
+            'charPreferences'    => $charPreferences,
         ]);
     }
 
     public function changeGender(Request $request, int $accountId)
     {
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate(['password' => ['required', 'string']]);
 
         if (!Hash::check($request->password, Auth::user()->password)) {
             return back()->withErrors(['password' => __('The provided password does not match our records.')]);
         }
 
-        $gameAccount = GameAccount::where('account_id', $accountId)
-            ->where('master_id', Auth::id())
-            ->firstOrFail();
+        $query = GameAccount::where('account_id', $accountId);
+        if (!$isAdmin) {
+            $query->where('master_id', Auth::id());
+        }
+        $gameAccount = $query->firstOrFail();
 
         $onlineCount = DB::connection('mysql_main')
             ->table('char')
@@ -316,11 +332,13 @@ class GameAccountController extends Controller
             'action'     => 'game_account_gender_changed',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'account_id' => $accountId,
-                'username'   => $gameAccount->userid,
-                'new_sex'    => $newSex,
-            ],
+            'metadata'   => array_filter([
+                'account_id'     => $accountId,
+                'username'       => $gameAccount->userid,
+                'new_sex'        => $newSex,
+                'admin_override' => $isAdmin ?: null,
+                'admin_name'     => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Gender changed successfully.'));
@@ -389,27 +407,27 @@ class GameAccountController extends Controller
 
     public function changePassword(Request $request, $account_id)
     {
-        // 1. Añadimos 'current_password' a la validación
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate([
             'current_password' => ['required', 'string'],
-            'password' => ['required', 'confirmed', 'min:4', 'max:32'],
+            'password'         => ['required', 'confirmed', 'min:4', 'max:32'],
         ], [
             'current_password.required' => __('Please enter your master account password.'),
-            'password.confirmed' => __('The password confirmation does not match.'),
+            'password.confirmed'        => __('The password confirmation does not match.'),
         ]);
 
-        // 2. LA CLAVE: Validar que la contraseña maestra coincida
-        // Comparamos lo que escribió el usuario con el hash en ra_users
         if (!Hash::check($request->current_password, Auth::user()->password)) {
             return back()->withErrors([
                 'current_password' => __('The provided password does not match our records.')
             ]);
         }
 
-        // 3. Verificar propiedad de la cuenta de juego (Seguridad Crítica)
-        $gameAccount = GameAccount::where('account_id', $account_id)
-            ->where('master_id', Auth::id())
-            ->first();
+        $query = GameAccount::where('account_id', $account_id);
+        if (!$isAdmin) {
+            $query->where('master_id', Auth::id());
+        }
+        $gameAccount = $query->first();
 
         if (!$gameAccount) {
             return back()->withErrors(['error' => __('You do not have permission to manage this account.')]);
@@ -427,68 +445,75 @@ class GameAccountController extends Controller
             'user_pass' => $newPassword
         ]);
 
-        // 5. Registro de Auditoría
         ActionLog::create([
             'user_id'    => Auth::id(),
             'category'   => 'GAME_ACCOUNT',
             'action'     => 'game_account_password_change_verified',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'account_id' => (int) $account_id,
-                'username'   => $gameAccount->userid,
-                'method'     => 'master_password_confirmed' 
-            ]
+            'metadata'   => array_filter([
+                'account_id'     => (int) $account_id,
+                'username'       => $gameAccount->userid,
+                'admin_override' => $isAdmin ?: null,
+                'admin_name'     => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Password updated successfully.'));
     }
 
-    /**
-     * Obtiene el historial de actividad de una cuenta de juego específica.
-     */
     public function logs($account_id)
     {
-        // Verificamos que la cuenta pertenezca al usuario logueado
-        $exists = GameAccount::where('account_id', $account_id)
-                    ->where('master_id', auth()->id())
-                    ->exists();
+        $isAdmin = Auth::user()->role === 'Admin';
 
-        if (!$exists) {
-            return response()->json([], 403);
+        if (!$isAdmin) {
+            $exists = GameAccount::where('account_id', $account_id)
+                ->where('master_id', auth()->id())
+                ->exists();
+
+            if (!$exists) {
+                return response()->json([], 403);
+            }
         }
 
-        return ActionLog::on('mysql') 
-            ->where('user_id', auth()->id())
-            ->where('category', 'GAME_ACCOUNT')
-            ->where(function($query) use ($account_id) {
-                $query->where('metadata->account_id', (int)$account_id)
-                    ->orWhere('metadata->account_id', (string)$account_id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get(['id', 'action', 'ip_address', 'created_at']);
+        $query = ActionLog::on('mysql')
+            ->whereIn('category', ['GAME_ACCOUNT', 'CHARACTER'])
+            ->where(function ($q) use ($account_id) {
+                $q->where('metadata->account_id', (int) $account_id)
+                  ->orWhere('metadata->account_id', (string) $account_id);
+            });
+
+        if (!$isAdmin) {
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query->orderBy('created_at', 'desc')
+            ->get(['id', 'category', 'action', 'ip_address', 'metadata', 'created_at', 'user_id']);
     }
 
     public function destroy(Request $request, $account_id)
     {
-        $request->validate([
-            'password' => ['required', 'string'],
-        ]);
+        $isAdmin = Auth::user()->role === 'Admin';
+
+        $request->validate(['password' => ['required', 'string']]);
 
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => __('The provided password does not match our records.')]);
         }
 
-        $gameAccount = GameAccount::where('account_id', $account_id)
-            ->where('master_id', auth()->id())
-            ->firstOrFail();
+        $query = GameAccount::where('account_id', $account_id);
+        if (!$isAdmin) {
+            $query->where('master_id', auth()->id());
+        }
+        $gameAccount = $query->firstOrFail();
 
         $originalUserid = $gameAccount->userid;
         // 'del_' (4) + account_id (máx 10 dígitos) = máx 14 chars — seguro bajo el límite de rAthena (23)
         $newUserid = 'del_' . $gameAccount->account_id;
 
-        // Transacción externa en rAthena: si el registro en el panel falla, el update de rAthena hace rollback
-        DB::connection($gameAccount->getConnectionName())->transaction(function () use ($gameAccount, $newUserid, $originalUserid, $account_id, $request) {
+        $adminName = $isAdmin ? Auth::user()->name : null;
+
+        DB::connection($gameAccount->getConnectionName())->transaction(function () use ($gameAccount, $newUserid, $originalUserid, $account_id, $request, $isAdmin, $adminName) {
 
             $gameAccount->update([
                 'userid'    => $newUserid,
@@ -496,8 +521,7 @@ class GameAccountController extends Controller
                 'state'     => 5,
             ]);
 
-            // Transacción interna en el panel: historial dedicado + auditoría general
-            DB::connection('mysql')->transaction(function () use ($originalUserid, $account_id, $request) {
+            DB::connection('mysql')->transaction(function () use ($originalUserid, $account_id, $request, $isAdmin, $adminName) {
 
                 DeletedAccountLog::create([
                     'account_id'      => (int) $account_id,
@@ -511,11 +535,13 @@ class GameAccountController extends Controller
                     'action'     => 'game_account_deactivated',
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
-                    'metadata'   => [
+                    'metadata'   => array_filter([
                         'account_id'        => (int) $account_id,
                         'previous_username' => $originalUserid,
                         'new_status'        => 'Deactivated and Unlinked',
-                    ],
+                        'admin_override'    => $isAdmin ?: null,
+                        'admin_name'        => $adminName,
+                    ]),
                 ]);
             });
         });

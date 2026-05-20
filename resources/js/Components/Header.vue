@@ -5,7 +5,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import LocaleSelector from '@/Components/LocaleSelector.vue'; 
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import { visitorMenuItems, authMenuItems } from '@/menu.js';
-import { computed } from 'vue'; // Importamos computed para hacer la lógica dinámica
+import { computed, ref } from 'vue';
 
 const page = usePage();
 
@@ -31,10 +31,15 @@ const isUrl = (routeName) => {
 
 // LÓGICA MÁGICA: Une los menús si hay sesión iniciada
 const currentMenuItems = computed(() => {
-    return page.props.auth.user 
+    return page.props.auth.user
         ? [...visitorMenuItems, ...authMenuItems] // Une el menú público y el privado
         : visitorMenuItems;                       // Solo muestra el público
 });
+
+const openMobileSubmenus = ref({});
+const toggleMobileSubmenu = (name) => {
+    openMobileSubmenus.value[name] = !openMobileSubmenus.value[name];
+};
 </script>
 
 <template>
@@ -190,14 +195,19 @@ const currentMenuItems = computed(() => {
                             {{ __(item.name) }}
                         </Link>
 
-                        <div v-else class="space-y-1">
-                            <div class="px-3 py-3 text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark uppercase tracking-widest">
+                        <div v-else class="space-y-0.5">
+                            <button @click="toggleMobileSubmenu(item.name)"
+                                class="w-full flex items-center justify-between px-3 py-3 rounded-md text-sm font-bold text-rapanel-text-light dark:text-rapanel-text-dark uppercase tracking-widest hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                                 {{ __(item.name) }}
+                                <ChevronDownIcon class="w-4 h-4 opacity-50 transition-transform duration-200"
+                                    :class="{ 'rotate-180': openMobileSubmenus[item.name] }" />
+                            </button>
+                            <div v-show="openMobileSubmenus[item.name]" class="space-y-0.5 pb-1">
+                                <Link v-for="sub in item.children" :key="sub.name" :href="safeRoute(sub.route)"
+                                    class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                    {{ __(sub.name) }}
+                                </Link>
                             </div>
-                            <Link v-for="sub in item.children" :key="sub.name" :href="safeRoute(sub.route)"
-                                class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
-                                {{ __(sub.name) }}
-                            </Link>
                         </div>
                     </template>
 

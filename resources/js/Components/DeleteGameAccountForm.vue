@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import Modal from '@/Components/Modal.vue';
 import InputError from '@/Components/InputError.vue';
@@ -15,6 +15,8 @@ const props = defineProps({
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
+
+const isAdmin = computed(() => page.props.auth?.user?.role === 'Admin');
 
 const confirmingAccountDeletion = ref(false);
 const step = ref(1); // Controlamos el paso actual
@@ -64,7 +66,7 @@ const deleteAccount = () => {
         </button>
 
         <Modal :show="confirmingAccountDeletion" @close="closeModal">
-            <div class="p-6 bg-white dark:bg-rapanel-navy-800 border border-rapanel-danger/30 rounded-lg text-left">
+            <div class="p-6 bg-white dark:bg-rapanel-navy-900 border border-rapanel-danger/30 rounded-lg text-left">
                 
                 <div v-if="step === 1">
                     <h2 class="text-lg font-medium text-rapanel-danger">

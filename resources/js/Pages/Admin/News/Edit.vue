@@ -46,14 +46,14 @@ const confirmDelete = () => {
         <div class="max-w-3xl space-y-6">
 
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between pb-5 border-b border-rapanel-navy-100 dark:border-white/[0.055]">
                 <div class="flex items-center gap-4">
                     <Link :href="safeRoute('admin.news.index')"
-                          class="p-2 rounded-lg hover:bg-rapanel-navy-100 dark:hover:bg-white/10 text-rapanel-text-light/60 dark:text-white/50 transition">
+                          class="p-2 rounded-lg hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.07] text-rapanel-text-light/55 dark:text-white/45 transition-colors">
                         <ArrowLeftIcon class="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">Edit News</h1>
+                        <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">Edit News</h1>
                         <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">Admin › News › Edit</p>
                     </div>
                 </div>

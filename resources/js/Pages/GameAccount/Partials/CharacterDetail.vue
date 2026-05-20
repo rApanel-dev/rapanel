@@ -8,7 +8,7 @@ const props = defineProps({
     cardNames: { type: Object, default: () => ({}) },
 });
 
-const emit = defineEmits(['close', 'reset-look', 'reset-position']);
+const emit = defineEmits(['close', 'reset-look', 'reset-position', 'open-preferences', 'change-slot']);
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
@@ -42,12 +42,20 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Character') }}</p>
                                 <h2 class="text-lg font-display font-bold text-rapanel-blue uppercase tracking-wide">{{ char.name }}</h2>
                             </div>
-                            <!-- Desktop: todos los botones en línea -->
+                            <!-- Desktop: todos los botones en línea (orden: gold, blue, purple, navy) -->
                             <div class="hidden sm:flex items-center gap-2">
-                                <ActionButton variant="reset-look" @click="emit('reset-look', char)" :disabled="char.online > 0">
+                                <ActionButton variant="gold" @click="emit('open-preferences', char)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    {{ __('Character Preferences') }}
+                                </ActionButton>
+                                <ActionButton variant="blue" @click="emit('change-slot', char)" :disabled="char.online > 0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                                    {{ __('Change Slot') }}
+                                </ActionButton>
+                                <ActionButton variant="purple" @click="emit('reset-look', char)" :disabled="char.online > 0">
                                     {{ __('Reset Look') }}
                                 </ActionButton>
-                                <ActionButton variant="blue" @click="emit('reset-position', char)" :disabled="char.online > 0">
+                                <ActionButton variant="navy" @click="emit('reset-position', char)" :disabled="char.online > 0">
                                     {{ __('Reset Position') }}
                                 </ActionButton>
                                 <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-danger hover:text-white transition-all">
@@ -59,12 +67,18 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
-                        <!-- Móvil: Reset Look + Reset Position en 2 columnas -->
+                        <!-- Móvil: 4 botones en 2 columnas (orden: gold, blue, purple, navy) -->
                         <div class="grid grid-cols-2 gap-2 mt-3 sm:hidden">
-                            <ActionButton variant="reset-look" @click="emit('reset-look', char)" :disabled="char.online > 0" class="justify-center py-2">
+                            <ActionButton variant="gold" @click="emit('open-preferences', char)" class="justify-center py-2">
+                                {{ __('Character Preferences') }}
+                            </ActionButton>
+                            <ActionButton variant="blue" @click="emit('change-slot', char)" :disabled="char.online > 0" class="justify-center py-2">
+                                {{ __('Change Slot') }}
+                            </ActionButton>
+                            <ActionButton variant="purple" @click="emit('reset-look', char)" :disabled="char.online > 0" class="justify-center py-2">
                                 {{ __('Reset Look') }}
                             </ActionButton>
-                            <ActionButton variant="blue" @click="emit('reset-position', char)" :disabled="char.online > 0" class="justify-center py-2">
+                            <ActionButton variant="navy" @click="emit('reset-position', char)" :disabled="char.online > 0" class="justify-center py-2">
                                 {{ __('Reset Position') }}
                             </ActionButton>
                         </div>
@@ -74,7 +88,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CHARACTER INFORMATION ===== -->
                         <section>
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-4">
                                 {{ __('Character Information for') }} <span class="text-rapanel-blue">{{ char.name }}</span>
                             </h3>
 
@@ -310,7 +324,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- OTHER PARTY MEMBERS -->
                             <section v-if="char.party_name && char.party_members?.length > 0">
-                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                     {{ __('Other Party Members of') }} <span class="text-rapanel-blue uppercase">{{ char.party_name }}</span>
                                 </h3>
                                 <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
@@ -353,7 +367,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- FRIENDS -->
                             <section>
-                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                     {{ __('Friends of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                     <span class="ml-1 font-normal">({{ char.friends?.length ?? 0 }})</span>
                                 </h3>
@@ -395,7 +409,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== INVENTORY ITEMS ===== -->
                         <section>
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                 {{ __('Inventory Items of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.inventory?.length ?? 0 }})</span>
                             </h3>
@@ -446,7 +460,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CART INVENTORY ===== -->
                         <section v-if="isCartClass(char.class)">
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                 {{ __('Cart Inventory Items of') }} <span class="text-rapanel-gold uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.cart_inventory?.length ?? 0 }})</span>
                             </h3>
