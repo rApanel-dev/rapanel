@@ -28,14 +28,62 @@ const applyFilters = () => {
 };
 watch([search, category], applyFilters);
 
-const formatDate = (d) => d ? new Date(d).toLocaleString() : '—';
+const formatDate = (d) => d ? String(d).replace('T', ' ').replace(/\.\d+Z?$/, '') : '—';
 
 const actionColor = (action) => {
-    if (action?.includes('password')) return 'text-amber-500 dark:text-amber-400';
-    if (action?.includes('delete') || action?.includes('deactivated')) return 'text-red-500 dark:text-red-400';
-    if (action?.includes('created') || action?.includes('linked')) return 'text-green-500 dark:text-green-400';
-    if (action?.includes('gender') || action?.includes('reset')) return 'text-purple-500 dark:text-purple-400';
-    return 'text-blue-500 dark:text-blue-400';
+    if (action?.includes('password'))                                    return 'text-amber-500 dark:text-amber-400';
+    if (action?.includes('unbanned') || action?.includes('activated'))   return 'text-rapanel-success';
+    if (action?.includes('banned') || action?.includes('deactivated') || action?.includes('delete')) return 'text-rapanel-danger';
+    if (action?.includes('created') || action?.includes('linked'))       return 'text-rapanel-success';
+    if (action?.includes('gender') || action?.includes('reset'))         return 'text-rapanel-purple';
+    if (action?.includes('group') || action?.includes('updated'))        return 'text-rapanel-gold';
+    return 'text-rapanel-blue';
+};
+
+const metaDetails = (log) => {
+    const m = log.metadata ?? {};
+    const items = [];
+
+    // — Target principal —
+    if (m.username)
+        items.push({ label: 'Account', value: `${m.username} (#${m.account_id ?? '?'})`, bold: true });
+    else if (m.previous_username)
+        items.push({ label: 'Account', value: `${m.previous_username} (#${m.account_id ?? '?'})`, bold: true });
+    else if (m.char_name)
+        items.push({ label: 'Character', value: `${m.char_name} (#${m.char_id ?? '?'})`, bold: true });
+    else if (m.target_user_name)
+        items.push({ label: 'User', value: `${m.target_user_name} (#${m.target_user_id ?? '?'})`, bold: true });
+
+    // — Game accounts vinculados (master ban) —
+    if (m.game_accounts && typeof m.game_accounts === 'object') {
+        const list = Object.entries(m.game_accounts).map(([id, name]) => `${name} (#${id})`).join(', ');
+        if (list) items.push({ label: 'Game Accts', value: list });
+    }
+
+    // — Detalles por acción —
+    if (m.ban_type)
+        items.push({ label: 'Ban', value: m.ban_type === 'permanent' ? 'Permanent' : `${m.days}d` });
+    if (m.reason)
+        items.push({ label: 'Reason', value: `"${m.reason}"` });
+    if (m.from_group !== undefined && m.to_group !== undefined)
+        items.push({ label: 'Group', value: `${m.from_group} → ${m.to_group}` });
+    if (m.new_sex)
+        items.push({ label: 'Gender', value: `→ ${m.new_sex === 'M' ? 'Male' : 'Female'}` });
+    if (m.reset_to)
+        items.push({ label: 'Reset to', value: m.reset_to });
+    if (m.from_slot !== undefined && m.to_slot !== undefined)
+        items.push({ label: 'Slot', value: `${m.from_slot} → ${m.to_slot}${m.swapped_with ? ` (↔ ${m.swapped_with})` : ''}` });
+    if (m.method)
+        items.push({ label: 'Method', value: m.method });
+
+    // — Campos editados (game_account_updated) —
+    if (m.from && m.to && typeof m.from === 'object') {
+        const changed = Object.keys(m.to).filter(k => m.from[k] !== m.to[k]);
+        if (changed.length)
+            items.push({ label: 'Changed', value: changed.map(k => `${k}: ${m.from[k] ?? '—'} → ${m.to[k]}`).join(' · ') });
+    }
+
+    return items;
 };
 </script>
 
@@ -66,39 +114,52 @@ const actionColor = (action) => {
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Date</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">User</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap">Date</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Admin</th>
                                 <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">Category</th>
                                 <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Action</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">IP Address</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Details</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">IP</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
                             <tr v-if="!logs.data?.length">
-                                <td colspan="5" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">No logs found.</td>
+                                <td colspan="6" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">No logs found.</td>
                             </tr>
                             <tr v-for="log in logs.data" :key="log.id"
-                                class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition align-top">
                                 <td class="px-4 py-3 text-xs text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap">
                                     {{ formatDate(log.created_at) }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <template v-if="log.user">
-                                        <span class="font-semibold text-rapanel-navy-900 dark:text-white">
-                                            {{ log.user.name }}
-                                        </span>
-                                    </template>
-                                    <span v-else class="text-rapanel-text-light/50 dark:text-white/40">Deleted user</span>
+                                    <span v-if="log.user" class="font-semibold text-rapanel-navy-900 dark:text-white text-sm">
+                                        {{ log.user.name }}
+                                    </span>
+                                    <span v-else class="text-rapanel-text-light/50 dark:text-white/40 text-xs">Deleted user</span>
                                 </td>
-                                <td class="px-4 py-3 text-xs text-rapanel-text-light/60 dark:text-white/50 hidden md:table-cell">
+                                <td class="px-4 py-3 text-xs text-rapanel-text-light/60 dark:text-white/50 hidden md:table-cell whitespace-nowrap">
                                     {{ log.category }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span :class="[actionColor(log.action), 'text-xs font-semibold']">
+                                    <span :class="[actionColor(log.action), 'text-xs font-semibold font-mono whitespace-nowrap']">
                                         {{ log.action }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 font-mono text-xs text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">
+
+                                <!-- Details extraídos del metadata -->
+                                <td class="px-4 py-3 hidden lg:table-cell">
+                                    <div v-if="metaDetails(log).length" class="flex flex-col gap-1">
+                                        <div v-for="item in metaDetails(log)" :key="item.label" class="flex items-baseline gap-1.5 text-xs">
+                                            <span class="text-[10px] font-black uppercase tracking-wider text-rapanel-text-light/35 dark:text-white/30 shrink-0">{{ item.label }}</span>
+                                            <span :class="[item.bold ? 'font-semibold text-rapanel-navy-900 dark:text-white' : 'text-rapanel-text-light/70 dark:text-white/55']">
+                                                {{ item.value }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span v-else class="text-rapanel-text-light/30 dark:text-white/20 text-xs">—</span>
+                                </td>
+
+                                <td class="px-4 py-3 font-mono text-xs text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell whitespace-nowrap">
                                     {{ log.ip_address ?? '—' }}
                                 </td>
                             </tr>

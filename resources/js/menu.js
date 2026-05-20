@@ -19,7 +19,8 @@ export const visitorMenuItems = [
     name: 'Information',
     icon: InformationCircleIcon,
     children: [
-      { name: '📰 Wiki', route: 'info.wiki' },
+      { name: '📰 News', route: 'news.index' },
+      { name: '📖 Wiki', route: 'info.wiki' },
       { name: '🏪 Who Sell', route: 'info.who-sell' },
       { name: '🃏 MvP Cards', route: 'info.mvp-card' },
       { name: '🔎 Item DB', route: 'info.item-db' },

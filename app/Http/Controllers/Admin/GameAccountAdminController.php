@@ -158,6 +158,48 @@ class GameAccountAdminController extends Controller
         return back()->with('success', __('Account unbanned successfully.'));
     }
 
+    public function update(Request $request, int $accountId)
+    {
+        $account = GameAccount::where('account_id', $accountId)->firstOrFail();
+
+        $data = $request->validate([
+            'userid'    => ['required', 'string', 'max:23', 'regex:/^\S+$/',
+                            \Illuminate\Validation\Rule::unique('mysql_main.login', 'userid')->ignore($accountId, 'account_id')],
+            'email'     => ['required', 'email', 'max:39',
+                            \Illuminate\Validation\Rule::unique('mysql_main.login', 'email')->ignore($accountId, 'account_id')],
+            'sex'       => 'required|in:M,F',
+            'birthdate' => 'nullable|date|before:today',
+            'group_id'  => 'required|integer|min:0|max:99',
+        ]);
+
+        $old = $account->only(['userid', 'email', 'sex', 'birthdate', 'group_id']);
+
+        $account->update([
+            'userid'    => $data['userid'],
+            'email'     => $data['email'],
+            'sex'       => $data['sex'],
+            'birthdate' => $data['birthdate'] ?? null,
+            'group_id'  => $data['group_id'],
+        ]);
+
+        ActionLog::create([
+            'user_id'    => Auth::id(),
+            'category'   => 'GAME_ACCOUNT',
+            'action'     => 'game_account_updated',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => [
+                'account_id'     => $accountId,
+                'from'           => $old,
+                'to'             => $data,
+                'admin_name'     => Auth::user()->name,
+                'admin_override' => true,
+            ],
+        ]);
+
+        return back()->with('success', __('Account updated successfully.'));
+    }
+
     public function setGroup(Request $request, int $accountId)
     {
         $data = $request->validate([

@@ -144,7 +144,7 @@ const userInitial = computed(() =>
                     <!-- Grouped items -->
                     <template v-for="groupName in ['Accounts', 'Content', 'System']" :key="groupName">
                         <div class="mt-5 mb-1.5 px-3 flex items-center gap-2">
-                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-white/22">{{ groupName }}</span>
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-rapanel-gold">{{ groupName }}</span>
                             <div class="flex-1 h-px bg-white/[0.045]"></div>
                         </div>
                         <div class="space-y-0.5">

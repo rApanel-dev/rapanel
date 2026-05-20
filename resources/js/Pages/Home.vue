@@ -153,7 +153,8 @@ const scrollTo = (id) => {
                                             'text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border leading-none',
                                             item.type === 1 ? 'bg-rapanel-blue/30 text-rapanel-blue border-rapanel-blue/40' :
                                             item.type === 2 ? 'bg-rapanel-gold/30 text-rapanel-gold border-rapanel-gold/40' :
-                                            'bg-white/10 text-white/50 border-white/20'
+                                            item.type === 3 ? 'bg-rapanel-danger/30 text-rapanel-danger border-rapanel-danger/40' :
+                                            'bg-rapanel-blue/30 text-rapanel-blue border-rapanel-blue/40'
                                         ]">{{ item.type_label }}</span>
                                     </div>
                                 </div>

@@ -18,21 +18,26 @@ class DownloadController extends Controller
     {
         $perPage = min((int) request('perPage', 15), 100);
 
-        $downloads = Download::with('category')
+        $downloads = Download::with('category', 'creator', 'updater')
             ->orderBy('sort_order')
             ->orderByDesc('id')
             ->paginate($perPage)
             ->through(fn ($d) => [
-                'id'             => $d->id,
-                'name'           => $d->name,
-                'slug'           => $d->slug,
-                'category_name'  => $d->category?->name,
-                'category_icon'  => $d->category?->icon,
-                'is_external'    => $d->is_external,
-                'is_only_auth'   => $d->is_only_auth,
-                'is_active'      => $d->is_active,
-                'download_count' => $d->download_count,
-                'created_at'     => $d->created_at?->diffForHumans(),
+                'id'              => $d->id,
+                'name'            => $d->name,
+                'slug'            => $d->slug,
+                'category_name'   => $d->category?->name,
+                'category_icon'   => $d->category?->icon,
+                'is_external'     => $d->is_external,
+                'is_only_auth'    => $d->is_only_auth,
+                'is_active'       => $d->is_active,
+                'download_count'  => $d->download_count,
+                'created_by_name' => $d->creator?->name,
+                'created_at'      => $d->created_at?->format('Y-m-d H:i'),
+                'created_ago'     => $d->created_at?->diffForHumans(),
+                'updated_at'      => $d->updated_by ? $d->updated_at?->format('Y-m-d H:i') : null,
+                'updated_ago'     => $d->updated_by ? $d->updated_at?->diffForHumans() : null,
+                'updated_by_name' => $d->updater?->name,
             ]);
 
         return Inertia::render('Admin/Downloads/Index', [

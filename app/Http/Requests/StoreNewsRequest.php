@@ -16,7 +16,7 @@ class StoreNewsRequest extends FormRequest
         return [
             'title'          => ['required', 'string', 'max:255'],
             'body'           => ['nullable', 'string'],
-            'type'           => ['required', 'integer', 'in:0,1,2'],
+            'type'           => ['required', 'integer', 'in:1,2,3'],
             'is_published'   => ['boolean'],
             'is_pinned'      => ['boolean'],
             'allow_comments' => ['boolean'],

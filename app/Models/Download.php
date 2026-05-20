@@ -27,6 +27,16 @@ class Download extends Model
         return $this->belongsTo(DownloadCategory::class, 'category_id');
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+    }
+
     public function imageUrl(): ?string
     {
         return $this->image_path ? asset('storage/' . $this->image_path) : null;

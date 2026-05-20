@@ -144,7 +144,7 @@ class UserController extends Controller
 
         ActionLog::create([
             'user_id'    => $request->user()->id,
-            'category'   => 'USER_MANAGEMENT',
+            'category'   => 'MASTER_ACCOUNT',
             'action'     => $newStatus ? 'master_account_activated' : 'master_account_banned',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),

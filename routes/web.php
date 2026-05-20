@@ -23,6 +23,9 @@ use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
 use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
 use App\Http\Controllers\MvpCardController;
 use App\Http\Controllers\Admin\MvpCardAdminController;
+use App\Http\Controllers\NewsCommentController;
+use App\Http\Controllers\NewsReactionController;
+use App\Http\Controllers\Admin\NewsCommentController as AdminNewsCommentController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -120,10 +123,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/game-accounts/{accountId}/ban',          [GameAccountAdminController::class, 'ban'])->name('game-accounts.ban');
     Route::post('/game-accounts/{accountId}/unban',        [GameAccountAdminController::class, 'unban'])->name('game-accounts.unban');
     Route::patch('/game-accounts/{accountId}/group',       [GameAccountAdminController::class, 'setGroup'])->name('game-accounts.group');
+    Route::put('/game-accounts/{accountId}',               [GameAccountAdminController::class, 'update'])->name('game-accounts.update');
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
     Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
     Route::resource('news', AdminNewsController::class)->except(['show']);
+    Route::delete('news-comments/{newsComment}', [AdminNewsCommentController::class, 'destroy'])->name('news-comments.destroy');
     Route::resource('downloads', AdminDownloadController::class)->except(['show']);
     Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
     Route::post('mvp-cards/sync', [MvpCardAdminController::class, 'sync'])->name('mvp-cards.sync');
@@ -135,7 +140,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 // Noticias públicas
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
+Route::post('/news/{news:slug}/comments', [NewsCommentController::class, 'store'])->middleware('auth')->name('news.comments.store');
+Route::post('/news/{news:slug}/react', [NewsReactionController::class, 'toggle'])->middleware('auth')->name('news.react');
 
 // Emblema de guild (público, sin auth)
 Route::get('/guild-emblem/{guild_id}', [GuildController::class, 'emblem'])

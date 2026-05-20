@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -100,6 +100,27 @@ const submitGroup = () => {
     groupForm.patch(safeRoute('admin.game-accounts.group', groupTarget.value.account_id), {
         preserveScroll: true,
         onSuccess: () => closeGroup(),
+    });
+};
+
+// ── Edit modal ─────────────────────────────────────────────────────────
+const editTarget = ref(null);
+const editForm   = useForm({ userid: '', email: '', sex: 'M', birthdate: '', group_id: 0 });
+
+const openEdit  = (acc) => {
+    editTarget.value = acc;
+    editForm.userid    = acc.userid;
+    editForm.email     = acc.email ?? '';
+    editForm.sex       = acc.sex ?? 'M';
+    editForm.birthdate = acc.birthdate ?? '';
+    editForm.group_id  = acc.group_id ?? 0;
+    editForm.clearErrors();
+};
+const closeEdit = () => { editTarget.value = null; editForm.reset(); };
+const submitEdit = () => {
+    editForm.put(safeRoute('admin.game-accounts.update', editTarget.value.account_id), {
+        preserveScroll: true,
+        onSuccess: () => closeEdit(),
     });
 };
 </script>
@@ -257,26 +278,27 @@ const submitGroup = () => {
 
                         <!-- Actions -->
                         <td class="px-4 py-3">
-                            <div class="flex items-center justify-end gap-1.5 flex-wrap">
-                                <!-- gold: Group ID -->
-                                <ActionButton variant="gold" size="sm" @click="openGroup(acc)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
-                                    Group
+                            <div class="flex items-center justify-center gap-1">
+                                <!-- View -->
+                                <ActionButton variant="blue" size="icon" title="View account"
+                                    @click="router.visit(safeRoute('game-accounts.show', acc.account_id))">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 </ActionButton>
-                                <!-- blue: View -->
-                                <ActionButton variant="blue" size="sm" @click="router.visit(safeRoute('game-accounts.show', acc.account_id))">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    View
+                                <!-- Edit -->
+                                <ActionButton variant="navy" size="icon" title="Edit account" @click="openEdit(acc)">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                                 </ActionButton>
-                                <!-- danger: Ban (solo si activo) -->
-                                <ActionButton v-if="acc.state === 0" variant="danger" size="sm" @click="openBan(acc)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                                    Ban
+                                <!-- Group -->
+                                <ActionButton variant="gold" size="icon" title="Change group" @click="openGroup(acc)">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
                                 </ActionButton>
-                                <!-- success: Unban (solo si baneado) -->
-                                <ActionButton v-if="acc.state === 1" variant="success" size="sm" @click="submitUnban(acc)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Unban
+                                <!-- Ban (solo si activo) -->
+                                <ActionButton v-if="acc.state === 0" variant="danger" size="icon" title="Ban account" @click="openBan(acc)">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                </ActionButton>
+                                <!-- Unban (baneado o de-linked) -->
+                                <ActionButton v-if="acc.state === 1 || acc.state === 5" variant="success" size="icon" title="Unban / Restore account" @click="submitUnban(acc)">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </ActionButton>
                             </div>
                         </td>
@@ -326,6 +348,103 @@ const submitGroup = () => {
                 </div>
             </form>
             </div>
+        </div>
+    </Modal>
+
+    <!-- ── Modal: Edit Account ── -->
+    <Modal :show="!!editTarget" @close="closeEdit" maxWidth="2xl">
+        <div class="bg-white dark:bg-rapanel-navy-900 max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="sticky top-0 bg-white dark:bg-rapanel-navy-900 z-10">
+                <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
+                <div class="px-6 pt-5 pb-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
+                    <h2 class="text-lg font-display font-bold tracking-wide text-rapanel-navy-900 dark:text-white">
+                        Edit Account — <span class="text-rapanel-blue">{{ editTarget?.userid }}</span>
+                    </h2>
+                    <p class="text-xs text-rapanel-text-light/40 dark:text-white/30 mt-0.5">ID: {{ editTarget?.account_id }}</p>
+                </div>
+            </div>
+
+            <form @submit.prevent="submitEdit" class="p-6 space-y-6">
+
+                <!-- § 1: Identity -->
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">Identity</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <InputLabel value="Username" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <TextInput v-model="editForm.userid" type="text" required autofocus maxlength="23"
+                                class="mt-1 block w-full dark:bg-rapanel-navy-900" />
+                            <InputError class="mt-1" :message="editForm.errors.userid" />
+                        </div>
+                        <div>
+                            <InputLabel value="Email" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <TextInput v-model="editForm.email" type="email" required maxlength="39"
+                                class="mt-1 block w-full dark:bg-rapanel-navy-900" />
+                            <InputError class="mt-1" :message="editForm.errors.email" />
+                        </div>
+                        <div>
+                            <InputLabel value="Gender" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <select v-model="editForm.sex" required
+                                class="mt-1 block w-full text-sm bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 transition-colors">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                            <InputError class="mt-1" :message="editForm.errors.sex" />
+                        </div>
+                        <div>
+                            <InputLabel value="Birthdate" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <TextInput v-model="editForm.birthdate" type="date"
+                                class="mt-1 block w-full dark:bg-rapanel-navy-900" />
+                            <InputError class="mt-1" :message="editForm.errors.birthdate" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- § 2: Group -->
+                <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-1">Group / GM Level</p>
+                    <p class="text-xs text-rapanel-text-light/40 dark:text-white/25 mb-3">Group 0 = Player · 1 = Sub-GM · 2+ = GM levels. Ver <code>groups.conf</code>.</p>
+                    <div class="w-full sm:w-1/2">
+                        <InputLabel value="Group ID" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                        <TextInput v-model="editForm.group_id" type="number" min="0" max="99" required
+                            class="mt-1 block w-full dark:bg-rapanel-navy-900" />
+                        <InputError class="mt-1" :message="editForm.errors.group_id" />
+                    </div>
+                </div>
+
+                <!-- § 3: System Info (read-only) -->
+                <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">
+                        System Info <span class="normal-case font-normal tracking-normal text-rapanel-text-light/30 dark:text-white/20">(read-only)</span>
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div v-for="field in [
+                            { label: 'Account ID',       value: editTarget?.account_id },
+                            { label: 'State',            value: stateLabel(editTarget?.state) },
+                            { label: 'Unban Time',       value: editTarget?.unban_time ? (editTarget.unban_time === 0 ? '—' : new Date(editTarget.unban_time * 1000).toLocaleString()) : '—' },
+                            { label: 'Last Login',       value: editTarget?.lastlogin ?? '—' },
+                            { label: 'Last IP',          value: editTarget?.last_ip ?? '—' },
+                            { label: 'Login Count',      value: editTarget?.logincount ?? '—' },
+                            { label: 'Master ID',        value: editTarget?.master_id ?? '—' },
+                            { label: 'Character Slots',  value: editTarget?.character_slots ?? '—' },
+                        ]" :key="field.label">
+                            <InputLabel :value="field.label" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <input :value="field.value" disabled
+                                class="mt-1 block w-full text-sm px-3 py-2 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.03] border border-rapanel-navy-100 dark:border-white/[0.06] text-rapanel-text-light/50 dark:text-white/30 font-mono truncate cursor-not-allowed" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end gap-3 pt-2 border-t border-rapanel-navy-100 dark:border-white/[0.06]">
+                    <SecondaryButton type="button" @click="closeEdit">Cancel</SecondaryButton>
+                    <button type="submit" :disabled="editForm.processing"
+                        class="px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
+                        {{ editForm.processing ? 'Saving…' : 'Save Changes' }}
+                    </button>
+                </div>
+            </form>
         </div>
     </Modal>
 

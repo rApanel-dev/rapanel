@@ -3,6 +3,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { ArrowLeftIcon, PhotoIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import RichTextEditor from '@/Components/RichTextEditor.vue';
 
 const props = defineProps({ news: Object });
 
@@ -71,11 +72,11 @@ const confirmDelete = () => {
                     <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">News Category</label>
                         <select v-model="form.type"
-                                class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10
+                                class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10
                                        text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
-                            <option :value="0">General</option>
-                            <option :value="1">Announcement</option>
-                            <option :value="2">Event</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="1">News</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="2">Event</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="3">Notice</option>
                         </select>
                     </div>
 
@@ -107,9 +108,7 @@ const confirmDelete = () => {
                 <!-- Body -->
                 <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                     <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">Content</label>
-                    <textarea v-model="form.body" rows="10"
-                              class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10
-                                     text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50 resize-y" />
+                    <RichTextEditor v-model="form.body" />
                     <p v-if="form.errors.body" class="mt-1.5 text-xs text-rapanel-danger">{{ form.errors.body }}</p>
                 </div>
 

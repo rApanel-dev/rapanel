@@ -33,9 +33,10 @@ class News extends Model
     public static function typeLabel(int $type): string
     {
         return match ($type) {
-            1 => 'Announcement',
+            1 => 'News',
             2 => 'Event',
-            default => 'General',
+            3 => 'Notice',
+            default => 'News',
         };
     }
 
@@ -52,6 +53,16 @@ class News extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(NewsComment::class)->where('is_approved', true)->orderBy('created_at');
+    }
+
+    public function reactions()
+    {
+        return $this->hasMany(NewsReaction::class);
     }
 
     public function scopePublished($query)

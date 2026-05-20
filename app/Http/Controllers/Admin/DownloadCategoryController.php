@@ -15,9 +15,24 @@ class DownloadCategoryController extends Controller
     public function index(): Response
     {
         $categories = DownloadCategory::withCount('downloads')
+            ->with('updater')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(fn ($c) => [
+                'id'              => $c->id,
+                'name'            => $c->name,
+                'icon'            => $c->icon,
+                'description'     => $c->description,
+                'sort_order'      => $c->sort_order,
+                'is_active'       => $c->is_active,
+                'downloads_count' => $c->downloads_count,
+                'created_at'      => $c->created_at?->format('Y-m-d H:i'),
+                'created_ago'     => $c->created_at?->diffForHumans(),
+                'updated_at'      => $c->updated_by ? $c->updated_at?->format('Y-m-d H:i') : null,
+                'updated_ago'     => $c->updated_by ? $c->updated_at?->diffForHumans() : null,
+                'updated_by_name' => $c->updater?->name,
+            ]);
 
         return Inertia::render('Admin/Downloads/Categories/Index', [
             'categories' => $categories,
@@ -76,6 +91,7 @@ class DownloadCategoryController extends Controller
             'icon'        => $request->icon,
             'sort_order'  => $request->sort_order ?? 0,
             'is_active'   => (bool) $request->is_active,
+            'updated_by'  => $request->user()->id,
         ]);
 
         return redirect()->route('admin.download-categories.index')

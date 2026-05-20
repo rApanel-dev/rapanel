@@ -18,19 +18,25 @@ class NewsController extends Controller
     {
         $perPage = min((int) request('perPage', 10), 100);
 
-        $news = News::orderByDesc('is_pinned')
+        $news = News::with('creator', 'updater')
+            ->orderByDesc('is_pinned')
             ->orderByDesc('id')
             ->paginate($perPage)
             ->through(fn ($n) => [
-                'id'            => $n->id,
-                'title'         => $n->title,
-                'slug'          => $n->slug,
-                'type'          => $n->type,
-                'type_label'    => News::typeLabel($n->type),
-                'featured_image' => $n->featured_image ? asset('storage/' . $n->featured_image) : null,
-                'is_published'  => $n->is_published,
-                'is_pinned'     => $n->is_pinned,
-                'created_at'    => $n->created_at?->diffForHumans(),
+                'id'              => $n->id,
+                'title'           => $n->title,
+                'slug'            => $n->slug,
+                'type'            => $n->type,
+                'type_label'      => News::typeLabel($n->type),
+                'featured_image'  => $n->featured_image ? asset('storage/' . $n->featured_image) : null,
+                'is_published'    => $n->is_published,
+                'is_pinned'       => $n->is_pinned,
+                'created_at'      => $n->created_at?->format('Y-m-d H:i'),
+                'created_ago'     => $n->created_at?->diffForHumans(),
+                'created_by_name' => $n->creator?->name,
+                'updated_at'      => $n->updated_by ? $n->updated_at?->format('Y-m-d H:i') : null,
+                'updated_ago'     => $n->updated_by ? $n->updated_at?->diffForHumans() : null,
+                'updated_by_name' => $n->updater?->name,
             ]);
 
         return Inertia::render('Admin/News/Index', [
