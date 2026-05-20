@@ -35,6 +35,19 @@ const props = defineProps({
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
 
+const isAdmin = computed(() => page.props.auth?.user?.role === 'Admin');
+
+const backHref = computed(() => {
+    if (!isAdmin.value) return route('dashboard');
+    const myId = page.props.auth?.user?.id;
+    // Admin viendo su propia cuenta de juego
+    if (props.gameAccount.master_id === myId) return route('dashboard');
+    // Admin viendo la cuenta de juego de otro usuario → volver a su dashboard
+    if (props.gameAccount.master_id) return route('dashboard') + '?as=' + props.gameAccount.master_id;
+    // Cuenta sin master_id (desvinculada) → listado admin
+    return route('admin.game-accounts.index');
+});
+
 const flashSuccess = computed(() => page.props.flash?.success);
 const flashError   = computed(() => page.props.flash?.error);
 
@@ -69,7 +82,7 @@ const getCardName = (id) => {
 };
 
 const formatSex   = (s) => s === 'M' ? __('Male') : __('Female');
-const formatState = (s) => s === 0 ? __('Active') : __('Blocked');
+const formatState = (s) => s === 0 ? __('Active') : __('Banned');
 
 // --- MODALES ---
 
@@ -231,6 +244,7 @@ const confirmPrefUpdate = () => {
 };
 
 const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
+
 </script>
 
 <template>
@@ -255,12 +269,19 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
                         <!-- Título + botón eliminar (móvil: mismo row) -->
                         <div class="flex items-center justify-between sm:justify-start gap-3">
                             <div class="flex items-center gap-3">
-                                <Link :href="route('dashboard')" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
+                                <Link :href="backHref" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
                                 </Link>
                                 <div>
                                     <p class="text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Viewing Account') }}</p>
-                                    <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark">{{ gameAccount.userid }}</h1>
+                                    <div class="flex items-center gap-2">
+                                        <h1 class="text-xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark">{{ gameAccount.userid }}</h1>
+                                        <StatusBadge
+                                            :variant="gameAccount.state === 0 ? 'success' : 'danger'"
+                                            :label="gameAccount.state === 0 ? __('Active') : __('Banned')"
+                                            size="sm"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <!-- Eliminar Cuenta: solo en móvil, esquina derecha del título -->
@@ -386,7 +407,7 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
             <!-- ===== SECCIÓN 2: PERSONAJES ===== -->
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
-                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                    <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Characters on') }} <span class="text-rapanel-blue">{{ serverName }}</span>
                     </h3>
                 </div>
@@ -486,7 +507,7 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
             <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900">
-                    <h3 class="text-sm font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                    <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
                         {{ __('Storage Items of') }} <span class="text-rapanel-blue uppercase">{{ gameAccount.userid }}</span>
                         <span class="ml-2 text-xs font-normal text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">({{ storageItems.length }})</span>
                     </h3>

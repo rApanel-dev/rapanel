@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\GameAccount;
+use App\Models\UserLog;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,13 +31,51 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user      = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $trackedFields = ['name', 'email', 'birthdate'];
+        $changes = [];
+
+        foreach ($trackedFields as $field) {
+            if (!array_key_exists($field, $validated)) {
+                continue;
+            }
+            $newVal = $validated[$field];
+            $oldVal = $user->$field;
+
+            if ((string) $oldVal !== (string) $newVal && !($oldVal === null && $newVal === null)) {
+                $changes[$field] = ['old' => $oldVal, 'new' => $newVal];
+            }
         }
 
-        $request->user()->save();
+        $user->fill($validated);
+
+        if (isset($changes['email'])) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        foreach ($changes as $field => $vals) {
+            UserLog::create([
+                'user_id'    => $user->id,
+                'field'      => $field,
+                'old_value'  => $vals['old'],
+                'new_value'  => $vals['new'],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        }
+
+        $gameAccountSync = array_intersect_key(
+            ['email' => $user->email, 'birthdate' => $user->birthdate],
+            $changes
+        );
+
+        if (!empty($gameAccountSync)) {
+            GameAccount::where('master_id', $user->id)->update($gameAccountSync);
+        }
 
         return Redirect::route('profile.edit');
     }

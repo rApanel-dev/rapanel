@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import FlashMessages from '@/Components/FlashMessages.vue';
 import {
     HomeIcon,
     UserCircleIcon,
@@ -15,21 +16,24 @@ import {
     NewspaperIcon,
     ArrowDownTrayIcon,
     TagIcon,
+    TrophyIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
 
 const page = usePage();
 const sidebarOpen = ref(false);
+const flash = computed(() => page.props.flash ?? {});
 
 const navigation = [
     { name: 'Dashboard',       route: 'admin.dashboard',           icon: HomeIcon,                  group: null },
     { name: 'Master Accounts', route: 'admin.users.index',         icon: UserCircleIcon,             group: 'Accounts' },
-    { name: 'Login Accounts',  route: 'admin.game-accounts.index', icon: ComputerDesktopIcon,        group: 'Accounts' },
+    { name: 'Game Accounts',   route: 'admin.game-accounts.index', icon: ComputerDesktopIcon,        group: 'Accounts' },
     { name: 'Characters',      route: 'admin.characters.index',    icon: UserGroupIcon,              group: 'Accounts' },
     { name: 'News',               route: 'admin.news.index',                icon: NewspaperIcon,       group: 'Content' },
     { name: 'Downloads',          route: 'admin.downloads.index',           icon: ArrowDownTrayIcon,   group: 'Content' },
     { name: 'Download Categories', route: 'admin.download-categories.index', icon: TagIcon,             group: 'Content' },
+    { name: 'MvP Cards',           route: 'admin.mvp-cards.index',           icon: TrophyIcon,          group: 'Content' },
     { name: 'Action Logs',     route: 'admin.logs.index',          icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',         route: 'admin.console.index',       icon: CommandLineIcon,            group: 'System' },
 ];
@@ -48,10 +52,10 @@ const safeRoute = (name) => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 flex flex-col">
+    <div class="min-h-screen bg-rapanel-navy-50 dark:bg-[#080d14] flex flex-col">
 
         <!-- Top bar -->
-        <header class="bg-rapanel-navy-900 dark:bg-rapanel-navy-950 text-white flex items-center justify-between px-4 h-14 shrink-0 z-30 shadow-lg border-b border-white/5">
+        <header class="bg-rapanel-navy-900 dark:bg-[#0b1120] text-white flex items-center justify-between px-4 h-14 shrink-0 z-30 shadow-[0_1px_0_rgba(74,144,226,0.18),0_4px_20px_rgba(0,0,0,0.4)] border-b border-rapanel-blue/20">
             <div class="flex items-center gap-3">
                 <!-- Mobile hamburger -->
                 <button @click="sidebarOpen = !sidebarOpen"
@@ -103,29 +107,30 @@ const safeRoute = (name) => {
 
             <!-- Sidebar -->
             <aside :class="[
-                'fixed lg:static inset-y-0 left-0 z-20 w-60 bg-rapanel-navy-900 dark:bg-rapanel-navy-950 flex flex-col transition-transform duration-200 ease-in-out border-r border-white/5',
+                'fixed lg:static inset-y-0 left-0 z-20 w-60 bg-rapanel-navy-900 dark:bg-[#0b1120] flex flex-col transition-transform duration-200 ease-in-out border-r border-white/[0.06]',
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             ]" style="top: 3.5rem;">
-                <nav class="flex-1 px-3 py-4 overflow-y-auto">
+                <nav class="flex-1 px-2 py-4 overflow-y-auto">
                     <!-- Dashboard (no group) -->
                     <template v-for="item in navigation.filter(i => !i.group)" :key="item.name">
                         <Link :href="safeRoute(item.route)"
                             @click="sidebarOpen = false"
                             :class="[
                                 isActive(item.route)
-                                    ? 'bg-rapanel-blue text-white shadow-md'
-                                    : 'text-white/50 hover:bg-white/10 hover:text-white',
-                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition mb-1'
+                                    ? 'border-l-[3px] border-rapanel-blue bg-rapanel-blue/10 text-rapanel-blue font-semibold'
+                                    : 'border-l-[3px] border-transparent text-white/50 hover:bg-white/[0.05] hover:text-white/90',
+                                'flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-r-lg text-sm transition-all duration-150 mb-0.5'
                             ]">
-                            <component :is="item.icon" class="w-5 h-5 shrink-0" />
+                            <component :is="item.icon" class="w-4 h-4 shrink-0" />
                             {{ item.name }}
                         </Link>
                     </template>
 
                     <!-- Grouped items -->
                     <template v-for="groupName in ['Accounts', 'Content', 'System']" :key="groupName">
-                        <div class="mt-5 mb-1.5 px-3">
-                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/25">{{ groupName }}</span>
+                        <div class="mt-6 mb-2 pl-3 flex items-center gap-2">
+                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">{{ groupName }}</span>
+                            <div class="flex-1 h-px bg-white/[0.06]"></div>
                         </div>
                         <div class="space-y-0.5">
                             <template v-for="item in navigation.filter(i => i.group === groupName)" :key="item.name">
@@ -133,11 +138,11 @@ const safeRoute = (name) => {
                                     @click="sidebarOpen = false"
                                     :class="[
                                         isActive(item.route)
-                                            ? 'bg-rapanel-blue text-white shadow-md'
-                                            : 'text-white/50 hover:bg-white/10 hover:text-white',
-                                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition'
+                                            ? 'border-l-[3px] border-rapanel-blue bg-rapanel-blue/10 text-rapanel-blue font-semibold'
+                                            : 'border-l-[3px] border-transparent text-white/50 hover:bg-white/[0.05] hover:text-white/90',
+                                        'flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-r-lg text-sm transition-all duration-150'
                                     ]">
-                                    <component :is="item.icon" class="w-5 h-5 shrink-0" />
+                                    <component :is="item.icon" class="w-4 h-4 shrink-0" />
                                     {{ item.name }}
                                 </Link>
                             </template>
@@ -145,19 +150,22 @@ const safeRoute = (name) => {
                     </template>
                 </nav>
 
-                <div class="px-3 pb-4 border-t border-white/10 pt-3">
-                    <div class="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-1.5 px-1">
-                        Logged in as
-                    </div>
-                    <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/5">
+                <div class="px-3 pb-4 border-t border-white/[0.06] pt-3">
+                    <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-rapanel-blue/5 border border-rapanel-blue/20">
                         <ShieldCheckIcon class="w-4 h-4 text-rapanel-gold shrink-0" />
-                        <span class="text-sm text-white font-medium truncate">{{ page.props.auth.user?.name }}</span>
+                        <div class="min-w-0">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-white/30 leading-none mb-0.5">Logged in as</p>
+                            <p class="text-xs text-white font-semibold truncate">{{ page.props.auth.user?.name }}</p>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             <!-- Main content -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0">
+                <div class="mb-5">
+                    <FlashMessages :success="flash.success" :error="flash.error" :warning="flash.warning" />
+                </div>
                 <slot />
             </main>
         </div>

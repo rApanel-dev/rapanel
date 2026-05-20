@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import Modal from '@/Components/Modal.vue';
 import InputError from '@/Components/InputError.vue';
@@ -15,6 +15,8 @@ const props = defineProps({
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
+
+const isAdmin = computed(() => page.props.auth?.user?.role === 'Admin');
 
 const confirmingAccountDeletion = ref(false);
 const step = ref(1); // Controlamos el paso actual

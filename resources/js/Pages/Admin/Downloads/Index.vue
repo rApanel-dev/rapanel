@@ -1,6 +1,7 @@
 <script setup>
 import { Link, router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 
 defineProps({
     downloads: Object,
@@ -19,27 +20,18 @@ const destroy = (id) => {
 
 <template>
     <AdminLayout>
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ __('Downloads') }}</h1>
-                <p class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark mt-0.5">{{ __('Manage downloadable files and links.') }}</p>
-            </div>
+        <PageHeader :title="__('Downloads')" :description="__('Manage downloadable files and links.')" class="mb-6">
             <Link :href="route('admin.downloads.create')"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-bold hover:opacity-90 transition">
                 + {{ __('New Download') }}
             </Link>
-        </div>
-
-        <!-- Flash -->
-        <div v-if="$page.props.flash?.success" class="mb-4 px-4 py-3 rounded-lg bg-rapanel-success/10 border border-rapanel-success/30 text-sm text-rapanel-success font-medium">
-            {{ $page.props.flash.success }}
-        </div>
+        </PageHeader>
 
         <!-- Table -->
-        <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.35)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark text-xs uppercase tracking-wider font-bold">
+                    <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
                         <th class="px-5 py-3 text-left">{{ __('Name') }}</th>
                         <th class="px-5 py-3 text-left hidden md:table-cell">{{ __('Category') }}</th>
                         <th class="px-5 py-3 text-center hidden sm:table-cell">{{ __('Type') }}</th>

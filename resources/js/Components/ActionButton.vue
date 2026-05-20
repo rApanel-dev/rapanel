@@ -23,8 +23,9 @@ const variantClasses = {
 };
 
 const sizeClasses = {
-    md: 'px-3 py-1.5 text-xs',
-    sm: 'px-2.5 py-1 text-xs',
+    md:   'px-3 py-1.5 text-xs',
+    sm:   'px-2.5 py-1 text-xs',
+    icon: 'p-1.5 text-xs',
 };
 </script>
 

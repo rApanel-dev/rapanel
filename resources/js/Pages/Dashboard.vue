@@ -18,15 +18,10 @@ import Footer from '@/Components/Footer.vue';
 
 // 1. AÑADIMOS LAS PROPS PARA RECIBIR LOS DATOS DEL CONTROLADOR
 const props = defineProps({
-    gameAccountsCount: {
-        type: Number,
-        default: 0
-    },
-    gameAccounts: {
-        type: Array,
-        default: () => []
-    },
-    maxAccounts: Number,
+    gameAccountsCount: { type: Number, default: 0 },
+    gameAccounts:      { type: Array,  default: () => [] },
+    maxAccounts:       Number,
+    viewedUser:        { type: Object, default: null },
 });
 
 // Lógica de validación
@@ -95,12 +90,19 @@ const openClaimModal = () => {
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
-                        <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-widest">
-                            {{ __('Master Account') }}
-                        </h1>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-widest">
+                                {{ __('Master Account') }}
+                            </h1>
+                            <StatusBadge
+                                :variant="viewedUser?.status ? 'success' : 'danger'"
+                                :label="viewedUser?.status ? __('Active') : __('Banned')"
+                                size="sm"
+                            />
+                        </div>
                         <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm">
-                            {{ __('Welcome to your central control panel,') }} 
-                            <span class="text-rapanel-blue font-bold">{{ $page.props.auth.user.name }}</span>.
+                            {{ __('Welcome to your central control panel,') }}
+                            <span class="text-rapanel-blue font-bold">{{ viewedUser?.name ?? $page.props.auth.user.name }}</span>.
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -182,7 +184,8 @@ const openClaimModal = () => {
                                 <td class="px-6 py-4 text-center">
                                     <StatusBadge
                                         :variant="account.state === 0 ? 'success' : 'danger'"
-                                        :label="account.state === 0 ? __('Active') : __('Blocked')"
+                                        :label="account.state === 0 ? __('Active') : __('Banned')"
+                                        size="sm"
                                         dot
                                     />
                                 </td>

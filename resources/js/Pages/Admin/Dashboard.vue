@@ -65,7 +65,7 @@ const barWidth = (count) => {
                     </template>
                 </StatsCard>
 
-                <StatsCard label="Login Accounts" :value="stats.total_game_accounts">
+                <StatsCard label="Game Accounts" :value="stats.total_game_accounts">
                     <template #icon><ComputerDesktopIcon class="w-5 h-5 text-purple-400" /></template>
                     <template #footer>
                         <div class="text-xs text-rapanel-success font-semibold">{{ stats.active_game_accounts }} active</div>
@@ -89,7 +89,7 @@ const barWidth = (count) => {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- Map -->
-                <div class="lg:col-span-2 bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col">
+                <div class="lg:col-span-2 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col">
                     <div class="flex items-center justify-between px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/10 shrink-0">
                         <div>
                             <h2 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Player Distribution</h2>
@@ -108,7 +108,7 @@ const barWidth = (count) => {
                 <div class="flex flex-col gap-4">
 
                     <!-- Top Countries -->
-                    <div class="flex-1 bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+                    <div class="flex-1 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                             <h2 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Top Countries</h2>
                         </div>
@@ -136,7 +136,7 @@ const barWidth = (count) => {
                     </div>
 
                     <!-- Quick stats: Log Activity -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+                    <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                             <h2 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Log Activity</h2>
                         </div>

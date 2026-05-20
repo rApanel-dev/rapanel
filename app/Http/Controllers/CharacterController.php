@@ -21,6 +21,10 @@ class CharacterController extends Controller
             return null;
         }
 
+        if (Auth::user()->role === 'Admin') {
+            return $char;
+        }
+
         $owns = GameAccount::where('account_id', $char->account_id)
             ->where('master_id', Auth::id())
             ->exists();
@@ -30,6 +34,8 @@ class CharacterController extends Controller
 
     public function resetPosition(Request $request, int $charId)
     {
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate(['password' => ['required', 'string']]);
 
         if (!Hash::check($request->password, Auth::user()->password)) {
@@ -61,11 +67,14 @@ class CharacterController extends Controller
             'action'     => 'character_reset_position',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'char_id'   => $charId,
-                'char_name' => $char->name,
-                'reset_to'  => "{$map} ({$x},{$y})",
-            ],
+            'metadata'   => array_filter([
+                'account_id'     => $char->account_id,
+                'char_id'        => $charId,
+                'char_name'      => $char->name,
+                'reset_to'       => "{$map} ({$x},{$y})",
+                'admin_override' => $isAdmin ?: null,
+                'admin_name'     => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Position reset successfully.'));
@@ -73,6 +82,8 @@ class CharacterController extends Controller
 
     public function resetLook(Request $request, int $charId)
     {
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate(['password' => ['required', 'string']]);
 
         if (!Hash::check($request->password, Auth::user()->password)) {
@@ -102,10 +113,13 @@ class CharacterController extends Controller
             'action'     => 'character_reset_look',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'char_id'   => $charId,
-                'char_name' => $char->name,
-            ],
+            'metadata'   => array_filter([
+                'account_id'     => $char->account_id,
+                'char_id'        => $charId,
+                'char_name'      => $char->name,
+                'admin_override' => $isAdmin ?: null,
+                'admin_name'     => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Look reset successfully.'));
@@ -113,6 +127,8 @@ class CharacterController extends Controller
 
     public function changeSlot(Request $request, int $charId)
     {
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate([
             'password' => ['required', 'string'],
             'slot'     => ['required', 'integer', 'min:0'],
@@ -175,13 +191,16 @@ class CharacterController extends Controller
             'action'     => 'character_slot_changed',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
-                'char_id'      => $charId,
-                'char_name'    => $char->name,
-                'from_slot'    => $char->char_num,
-                'to_slot'      => $targetSlot,
-                'swapped_with' => $targetChar?->name,
-            ],
+            'metadata'   => array_filter([
+                'account_id'     => $char->account_id,
+                'char_id'        => $charId,
+                'char_name'      => $char->name,
+                'from_slot'      => $char->char_num,
+                'to_slot'        => $targetSlot,
+                'swapped_with'   => $targetChar?->name,
+                'admin_override' => $isAdmin ?: null,
+                'admin_name'     => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Slot changed successfully.'));
@@ -189,6 +208,8 @@ class CharacterController extends Controller
 
     public function updatePreferences(Request $request, int $charId)
     {
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $request->validate([
             'password'           => ['required', 'string'],
             'hide_from_rankings' => ['boolean'],
@@ -215,11 +236,14 @@ class CharacterController extends Controller
             'action'     => 'character_preferences_updated',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata'   => [
+            'metadata'   => array_filter([
+                'account_id'         => $char->account_id,
                 'char_id'            => $charId,
                 'char_name'          => $char->name,
                 'hide_from_rankings' => (bool) $request->boolean('hide_from_rankings'),
-            ],
+                'admin_override'     => $isAdmin ?: null,
+                'admin_name'         => $isAdmin ? Auth::user()->name : null,
+            ]),
         ]);
 
         return back()->with('success', __('Character preferences saved.'));

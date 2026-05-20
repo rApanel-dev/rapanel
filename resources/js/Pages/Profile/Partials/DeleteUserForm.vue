@@ -8,24 +8,16 @@ import TextInput from '@/Components/TextInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { nextTick, ref } from 'vue';
 
-// Instanciamos page para acceder a las traducciones
 const page = usePage();
-
-// Función helper para las traducciones
-const __ = (key) => {
-    return page.props.translations?.[key] || key;
-};
+const __ = (key) => page.props.translations?.[key] || key;
 
 const confirmingUserDeletion = ref(false);
-const passwordInput = ref(null);
+const passwordInput          = ref(null);
 
-const form = useForm({
-    password: '',
-});
+const form = useForm({ password: '' });
 
 const confirmUserDeletion = () => {
     confirmingUserDeletion.value = true;
-
     nextTick(() => passwordInput.value.focus());
 };
 
@@ -33,72 +25,51 @@ const deleteUser = () => {
     form.delete(route('profile.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
-        onError: () => passwordInput.value.focus(),
-        onFinish: () => form.reset(),
+        onError:   () => passwordInput.value.focus(),
+        onFinish:  () => form.reset(),
     });
 };
 
 const closeModal = () => {
     confirmingUserDeletion.value = false;
-
     form.clearErrors();
     form.reset();
 };
 </script>
 
 <template>
-    <section class="space-y-6">
-        <header>
-            <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-wider">
-                {{ __('Delete Account') }}
+    <DangerButton @click="confirmUserDeletion">
+        {{ __('Delete Account') }}
+    </DangerButton>
+
+    <Modal :show="confirmingUserDeletion" @close="closeModal">
+        <div class="p-6 bg-white dark:bg-rapanel-navy-900">
+            <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
+                {{ __('Are you sure you want to delete your account?') }}
             </h2>
 
-            <p class="mt-1 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+            <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mb-6 italic">
+                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
             </p>
-        </header>
 
-        <DangerButton @click="confirmUserDeletion">{{ __('Delete Account') }}</DangerButton>
-
-        <Modal :show="confirmingUserDeletion" @close="closeModal">
-            <div class="p-6">
-                <h2
-                    class="text-lg font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark tracking-widerv"
-                >
-                    {{ __('Are you sure you want to delete your account?') }}
-                </h2>
-
-                <p class="mt-1 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
-                    {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
-                </p>
-
-                <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        :value="__('Password')"
-                        class="sr-only"
-                    />
-
+            <div class="space-y-4">
+                <div>
+                    <InputLabel for="del_password" :value="__('Password')" class="sr-only" />
                     <TextInput
-                        id="password"
+                        id="del_password"
                         ref="passwordInput"
                         v-model="form.password"
                         type="password"
-                        class="mt-1 block w-3/4"
+                        class="block w-full bg-white dark:bg-rapanel-navy-800"
                         :placeholder="__('Password')"
                         @keyup.enter="deleteUser"
                     />
-
-                    <InputError :message="form.errors.password" class="mt-2" />
+                    <InputError :message="form.errors.password" class="mt-1.5" />
                 </div>
 
-                <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal">
-                        {{ __('Cancel') }}
-                    </SecondaryButton>
-
+                <div class="flex justify-end gap-3 pt-1">
+                    <SecondaryButton @click="closeModal">{{ __('Cancel') }}</SecondaryButton>
                     <DangerButton
-                        class="ms-3"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                         @click="deleteUser"
@@ -107,6 +78,6 @@ const closeModal = () => {
                     </DangerButton>
                 </div>
             </div>
-        </Modal>
-    </section>
+        </div>
+    </Modal>
 </template>

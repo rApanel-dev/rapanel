@@ -88,7 +88,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CHARACTER INFORMATION ===== -->
                         <section>
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-4">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-4">
                                 {{ __('Character Information for') }} <span class="text-rapanel-blue">{{ char.name }}</span>
                             </h3>
 
@@ -324,7 +324,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- OTHER PARTY MEMBERS -->
                             <section v-if="char.party_name && char.party_members?.length > 0">
-                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                     {{ __('Other Party Members of') }} <span class="text-rapanel-blue uppercase">{{ char.party_name }}</span>
                                 </h3>
                                 <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
@@ -367,7 +367,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                             <!-- FRIENDS -->
                             <section>
-                                <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                                <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                     {{ __('Friends of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                     <span class="ml-1 font-normal">({{ char.friends?.length ?? 0 }})</span>
                                 </h3>
@@ -409,7 +409,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== INVENTORY ITEMS ===== -->
                         <section>
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                 {{ __('Inventory Items of') }} <span class="text-rapanel-blue uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.inventory?.length ?? 0 }})</span>
                             </h3>
@@ -460,7 +460,7 @@ const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)
 
                         <!-- ===== CART INVENTORY ===== -->
                         <section v-if="isCartClass(char.class)">
-                            <h3 class="text-xs font-display font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mb-3">
+                            <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark mb-3">
                                 {{ __('Cart Inventory Items of') }} <span class="text-rapanel-gold uppercase">{{ char.name }}</span>
                                 <span class="ml-1 font-normal">({{ char.cart_inventory?.length ?? 0 }})</span>
                             </h3>
