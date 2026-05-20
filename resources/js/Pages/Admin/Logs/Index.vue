@@ -46,7 +46,7 @@ const actionColor = (action) => {
             <PageHeader title="Action Logs" :description="`${logs.total} total entries`" />
 
             <!-- Filters -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="relative flex-1">
                     <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
                     <input v-model="search" type="text" placeholder="Search by user, action, or category…"
@@ -61,7 +61,7 @@ const actionColor = (action) => {
             </div>
 
             <!-- Table -->
-            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>

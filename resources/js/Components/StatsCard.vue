@@ -2,25 +2,40 @@
 defineProps({
     label: String,
     value: [String, Number],
-    valueClass: { type: String, default: 'text-rapanel-text-light dark:text-white' },
     muted: { type: Boolean, default: false },
+    accent: { type: String, default: 'blue' },
 });
+
+const accentStrip = {
+    blue:   'from-rapanel-blue/70 via-rapanel-blue/30 to-transparent',
+    gold:   'from-rapanel-gold/70 via-rapanel-gold/30 to-transparent',
+    purple: 'from-rapanel-purple/70 via-rapanel-purple/30 to-transparent',
+    green:  'from-rapanel-success/70 via-rapanel-success/30 to-transparent',
+    red:    'from-rapanel-danger/70 via-rapanel-danger/30 to-transparent',
+};
 </script>
 
 <template>
     <div :class="[
-        'rounded-xl p-5 border shadow-sm transition-all duration-200 hover:scale-[1.02]',
+        'rounded-xl border shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md overflow-hidden',
         muted
             ? 'bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/10'
-            : 'bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/10 dark:shadow-black/20',
+            : 'bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/[0.08] dark:shadow-black/20',
     ]">
-        <div :class="['flex items-center mb-3', $slots.icon ? 'justify-between' : 'justify-start']">
-            <span class="text-xs font-bold uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/40">{{ label }}</span>
-            <slot name="icon" />
-        </div>
-        <div :class="['text-3xl font-bold', valueClass]">{{ value }}</div>
-        <div v-if="$slots.footer" class="mt-2">
-            <slot name="footer" />
+        <!-- Top accent gradient strip -->
+        <div :class="['h-[3px] bg-gradient-to-r', accentStrip[accent] ?? accentStrip.blue]" />
+
+        <div class="p-5">
+            <div :class="['flex items-center mb-3.5', $slots.icon ? 'justify-between' : 'justify-start']">
+                <span class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/35">{{ label }}</span>
+                <div v-if="$slots.icon" class="p-2 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.06]">
+                    <slot name="icon" />
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-rapanel-text-light dark:text-white tabular-nums">{{ value }}</div>
+            <div v-if="$slots.footer" class="mt-2.5">
+                <slot name="footer" />
+            </div>
         </div>
     </div>
 </template>

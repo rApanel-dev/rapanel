@@ -18,10 +18,10 @@ const destroy = (id) => {
 
 <template>
     <AdminLayout>
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-5 border-b border-rapanel-navy-100 dark:border-white/[0.055]">
             <div>
-                <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ __('Download Categories') }}</h1>
-                <p class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark mt-0.5">{{ __('Organize downloads into categories.') }}</p>
+                <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-navy-900 dark:text-white">{{ __('Download Categories') }}</h1>
+                <p class="text-sm text-rapanel-text-light/55 dark:text-white/45 mt-1">{{ __('Organize downloads into categories.') }}</p>
             </div>
             <Link :href="route('admin.download-categories.create')"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-bold hover:opacity-90 transition">
@@ -33,10 +33,10 @@ const destroy = (id) => {
             {{ $page.props.flash.success }}
         </div>
 
-        <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark text-xs uppercase tracking-wider font-bold">
+                    <tr class="bg-rapanel-navy-50 dark:bg-white/[0.04] border-b border-rapanel-navy-100 dark:border-white/[0.07] text-rapanel-text-light/50 dark:text-white/35 text-[10px] font-black uppercase tracking-widest">
                         <th class="px-5 py-3 text-left">{{ __('Name') }}</th>
                         <th class="px-5 py-3 text-left hidden md:table-cell">{{ __('Description') }}</th>
                         <th class="px-5 py-3 text-center">{{ __('Downloads') }}</th>

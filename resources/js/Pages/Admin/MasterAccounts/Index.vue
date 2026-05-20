@@ -108,7 +108,7 @@ const clearMfa = (user) => {
             </PageHeader>
 
             <!-- Filters -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="relative flex-1">
                     <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
                     <input v-model="search" type="text" placeholder="Name, email, ID, IP, country, birthdate…"
@@ -232,11 +232,14 @@ const clearMfa = (user) => {
     <Modal :show="!!editTarget" @close="closeEdit" maxWidth="2xl">
         <div class="bg-white dark:bg-rapanel-navy-900 max-h-[90vh] overflow-y-auto">
             <!-- Header -->
-            <div class="px-6 pt-6 pb-4 border-b border-rapanel-navy-100 dark:border-white/10 sticky top-0 bg-white dark:bg-rapanel-navy-900 z-10">
-                <h2 class="text-lg font-display font-bold tracking-wide text-rapanel-navy-900 dark:text-white">
-                    Edit User — <span class="text-rapanel-blue">{{ editTarget?.name }}</span>
-                </h2>
-                <p class="text-xs text-rapanel-text-light/40 dark:text-white/30 mt-0.5">ID: {{ editTarget?.id }}</p>
+            <div class="sticky top-0 bg-white dark:bg-rapanel-navy-900 z-10">
+                <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
+                <div class="px-6 pt-5 pb-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
+                    <h2 class="text-lg font-display font-bold tracking-wide text-rapanel-navy-900 dark:text-white">
+                        Edit User — <span class="text-rapanel-blue">{{ editTarget?.name }}</span>
+                    </h2>
+                    <p class="text-xs text-rapanel-text-light/40 dark:text-white/30 mt-0.5">ID: {{ editTarget?.id }}</p>
+                </div>
             </div>
 
             <form @submit.prevent="submitEdit" class="p-6 space-y-6">

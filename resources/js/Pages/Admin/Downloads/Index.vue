@@ -28,7 +28,7 @@ const destroy = (id) => {
         </PageHeader>
 
         <!-- Table -->
-        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.35)] overflow-hidden">
+        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">

@@ -44,7 +44,7 @@ const confirmDelete = (id) => {
             </PageHeader>
 
             <!-- Table -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>

@@ -130,7 +130,7 @@ const locationBadgeClass = (loc) => {
         </PageHeader>
 
         <!-- ── Table ── -->
-        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.35)] overflow-hidden">
+        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
@@ -251,8 +251,9 @@ const locationBadgeClass = (loc) => {
                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
                 @click.self="showAddModal = false">
 
-                <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-xl border border-rapanel-navy-100 dark:border-white/10 w-full max-w-md">
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10">
+                <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-xl border border-rapanel-navy-100 dark:border-white/[0.07] w-full max-w-md overflow-hidden">
+                    <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                         <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Add Card') }}</h2>
                         <button @click="showAddModal = false"
                             class="text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white transition text-xl leading-none">×</button>
@@ -319,10 +320,12 @@ const locationBadgeClass = (loc) => {
                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
                 @click.self="showHoldersModal = false">
 
-                <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-xl border border-rapanel-navy-100 dark:border-white/10 w-full max-w-3xl max-h-[80vh] flex flex-col">
+                <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-xl border border-rapanel-navy-100 dark:border-white/[0.07] w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden">
 
                     <!-- Header -->
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 shrink-0">
+                    <div class="shrink-0">
+                    <div class="h-[3px] bg-gradient-to-r from-rapanel-gold/70 via-rapanel-gold/30 to-transparent" />
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                         <div class="flex items-center gap-3">
                             <div v-if="holdersCard" class="w-10 h-10 rounded-lg overflow-hidden bg-rapanel-navy-50 dark:bg-rapanel-navy-800">
                                 <img :src="`/data/mvpcards/${holdersCard.image_path}`" class="w-full h-full object-contain" @error="$event.target.style.display='none'" />
@@ -335,6 +338,7 @@ const locationBadgeClass = (loc) => {
                         <button @click="showHoldersModal = false"
                             class="text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white transition text-xl leading-none">×</button>
                     </div>
+                    </div><!-- /shrink-0 -->
 
                     <!-- Body -->
                     <div class="overflow-y-auto flex-1">

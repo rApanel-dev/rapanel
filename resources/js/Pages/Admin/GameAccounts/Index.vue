@@ -115,7 +115,7 @@ const submitGroup = () => {
             </PageHeader>
 
             <!-- Filters -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.08] p-4 space-y-3 shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
 
                 <!-- Basic row -->
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -289,8 +289,10 @@ const submitGroup = () => {
 
     <!-- ── Modal: Ban ── -->
     <Modal :show="!!banTarget" @close="closeBan">
-        <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-            <h2 class="text-lg font-bold text-rapanel-danger mb-1 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">
+        <div class="bg-white dark:bg-rapanel-navy-900 overflow-hidden rounded-xl">
+            <div class="h-[3px] bg-gradient-to-r from-rapanel-danger/70 via-rapanel-danger/30 to-transparent" />
+            <div class="p-6">
+            <h2 class="text-lg font-bold text-rapanel-danger mb-1 border-b border-rapanel-navy-100 dark:border-white/[0.07] pb-3 uppercase tracking-wider">
                 Ban Account: <span class="text-rapanel-blue">{{ banTarget?.userid }}</span>
             </h2>
             <form @submit.prevent="submitBan" class="space-y-4 mt-4">
@@ -323,33 +325,37 @@ const submitGroup = () => {
                     </button>
                 </div>
             </form>
+            </div>
         </div>
     </Modal>
 
     <!-- ── Modal: Group ID ── -->
     <Modal :show="!!groupTarget" @close="closeGroup">
-        <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-            <h2 class="text-lg font-bold text-rapanel-gold mb-1 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">
-                Change Group ID: <span class="text-rapanel-blue">{{ groupTarget?.userid }}</span>
-            </h2>
-            <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mt-3 mb-4">
-                Group 0 = Player · 1 = Sub-GM · 2+ = GM levels. Check your rAthena <code>groups.conf</code> for exact values.
-            </p>
-            <form @submit.prevent="submitGroup" class="space-y-4">
-                <div>
-                    <InputLabel value="Group ID" class="text-rapanel-gold font-bold uppercase text-xs" />
-                    <TextInput v-model="groupForm.group_id" type="number" min="0" max="99" required autofocus
-                        class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" />
-                    <InputError class="mt-1" :message="groupForm.errors.group_id" />
-                </div>
-                <div class="flex justify-end gap-3 pt-2">
-                    <SecondaryButton type="button" @click="closeGroup">Cancel</SecondaryButton>
-                    <button type="submit" :disabled="groupForm.processing"
-                        class="px-4 py-2 rounded-lg bg-rapanel-gold text-white text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
-                        {{ groupForm.processing ? 'Saving…' : 'Save' }}
-                    </button>
-                </div>
-            </form>
+        <div class="bg-white dark:bg-rapanel-navy-900 overflow-hidden rounded-xl">
+            <div class="h-[3px] bg-gradient-to-r from-rapanel-gold/70 via-rapanel-gold/30 to-transparent" />
+            <div class="p-6">
+                <h2 class="text-lg font-bold text-rapanel-gold mb-1 border-b border-rapanel-navy-100 dark:border-white/[0.07] pb-3 uppercase tracking-wider">
+                    Change Group ID: <span class="text-rapanel-blue">{{ groupTarget?.userid }}</span>
+                </h2>
+                <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mt-3 mb-4">
+                    Group 0 = Player · 1 = Sub-GM · 2+ = GM levels. Check your rAthena <code>groups.conf</code> for exact values.
+                </p>
+                <form @submit.prevent="submitGroup" class="space-y-4">
+                    <div>
+                        <InputLabel value="Group ID" class="text-rapanel-gold font-bold uppercase text-xs" />
+                        <TextInput v-model="groupForm.group_id" type="number" min="0" max="99" required autofocus
+                            class="mt-1 block w-full border-rapanel-gold/30 focus:ring-rapanel-gold focus:border-rapanel-gold bg-white dark:bg-rapanel-navy-900" />
+                        <InputError class="mt-1" :message="groupForm.errors.group_id" />
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <SecondaryButton type="button" @click="closeGroup">Cancel</SecondaryButton>
+                        <button type="submit" :disabled="groupForm.processing"
+                            class="px-4 py-2 rounded-lg bg-rapanel-gold text-white text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
+                            {{ groupForm.processing ? 'Saving…' : 'Save' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </Modal>
 </template>
