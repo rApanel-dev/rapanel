@@ -147,7 +147,7 @@ const locationBadgeClass = (loc) => {
                         <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('total')">
                             {{ __('Count') }} <span class="opacity-60">{{ sortIcon('total') }}</span>
                         </th>
-                        <th class="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-36">{{ __('Actions') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-36">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
