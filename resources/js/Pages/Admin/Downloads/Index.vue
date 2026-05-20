@@ -31,28 +31,28 @@ const destroy = (id) => {
         <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
-                        <th class="px-5 py-3 text-left">{{ __('Name') }}</th>
-                        <th class="px-5 py-3 text-left hidden md:table-cell">{{ __('Category') }}</th>
-                        <th class="px-5 py-3 text-center hidden sm:table-cell">{{ __('Type') }}</th>
-                        <th class="px-5 py-3 text-center hidden sm:table-cell">{{ __('Downloads') }}</th>
-                        <th class="px-5 py-3 text-center">{{ __('Status') }}</th>
-                        <th class="px-5 py-3 text-right">{{ __('Actions') }}</th>
+                    <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Name') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">{{ __('Category') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden sm:table-cell">{{ __('Type') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden sm:table-cell">{{ __('Downloads') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Status') }}</th>
+                        <th class="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
                     <tr v-for="dl in downloads.data" :key="dl.id"
                         class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition-colors">
-                        <td class="px-5 py-3.5 font-medium text-rapanel-navy-900 dark:text-white">
+                        <td class="px-4 py-3 font-medium text-rapanel-navy-900 dark:text-white">
                             {{ dl.name }}
                         </td>
-                        <td class="px-5 py-3.5 text-rapanel-text-light dark:text-rapanel-text-dark hidden md:table-cell">
+                        <td class="px-4 py-3 text-rapanel-text-light dark:text-rapanel-text-dark hidden md:table-cell">
                             <span v-if="dl.category_name">
                                 <span v-if="dl.category_icon" class="mr-0.5">{{ dl.category_icon }}</span>{{ dl.category_name }}
                             </span>
                             <span v-else class="opacity-40">—</span>
                         </td>
-                        <td class="px-5 py-3.5 text-center hidden sm:table-cell">
+                        <td class="px-4 py-3 text-center hidden sm:table-cell">
                             <span :class="[
                                 'text-[10px] font-black uppercase px-2 py-0.5 rounded border',
                                 dl.is_external
@@ -60,10 +60,10 @@ const destroy = (id) => {
                                     : 'bg-rapanel-success/10 text-rapanel-success border-rapanel-success/20'
                             ]">{{ dl.is_external ? __('External') : __('Local') }}</span>
                         </td>
-                        <td class="px-5 py-3.5 text-center text-rapanel-text-light dark:text-rapanel-text-dark hidden sm:table-cell">
+                        <td class="px-4 py-3 text-center text-rapanel-text-light dark:text-rapanel-text-dark hidden sm:table-cell">
                             {{ dl.download_count.toLocaleString() }}
                         </td>
-                        <td class="px-5 py-3.5 text-center">
+                        <td class="px-4 py-3 text-center">
                             <span :class="[
                                 'text-[10px] font-black uppercase px-2 py-0.5 rounded border',
                                 dl.is_active
@@ -71,7 +71,7 @@ const destroy = (id) => {
                                     : 'bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/20'
                             ]">{{ dl.is_active ? __('Active') : __('Inactive') }}</span>
                         </td>
-                        <td class="px-5 py-3.5 text-right">
+                        <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <Link :href="route('admin.downloads.edit', dl.id)"
                                     class="text-xs font-semibold text-rapanel-blue hover:underline">{{ __('Edit') }}</Link>

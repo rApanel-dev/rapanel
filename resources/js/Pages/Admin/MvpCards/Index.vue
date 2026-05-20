@@ -133,21 +133,21 @@ const locationBadgeClass = (loc) => {
         <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
-                        <th class="px-4 py-3 text-left w-14">{{ __('Image') }}</th>
-                        <th class="px-4 py-3 text-left w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('item_id')">
+                    <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-14">{{ __('Image') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('item_id')">
                             {{ __('Item ID') }} <span class="opacity-60">{{ sortIcon('item_id') }}</span>
                         </th>
-                        <th class="px-4 py-3 text-left cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('name')">
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('name')">
                             {{ __('Name') }} <span class="opacity-60">{{ sortIcon('name') }}</span>
                         </th>
-                        <th class="px-4 py-3 text-center w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('is_active')">
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('is_active')">
                             {{ __('Status') }} <span class="opacity-60">{{ sortIcon('is_active') }}</span>
                         </th>
-                        <th class="px-4 py-3 text-center w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('total')">
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24 cursor-pointer select-none hover:text-rapanel-blue transition" @click="setSort('total')">
                             {{ __('Count') }} <span class="opacity-60">{{ sortIcon('total') }}</span>
                         </th>
-                        <th class="px-4 py-3 text-right w-36">{{ __('Actions') }}</th>
+                        <th class="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-36">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
@@ -361,11 +361,11 @@ const locationBadgeClass = (loc) => {
                         <!-- Table -->
                         <table v-else class="min-w-full text-sm">
                             <thead class="sticky top-0">
-                                <tr class="bg-rapanel-navy-50 dark:bg-white/5 border-b border-rapanel-navy-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
-                                    <th class="px-4 py-3 text-left">{{ __('Character') }}</th>
-                                    <th class="px-4 py-3 text-left">{{ __('Account') }}</th>
-                                    <th class="px-4 py-3 text-left">{{ __('Location') }}</th>
-                                    <th class="px-4 py-3 text-left hidden md:table-cell">{{ __('Master Account') }}</th>
+                                <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                                    <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Character') }}</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Account') }}</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Location') }}</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">{{ __('Master Account') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">

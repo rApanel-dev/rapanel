@@ -48,15 +48,15 @@ const confirmDelete = (id) => {
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-12">ID</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-28">Type</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-16">Image</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40">Title</th>
-                                <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-24">Published</th>
-                                <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-20">Pinned</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-32">Created</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 w-28">Actions</th>
+                            <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-12">ID</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-28">Type</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-16">Image</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Title</th>
+                                <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24">Published</th>
+                                <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-20">Pinned</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-32">Created</th>
+                                <th class="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-28">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
