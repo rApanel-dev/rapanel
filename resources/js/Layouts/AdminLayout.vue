@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import {
     HomeIcon,
@@ -55,6 +55,7 @@ const userInitial = computed(() =>
 </script>
 
 <template>
+    <Head title="Admin" />
     <div class="min-h-screen bg-rapanel-navy-50 dark:bg-[#080d14] flex flex-col">
 
         <!-- Top bar -->
