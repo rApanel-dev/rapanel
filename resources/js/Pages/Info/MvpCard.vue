@@ -26,7 +26,7 @@ const imgSrc = (card) => `/data/mvpcards/${card.image_path}`;
 </script>
 
 <template>
-    <Head :title="__('🃏 MvP Cards')" />
+    <Head :title="__('MvP Cards')" />
 
     <MainLayout :show-bg="true">
 
@@ -35,7 +35,7 @@ const imgSrc = (card) => `/data/mvpcards/${card.image_path}`;
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide">
-                        {{ __('🃏 MvP Cards') }}
+                        {{ __('MvP Cards') }}
                     </h1>
                     <p class="mt-1.5 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
                         {{ __('Total cards in server') }}: <span class="font-semibold text-rapanel-navy-900 dark:text-white">{{ totalInServer.toLocaleString() }}</span>

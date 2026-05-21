@@ -22,6 +22,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
 use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
 use App\Http\Controllers\MvpCardController;
+use App\Http\Controllers\WhoSellController;
 use App\Http\Controllers\Admin\MvpCardAdminController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsReactionController;
@@ -43,7 +44,8 @@ Route::get('/donations', function() { return Inertia::render('Home'); })->name('
 // Rutas de Información
 Route::prefix('info')->name('info.')->group(function() {
     Route::get('/wiki', function() { return Inertia::render('Home'); })->name('wiki');
-    Route::get('/who-sell', function() { return Inertia::render('Home'); })->name('who-sell');
+    Route::get('/who-sell', [WhoSellController::class, 'index'])->name('who-sell');
+    Route::get('/who-sell/shop/{vendingId}', [WhoSellController::class, 'show'])->name('who-sell.shop');
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
     Route::get('/item-db', function() { return Inertia::render('Home'); })->name('item-db');
 });

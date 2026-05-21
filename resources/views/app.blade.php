@@ -7,9 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="description" content="{{ config('app.name', 'rApanel') }} | Una plataforma moderna para servidores rAthena. ¡Revive los viejos tiempos con tecnología de vanguardia!">
+    <meta name="description" content="{{ config('app.name', 'rApanel') }} | Una plataforma moderna para servidores rAthena/Hercules. ¡Revive los viejos tiempos con tecnología de vanguardia!">
     <meta name="author" content="KhrizPlayCL ~ rApanel Project">
-    <meta name="keywords" content="{{ config('app.name', 'rApanel') }}, rAthena, Ragnarok Online, Web Panel, Laravel, Vue3">
+    <meta name="keywords" content="{{ config('app.name', 'rApanel') }}, rAthena, Hercules, Ragnarok Online, Web Panel, Laravel, Vue3">
     
     <meta property="og:locale" content="es_ES"/>
     <meta property="og:type" content="website">
@@ -17,15 +17,22 @@
     <meta property="og:description" content="Gestiona tu cuenta, vincula tus personajes y mantente al tanto de las novedades del servidor.">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:site_name" content="{{ config('app.name', 'rApanel') }}">
-    <!--<meta property="og:image" content="{{ asset('images/web_share.jpg') }}">-->
-    <meta property="og:image:width" content="512">
-    <meta property="og:image:height" content="512">
+    @php $ogImgV = file_exists(public_path('images/web_share.jpg')) ? filemtime(public_path('images/web_share.jpg')) : 1; @endphp
+    <meta property="og:image" content="{{ asset('images/web_share.jpg') }}?v={{ $ogImgV }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
-    <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg') }}" color="#4A90E2">
+    @php
+        $fv = function(string $file): int {
+            $path = public_path($file);
+            return file_exists($path) ? filemtime($path) : 1;
+        };
+    @endphp
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}?v={{ $fv('images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}?v={{ $fv('images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}?v={{ $fv('images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}?v={{ $fv('site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg') }}?v={{ $fv('safari-pinned-tab.svg') }}" color="#4A90E2">
     <meta name="msapplication-TileColor" content="#E74C3C">
     <meta name="theme-color" content="#ffffff">
 

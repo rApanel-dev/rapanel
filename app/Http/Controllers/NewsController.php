@@ -13,6 +13,7 @@ class NewsController extends Controller
         $type = request('type');
 
         $news = News::where('is_published', true)
+            ->withCount(['reactions', 'comments'])
             ->when($type, fn ($q) => $q->where('type', $type))
             ->orderByDesc('is_pinned')
             ->orderByDesc('created_at')
@@ -27,6 +28,8 @@ class NewsController extends Controller
                 'is_pinned'      => $n->is_pinned,
                 'created_at'     => $n->created_at?->format('d M Y'),
                 'created_ago'    => $n->created_at?->diffForHumans(),
+                'likes_count'    => $n->reactions_count,
+                'comments_count' => $n->comments_count,
             ]);
 
         return Inertia::render('News/Index', [

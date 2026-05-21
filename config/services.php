@@ -42,6 +42,8 @@ return [
     ],
 
     'ra' => [
+        'emulator'     => env('RA_EMULATOR', 'rathena'),
+        'game_mode'    => env('RA_GAME_MODE', 'renewal'),
         'use_md5'      => env('RA_USE_MD5_PASSWORDS', false),
         'max_accounts' => env('RA_MAX_GAME_ACCOUNTS', 3),
         'reset_map'    => env('RA_RESET_MAP', 'prontera'),

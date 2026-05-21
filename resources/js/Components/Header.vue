@@ -150,7 +150,8 @@ const toggleMobileSubmenu = (name) => {
                                 <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
                                     <MenuItems class="absolute left-0 mt-2 w-56 origin-top-left rounded-md bg-white dark:bg-rapanel-navy-800 shadow-2xl py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 border border-rapanel-navy-100 dark:border-white/10">
                                         <MenuItem v-for="sub in item.children" :key="sub.name" v-slot="{ active }">
-                                            <Link :href="safeRoute(sub.route)" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-text-light dark:text-rapanel-text-dark', 'block px-4 py-2 text-sm transition']">
+                                            <Link :href="safeRoute(sub.route)" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-text-light dark:text-rapanel-text-dark', 'flex items-center gap-2 px-4 py-2 text-sm transition']">
+                                                <span v-if="sub.icon" class="shrink-0">{{ sub.icon }}</span>
                                                 {{ __(sub.name) }}
                                             </Link>
                                         </MenuItem>
@@ -204,7 +205,8 @@ const toggleMobileSubmenu = (name) => {
                             </button>
                             <div v-show="openMobileSubmenus[item.name]" class="space-y-0.5 pb-1">
                                 <Link v-for="sub in item.children" :key="sub.name" :href="safeRoute(sub.route)"
-                                    class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                    class="flex items-center gap-2 pl-6 pr-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                    <span v-if="sub.icon" class="shrink-0">{{ sub.icon }}</span>
                                     {{ __(sub.name) }}
                                 </Link>
                             </div>

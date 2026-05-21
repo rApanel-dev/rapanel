@@ -4,9 +4,8 @@ import {
   ArrowDownTrayIcon,
   TrophyIcon,
   HeartIcon,
-  UserIcon,             // NUEVO: Para Master Account
-  ArrowsRightLeftIcon,  // NUEVO: Para Transfer
-  StarIcon              // NUEVO: Para Vote
+  ArrowsRightLeftIcon,
+  StarIcon
 } from '@heroicons/vue/24/outline'
 
 export const visitorMenuItems = [
@@ -19,11 +18,11 @@ export const visitorMenuItems = [
     name: 'Information',
     icon: InformationCircleIcon,
     children: [
-      { name: '📰 News', route: 'news.index' },
-      { name: '📖 Wiki', route: 'info.wiki' },
-      { name: '🏪 Who Sell', route: 'info.who-sell' },
-      { name: '🃏 MvP Cards', route: 'info.mvp-card' },
-      { name: '🔎 Item DB', route: 'info.item-db' },
+      { name: 'News',      route: 'news.index',    icon: '📰' },
+      { name: 'Wiki',      route: 'info.wiki',     icon: '📖' },
+      { name: 'Who Sell',  route: 'info.who-sell', icon: '🏪' },
+      { name: 'MvP Cards', route: 'info.mvp-card', icon: '🃏' },
+      { name: 'Item DB',   route: 'info.item-db',  icon: '🔎' },
     ],
   },
   {
@@ -35,15 +34,15 @@ export const visitorMenuItems = [
     name: 'Rankings',
     icon: TrophyIcon,
     children: [
-      { name: '🎖️ Battlegrounds', route: 'rank.battleground' },
-      { name: '👑 Guild vs Guild', route: 'rank.woe-damage' },
-      { name: '🏰 War of Emperium', route: 'rank.woe' },
-      { name: '🐲 MvP', route: 'rank.mvps' },
-      { name: '🥊 PvP', route: 'rank.pvp' },
-      { name: '💵 Cash', route: 'rank.cashpoints' },
-      { name: '💰 Zeny', route: 'rank.zeny' },
-      { name: '⌚ Playtime', route: 'rank.playtime' },
-      { name: '🏁 Level', route: 'rank.leveling' },
+      { name: 'Battlegrounds',   route: 'rank.battleground', icon: '🎖️' },
+      { name: 'Guild vs Guild',  route: 'rank.woe-damage',   icon: '👑' },
+      { name: 'War of Emperium', route: 'rank.woe',          icon: '🏰' },
+      { name: 'MvP',             route: 'rank.mvps',         icon: '🐲' },
+      { name: 'PvP',             route: 'rank.pvp',          icon: '🥊' },
+      { name: 'Cash',            route: 'rank.cashpoints',   icon: '💵' },
+      { name: 'Zeny',            route: 'rank.zeny',         icon: '💰' },
+      { name: 'Playtime',        route: 'rank.playtime',     icon: '⌚' },
+      { name: 'Level',           route: 'rank.leveling',     icon: '🏁' },
     ],
   },
   {
