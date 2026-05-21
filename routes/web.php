@@ -27,6 +27,8 @@ use App\Http\Controllers\Admin\MvpCardAdminController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsReactionController;
 use App\Http\Controllers\Admin\NewsCommentController as AdminNewsCommentController;
+use App\Http\Controllers\Admin\ItemDbController as AdminItemDbController;
+use App\Http\Controllers\ItemDbController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -47,7 +49,8 @@ Route::prefix('info')->name('info.')->group(function() {
     Route::get('/who-sell', [WhoSellController::class, 'index'])->name('who-sell');
     Route::get('/who-sell/shop/{vendingId}', [WhoSellController::class, 'show'])->name('who-sell.shop');
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
-    Route::get('/item-db', function() { return Inertia::render('Home'); })->name('item-db');
+    Route::get('/item-db', [ItemDbController::class, 'index'])->name('item-db');
+    Route::get('/item-db/{itemId}', [ItemDbController::class, 'show'])->name('item-db.show')->where('itemId', '[0-9]+');
 });
 
 // Rutas de Ranking
@@ -139,6 +142,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('mvp-cards', [MvpCardAdminController::class, 'index'])->name('mvp-cards.index');
     Route::post('mvp-cards', [MvpCardAdminController::class, 'store'])->name('mvp-cards.store');
     Route::delete('mvp-cards/{mvpCard}', [MvpCardAdminController::class, 'destroy'])->name('mvp-cards.destroy');
+
+    // Item DB admin
+    Route::get('item-db',          [AdminItemDbController::class, 'index'])->name('item-db.index');
+    Route::post('item-db/import',  [AdminItemDbController::class, 'import'])->name('item-db.import');
+    Route::delete('item-db',       [AdminItemDbController::class, 'destroy'])->name('item-db.destroy');
 });
 
 // Noticias públicas
