@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
+import { useItemDbModal } from '@/Composables/useItemDbModal';
 
 const props = defineProps({
     shop:  { type: Object, default: () => ({}) },
@@ -43,6 +45,8 @@ const elementStyle = (el) => {
 
 const copiedRow = ref(null);
 let copyTimer   = null;
+
+const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
 
 const copyNavigation = () => {
     const cmd = `/navigation ${props.shop.map} ${props.shop.x}/${props.shop.y}`;
@@ -136,7 +140,8 @@ const copyNavigation = () => {
 
                                 <!-- Item -->
                                 <td class="px-4 py-3">
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 cursor-pointer"
+                                         @click="openItemDb(item.nameid, item)">
                                         <img :src="itemImg(item.nameid)" :alt="item.item_name"
                                              class="w-9 h-9 object-contain shrink-0"
                                              @error="$event.target.style.display='none'" />
@@ -209,5 +214,8 @@ const copyNavigation = () => {
             </div>
 
         </div>
+
+        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
+
     </MainLayout>
 </template>

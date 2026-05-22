@@ -217,6 +217,46 @@ class GameAccountController extends Controller
             $storageItems = array_map(fn($i) => (array) $i, $storageRows);
         } catch (\Exception) {}
 
+        // Enriquecer nombres desde ra_item_db (prioridad sobre item_db del emulador)
+        // Usamos DB::table('item_db') para que el prefijo del panel se aplique automáticamente
+        try {
+            $allNameids = array_values(array_unique(array_merge(
+                array_column($storageItems, 'nameid'),
+                ...array_map(fn($items) => array_column($items, 'nameid'), $inventoryByChar ?: [[]]),
+                ...array_map(fn($items) => array_column($items, 'nameid'), $cartByChar ?: [[]])
+            )));
+
+            if (!empty($allNameids)) {
+                $raItems = DB::table('item_db')
+                    ->whereIn('item_id', $allNameids)
+                    ->get(['item_id', 'name', 'display_name', 'slots', 'type'])
+                    ->keyBy('item_id');
+
+                $applyRa = function (array &$item) use ($raItems): void {
+                    $ra = $raItems->get($item['nameid']);
+                    if (!$ra) return;
+                    $item['name_english'] = $ra->display_name ?? $ra->name ?? $item['name_english'];
+                    $item['item_slots']   = $ra->slots  ?? $item['item_slots'];
+                    $item['item_type']    = $ra->type   ?? $item['item_type'];
+                };
+
+                foreach ($storageItems as &$item) { $applyRa($item); }
+                unset($item);
+
+                foreach ($inventoryByChar as &$items) {
+                    foreach ($items as &$item) { $applyRa($item); }
+                    unset($item);
+                }
+                unset($items);
+
+                foreach ($cartByChar as &$items) {
+                    foreach ($items as &$item) { $applyRa($item); }
+                    unset($item);
+                }
+                unset($items);
+            }
+        } catch (\Exception) {}
+
         // Lookup de nombres de cartas (batch único)
         $allItems = array_merge(
             array_merge(...array_values($inventoryByChar) ?: [[]]),
@@ -253,6 +293,16 @@ class GameAccountController extends Controller
                     );
                     foreach ($cRows2 as $r) {
                         $cardNames[$r->id] = $r->name_english;
+                    }
+                }
+                // Cartas que tampoco están en item_db2 → buscar en ra_item_db (conexión panel, prefijo automático)
+                $missingIds2 = array_values(array_diff($cardIds, array_keys($cardNames)));
+                if (!empty($missingIds2)) {
+                    $raCards = DB::table('item_db')
+                        ->whereIn('item_id', $missingIds2)
+                        ->get(['item_id', 'display_name', 'name']);
+                    foreach ($raCards as $r) {
+                        $cardNames[$r->item_id] = $r->display_name ?? $r->name;
                     }
                 }
             } catch (\Exception) {}

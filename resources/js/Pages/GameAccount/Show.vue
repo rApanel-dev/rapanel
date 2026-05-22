@@ -12,6 +12,8 @@ import CharacterDetail from '@/Pages/GameAccount/Partials/CharacterDetail.vue';
 import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
 import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
+import { useItemDbModal } from '@/Composables/useItemDbModal';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import BgMain from '@/Components/BgMain.vue';
@@ -244,6 +246,9 @@ const confirmPrefUpdate = () => {
 };
 
 const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
+
+// Item DB modal
+const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
 
 </script>
 
@@ -534,14 +539,18 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                            <tr v-for="(item, idx) in storageItems" :key="idx" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20">
-                                <td class="px-3 py-1.5 text-center font-mono text-[11px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40">{{ item.nameid }}</td>
-                                <td class="px-3 py-1.5 text-center">
-                                    <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto" :alt="item.name_english" />
+                            <tr v-for="(item, idx) in storageItems" :key="idx"
+                                class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                                <td class="px-3 py-1.5 text-center font-mono text-[11px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue"
+                                    @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
+                                <td class="px-3 py-1.5 text-center cursor-pointer"
+                                    @click="openItemDb(item.nameid, item)">
+                                    <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" :alt="item.name_english" />
                                 </td>
-                                <td class="px-3 py-1.5">
+                                <td class="px-3 py-1.5 cursor-pointer"
+                                    @click="openItemDb(item.nameid, item)">
                                     <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
-                                    <span class="font-medium text-rapanel-navy-900 dark:text-white">{{ itemLabel(item) }}</span>
+                                    <span class="font-medium text-rapanel-navy-900 dark:text-white hover:text-rapanel-blue dark:hover:text-rapanel-blue transition-colors">{{ itemLabel(item) }}</span>
                                 </td>
                                 <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
                                 <td class="px-3 py-1.5 text-center">
@@ -552,7 +561,9 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
                                     <span v-else class="text-rapanel-text-light/30 dark:text-rapanel-text-dark/30">{{ __('No') }}</span>
                                 </td>
                                 <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 italic">
-                                    <span v-if="getCardName(item[slot])" class="text-rapanel-blue not-italic font-medium">{{ getCardName(item[slot]) }}</span>
+                                    <span v-if="getCardName(item[slot])"
+                                        class="text-rapanel-blue not-italic font-medium cursor-pointer hover:underline"
+                                        @click="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
                                     <span v-else>{{ __('None') }}</span>
                                 </td>
                             </tr>
@@ -562,6 +573,9 @@ const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
             </div>
 
         </main>
+
+        <!-- ===== ITEM DB MODAL ===== -->
+        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
         <!-- ===== CHARACTER DETAIL OVERLAY ===== -->
         <CharacterDetail

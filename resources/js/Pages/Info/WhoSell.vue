@@ -2,6 +2,8 @@
 import { ref, computed, watch } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
+import { useItemDbModal } from '@/Composables/useItemDbModal';
 
 const props = defineProps({
     items:   { type: Array,  default: () => [] },
@@ -166,6 +168,8 @@ const elementStyle = (el) => {
     if (el === 'Wind')  return 'bg-cyan-500/10 text-cyan-600 border-cyan-500/30 dark:text-cyan-400';
     return '';
 };
+
+const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
 </script>
 
 <template>
@@ -269,7 +273,8 @@ const elementStyle = (el) => {
 
                                 <!-- Item (icon + nombre + ID + slots + badges) -->
                                 <td class="px-4 py-3">
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 cursor-pointer group/item"
+                                         @click="openItemDb(item.nameid, item)">
 
                                         <!-- Icono sin cuadro -->
                                         <img :src="itemImg(item.nameid)"
@@ -663,6 +668,8 @@ const elementStyle = (el) => {
                 </div>
             </Transition>
         </Teleport>
+
+        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
     </MainLayout>
 </template>
