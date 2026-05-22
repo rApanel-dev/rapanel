@@ -195,7 +195,7 @@ The admin panel includes importers for rAthena databases. Go to **Admin → Item
 
 | Admin section | Files to upload | Location in rAthena |
 |---|---|---|
-| Item DB (YML) | `item_db_equip.yml` + `item_db_etc.yml` + `item_db_usable.yml` — select all three at once | `db/re/` or `db/pre-re/` |
+| Item DB (YML) | All `item_db_*.yml` files from your game mode folder — select them all at once. Pre-renewal has 3 files; renewal may have more. | `db/re/` or `db/pre-re/` |
 | Item DB (LUA) | `itemInfo.lua` — optional, enriches display names | client `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` or `db/pre-re/` |
 

@@ -195,7 +195,7 @@ Le panneau inclut des importateurs pour les bases de données YAML et LUA de rAt
 
 | Section admin | Fichiers à téléverser | Emplacement dans rAthena |
 |---|---|---|
-| Item DB (YML) | `item_db_equip.yml` + `item_db_etc.yml` + `item_db_usable.yml` — sélectionner les trois en même temps | `db/re/` ou `db/pre-re/` |
+| Item DB (YML) | Tous les fichiers `item_db_*.yml` du dossier de votre mode de jeu — les sélectionner tous en même temps. Pre-renewal en a 3 ; renewal peut en avoir davantage. | `db/re/` ou `db/pre-re/` |
 | Item DB (LUA) | `itemInfo.lua` — optionnel, enrichit les noms d'affichage | client `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` ou `db/pre-re/` |
 

@@ -195,7 +195,7 @@ O painel inclui importadores para os bancos de dados YAML e LUA do rAthena. Aces
 
 | Seção admin | Arquivos a enviar | Localização no rAthena |
 |---|---|---|
-| Item DB (YML) | `item_db_equip.yml` + `item_db_etc.yml` + `item_db_usable.yml` — selecionar os três ao mesmo tempo | `db/re/` ou `db/pre-re/` |
+| Item DB (YML) | Todos os arquivos `item_db_*.yml` da pasta do seu modo de jogo — selecionar todos ao mesmo tempo. Pre-renewal tem 3 arquivos; renewal pode ter mais. | `db/re/` ou `db/pre-re/` |
 | Item DB (LUA) | `itemInfo.lua` — opcional, enriquece os nomes de exibição | cliente `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` ou `db/pre-re/` |
 
