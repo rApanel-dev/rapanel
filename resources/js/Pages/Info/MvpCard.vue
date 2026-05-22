@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
 
 const props = defineProps({
     cards: { type: Array, default: () => [] },
@@ -22,7 +23,31 @@ const sorted = computed(() => {
 
 const totalInServer = computed(() => props.cards.reduce((sum, c) => sum + c.total, 0));
 
-const imgSrc = (card) => `/data/mvpcards/${card.image_path}`;
+const imgSrc = (card) => `/data/items/cards/${card.id}.png`;
+
+// ── Detail modal ─────────────────────────────────────────────────────
+const selectedItem  = ref(null);
+const serverCount   = ref(null);
+const loadingItemId = ref(null);
+
+const openDetail = async (card) => {
+    if (loadingItemId.value) return;
+    loadingItemId.value = card.id;
+    selectedItem.value  = null;
+    serverCount.value   = null;
+
+    try {
+        const res  = await fetch(route('info.item-db.show', card.id));
+        const data = await res.json();
+        serverCount.value  = data.server_count ?? null;
+        selectedItem.value = data;
+    } catch { /* silencioso */ }
+    finally {
+        loadingItemId.value = null;
+    }
+};
+
+const closeDetail = () => { selectedItem.value = null; serverCount.value = null; };
 </script>
 
 <template>
@@ -83,40 +108,50 @@ const imgSrc = (card) => `/data/mvpcards/${card.image_path}`;
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
             <div v-if="sorted.length"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
 
-                <div v-for="card in sorted" :key="card.id"
-                    class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col items-center p-4 gap-3 hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 group">
+                <button v-for="card in sorted" :key="card.id"
+                    @click="openDetail(card)"
+                    :disabled="loadingItemId === card.id"
+                    class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 group text-left cursor-pointer disabled:opacity-60 pt-[3px] px-[3px]">
 
-                    <!-- Card image -->
-                    <div class="w-full aspect-square rounded-xl overflow-hidden bg-rapanel-navy-50 dark:bg-rapanel-navy-800 flex items-center justify-center">
+                    <!-- Ilustración retrato 3:4 -->
+                    <div class="w-full aspect-[3/4] overflow-hidden rounded-t-xl bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center relative">
                         <img
                             :src="imgSrc(card)"
                             :alt="card.name"
-                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             @error="$event.target.style.display='none'"
                         />
-                    </div>
-
-                    <!-- Name -->
-                    <p class="text-center text-xs font-semibold text-rapanel-navy-900 dark:text-white leading-tight line-clamp-2 w-full">
-                        {{ card.name }}
-                    </p>
-
-                    <!-- Count badge -->
-                    <div class="flex items-center gap-1.5 mt-auto">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border"
-                            :class="card.total > 0
-                                ? 'bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/30 dark:bg-rapanel-gold/15 dark:text-rapanel-gold dark:border-rapanel-gold/40'
-                                : 'bg-transparent border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-rapanel-text-dark'">
-                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75M3.75 13.5v3.75" />
+                        <!-- Spinner mientras carga el modal -->
+                        <div v-if="loadingItemId === card.id"
+                            class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl">
+                            <svg class="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                             </svg>
-                            {{ card.total.toLocaleString() }}
-                        </span>
+                        </div>
                     </div>
 
-                </div>
+                    <!-- Nombre + contador -->
+                    <div class="px-2.5 pt-2 pb-2.5 flex flex-col gap-1.5">
+                        <p class="text-center text-[11px] font-semibold text-rapanel-navy-900 dark:text-white leading-tight line-clamp-2">
+                            {{ card.name }}
+                        </p>
+                        <div class="flex justify-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border"
+                                :class="card.total > 0
+                                    ? 'bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/30 dark:bg-rapanel-gold/15 dark:text-rapanel-gold dark:border-rapanel-gold/40'
+                                    : 'bg-transparent border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-rapanel-text-dark'">
+                                <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75M3.75 13.5v3.75" />
+                                </svg>
+                                {{ card.total.toLocaleString() }}
+                            </span>
+                        </div>
+                    </div>
+
+                </button>
             </div>
 
             <!-- Empty state -->
@@ -127,6 +162,9 @@ const imgSrc = (card) => `/data/mvpcards/${card.image_path}`;
             </div>
 
         </div>
+
+        <!-- ── Detail Modal ── -->
+        <ItemDbModal :item="selectedItem" :server-count="serverCount" @close="closeDetail" />
 
     </MainLayout>
 </template>

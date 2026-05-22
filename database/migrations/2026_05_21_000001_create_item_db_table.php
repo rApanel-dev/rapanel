@@ -9,8 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('item_db', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('item_id')->unique();
+            $table->unsignedInteger('item_id')->primary();
             $table->string('aegis_name', 100);
             $table->string('name', 255);
             $table->string('display_name', 255)->nullable();

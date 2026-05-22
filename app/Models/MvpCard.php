@@ -10,13 +10,14 @@ class MvpCard extends Model
 
     protected $fillable = [
         'item_id',
+        'mob_id',
         'name_override',
-        'image_path',
         'is_active',
     ];
 
     protected $casts = [
         'item_id'   => 'integer',
+        'mob_id'    => 'integer',
         'is_active' => 'boolean',
     ];
 }

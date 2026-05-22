@@ -28,6 +28,7 @@ use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsReactionController;
 use App\Http\Controllers\Admin\NewsCommentController as AdminNewsCommentController;
 use App\Http\Controllers\Admin\ItemDbController as AdminItemDbController;
+use App\Http\Controllers\Admin\MobDbController as AdminMobDbController;
 use App\Http\Controllers\ItemDbController;
 
 Route::get('/', function () {
@@ -136,17 +137,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('news-comments/{newsComment}', [AdminNewsCommentController::class, 'destroy'])->name('news-comments.destroy');
     Route::resource('downloads', AdminDownloadController::class)->except(['show']);
     Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
-    Route::post('mvp-cards/sync', [MvpCardAdminController::class, 'sync'])->name('mvp-cards.sync');
-    Route::get('mvp-cards/{mvpCard}/holders', [MvpCardAdminController::class, 'holders'])->name('mvp-cards.holders');
-    Route::patch('mvp-cards/{mvpCard}/toggle', [MvpCardAdminController::class, 'toggle'])->name('mvp-cards.toggle');
     Route::get('mvp-cards', [MvpCardAdminController::class, 'index'])->name('mvp-cards.index');
-    Route::post('mvp-cards', [MvpCardAdminController::class, 'store'])->name('mvp-cards.store');
-    Route::delete('mvp-cards/{mvpCard}', [MvpCardAdminController::class, 'destroy'])->name('mvp-cards.destroy');
+    Route::patch('mvp-cards/{itemId}/toggle', [MvpCardAdminController::class, 'toggle'])->name('mvp-cards.toggle')->whereNumber('itemId');
+    Route::get('mvp-cards/{itemId}/holders', [MvpCardAdminController::class, 'holders'])->name('mvp-cards.holders')->whereNumber('itemId');
 
     // Item DB admin
     Route::get('item-db',          [AdminItemDbController::class, 'index'])->name('item-db.index');
     Route::post('item-db/import',  [AdminItemDbController::class, 'import'])->name('item-db.import');
     Route::delete('item-db',       [AdminItemDbController::class, 'destroy'])->name('item-db.destroy');
+
+    // Mob DB admin
+    Route::get('mob-db',           [AdminMobDbController::class, 'index'])->name('mob-db.index');
+    Route::post('mob-db/import',   [AdminMobDbController::class, 'import'])->name('mob-db.import');
+    Route::delete('mob-db',        [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
 });
 
 // Noticias públicas

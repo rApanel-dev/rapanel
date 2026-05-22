@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemDb extends Model
 {
-    protected $table = 'item_db';
+    protected $table      = 'item_db';
+    protected $primaryKey = 'item_id';
+    public    $incrementing = false;
+    protected $keyType    = 'integer';
 
     protected $fillable = [
         'item_id',

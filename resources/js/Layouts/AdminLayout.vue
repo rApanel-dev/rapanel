@@ -17,6 +17,7 @@ import {
     TagIcon,
     TrophyIcon,
     BookOpenIcon,
+    CpuChipIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -33,8 +34,9 @@ const navigation = [
     { name: 'News',               route: 'admin.news.index',               icon: NewspaperIcon,              group: 'Content' },
     { name: 'Downloads',          route: 'admin.downloads.index',          icon: ArrowDownTrayIcon,          group: 'Content' },
     { name: 'Download Categories',route: 'admin.download-categories.index',icon: TagIcon,                    group: 'Content' },
-    { name: 'MvP Cards',          route: 'admin.mvp-cards.index',          icon: TrophyIcon,                 group: 'Content' },
     { name: 'Item DB',            route: 'admin.item-db.index',            icon: BookOpenIcon,               group: 'Content' },
+    { name: 'Mob DB',             route: 'admin.mob-db.index',             icon: CpuChipIcon,                group: 'Content' },
+    { name: 'MvP Cards',          route: 'admin.mvp-cards.index',          icon: TrophyIcon,                 group: 'Content' },
     { name: 'Action Logs',        route: 'admin.logs.index',               icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',            route: 'admin.console.index',            icon: CommandLineIcon,            group: 'System' },
 ];

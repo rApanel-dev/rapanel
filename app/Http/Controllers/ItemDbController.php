@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemDb;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +26,7 @@ class ItemDbController extends Controller
             })
             ->when($type !== '', fn ($q) => $q->where('type', $type))
             ->select([
-                'id', 'item_id', 'aegis_name', 'name', 'display_name',
+                'item_id', 'aegis_name', 'name', 'display_name',
                 'type', 'subtype', 'slots',
                 'description_html', 'properties',
             ])
@@ -50,6 +51,12 @@ class ItemDbController extends Controller
     {
         $item = ItemDb::where('item_id', $itemId)->firstOrFail();
 
-        return response()->json($item);
+        $db = DB::connection('mysql_main');
+        $serverCount = $db->table('inventory')->where('nameid', $itemId)->sum('amount')
+                     + $db->table('cart_inventory')->where('nameid', $itemId)->sum('amount')
+                     + $db->table('storage')->where('nameid', $itemId)->sum('amount')
+                     + $db->table('guild_storage')->where('nameid', $itemId)->sum('amount');
+
+        return response()->json(array_merge($item->toArray(), ['server_count' => (int) $serverCount]));
     }
 }

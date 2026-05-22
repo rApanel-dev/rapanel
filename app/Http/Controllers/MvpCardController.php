@@ -35,32 +35,23 @@ class MvpCardController extends Controller
 
         return $dbCards->map(function (MvpCard $card) use ($names, $counts) {
             return [
-                'id'         => $card->item_id,
-                'name'       => $card->name_override ?? ($names[$card->item_id] ?? "Card #{$card->item_id}"),
-                'image_path' => $card->image_path,
-                'total'      => $counts[$card->item_id] ?? 0,
+                'id'    => $card->item_id,
+                'name'  => $card->name_override ?? ($names[$card->item_id] ?? "Card #{$card->item_id}"),
+                'total' => $counts[$card->item_id] ?? 0,
             ];
         })->toArray();
     }
 
     private function fetchCardNames(array $ids): array
     {
-        $in = implode(',', array_map('intval', $ids));
-
-        $rows = DB::connection('mysql_main')->select("
-            SELECT n.id,
-                   COALESCE(d.name_english, d2.name_english, CONCAT('Card #', n.id)) AS name
-            FROM (SELECT id FROM item_db WHERE id IN ({$in})
-                  UNION
-                  SELECT id FROM item_db2 WHERE id IN ({$in})) n
-            LEFT JOIN item_db  d  ON d.id  = n.id
-            LEFT JOIN item_db2 d2 ON d2.id = n.id
-        ");
-
         $map = [];
-        foreach ($rows as $row) {
-            $map[(int) $row->id] = $row->name;
-        }
+
+        DB::table('item_db')
+            ->whereIn('item_id', $ids)
+            ->get(['item_id', 'display_name', 'name'])
+            ->each(function ($row) use (&$map) {
+                $map[(int) $row->item_id] = $row->display_name ?? $row->name;
+            });
 
         return $map;
     }
