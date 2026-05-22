@@ -91,7 +91,7 @@ UPDATE ra_users SET role = 'admin' WHERE email = 'votre@email.com';
 Le panneau crée ses propres tables avec le préfixe `ra_` dans cette base de données.
 
 ```env
-DB_CONNECTION=mysql       # ou mariadb
+DB_CONNECTION=mysql       # mysql ou mariadb — toutes les connexions utilisent ce driver automatiquement
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=rapanel

@@ -91,7 +91,7 @@ UPDATE ra_users SET role = 'admin' WHERE email = 'your@email.com';
 The panel creates its own tables with an `ra_` prefix in this database.
 
 ```env
-DB_CONNECTION=mysql       # or mariadb
+DB_CONNECTION=mysql       # mysql or mariadb — all connections use this driver automatically
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=rapanel       # panel-only DB (can be the same host as rAthena)

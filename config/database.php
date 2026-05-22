@@ -65,7 +65,7 @@ return [
         ],
 
         'mysql_main' => [
-            'driver' => 'mysql',
+            'driver' => env('DB_CONNECTION', 'mysql'),
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
@@ -85,7 +85,7 @@ return [
         ],
 
         'mysql_log' => [
-            'driver' => 'mysql',
+            'driver' => env('DB_CONNECTION', 'mysql'),
             'url' => env('DB_URL'),
             'host' => env('DB_LOG_HOST', '127.0.0.1'),
             'port' => env('DB_LOG_PORT', '3306'),
@@ -105,7 +105,7 @@ return [
         ],
 
         'mysql_web' => [
-            'driver' => 'mysql',
+            'driver' => env('DB_CONNECTION', 'mysql'),
             'url' => env('DB_URL'),
             'host' => env('DB_WEB_HOST', '127.0.0.1'),
             'port' => env('DB_WEB_PORT', '3306'),
