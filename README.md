@@ -1,3 +1,13 @@
+<p align="center">
+  <img src="https://rapanel.playgame.cl/images/logo.png" alt="rApanel" width="280" />
+</p>
+
+<p align="center">
+  <a href="README.md">English</a> · <a href="README-ES.md">Español</a> · <a href="README-PT.md">Português</a> · <a href="README-FR.md">Français</a>
+</p>
+
+---
+
 # rApanel
 
 A web-based control panel for **rAthena** Ragnarok Online emulator servers. Players register a master account on the panel and manage their in-game accounts, characters, and storage from a dashboard. Admins get a full back-office for users, game accounts, news, downloads, Item DB, Mob DB, and MVP Cards.
