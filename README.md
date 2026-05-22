@@ -193,9 +193,10 @@ These folders are git-ignored — you manage the files independently.
 
 The admin panel includes importers for rAthena databases. Go to **Admin → Item DB** or **Admin → Mob DB** and upload the corresponding file from your rAthena installation:
 
-| Admin section | Accepted formats | Location in rAthena |
+| Admin section | Files to upload | Location in rAthena |
 |---|---|---|
-| Item DB | `item_db.yml` · `item_db.lua` · `item_db2.lua` | `db/re/` or `db/pre-re/` |
+| Item DB (YML) | `item_db_equip.yml` + `item_db_etc.yml` + `item_db_usable.yml` — select all three at once | `db/re/` or `db/pre-re/` |
+| Item DB (LUA) | `itemInfo.lua` — optional, enriches display names | client `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` or `db/pre-re/` |
 
 Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and Normal monster cards and lets you toggle which ones are visible on the public page.

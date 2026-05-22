@@ -193,9 +193,10 @@ Essas pastas estão no `.gitignore` — os arquivos são gerenciados de forma in
 
 O painel inclui importadores para os bancos de dados YAML e LUA do rAthena. Acesse **Admin → Item DB** ou **Admin → Mob DB** e envie o arquivo correspondente da sua instalação do rAthena:
 
-| Seção admin | Formatos aceitos | Localização no rAthena |
+| Seção admin | Arquivos a enviar | Localização no rAthena |
 |---|---|---|
-| Item DB | `item_db.yml` · `item_db.lua` · `item_db2.lua` | `db/re/` ou `db/pre-re/` |
+| Item DB (YML) | `item_db_equip.yml` + `item_db_etc.yml` + `item_db_usable.yml` — selecionar os três ao mesmo tempo | `db/re/` ou `db/pre-re/` |
+| Item DB (LUA) | `itemInfo.lua` — opcional, enriquece os nomes de exibição | cliente `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` ou `db/pre-re/` |
 
 Com ambos importados, **Admin → MvP Cards** descobre automaticamente as cartas de monstros MVP, Boss e Normal, e permite ativar quais ficam visíveis na página pública.
