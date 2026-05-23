@@ -13,7 +13,7 @@ const page      = usePage();
 const __        = (key) => page.props.translations?.[key] || key;
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
 
-const itemImg   = (nameid) => `/data/items/icons/${nameid}.png`;
+const itemImg   = (nameid) => `/data/items/item/${nameid}.png`;
 const formatPrice = (n) => Number(n).toLocaleString();
 
 const PRICE_TIERS = [

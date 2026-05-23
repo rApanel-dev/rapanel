@@ -312,7 +312,7 @@ const displayStats = (stats) => {
                                                      drop.item_data ? 'hover:bg-rapanel-navy-50 dark:hover:bg-white/5 cursor-pointer' : 'cursor-default']">
                                             <div class="shrink-0 w-7 h-7 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
                                                 <img v-if="drop.item_data"
-                                                    :src="`/data/items/icons/${drop.item_data.item_id}.png`"
+                                                    :src="`/data/items/item/${drop.item_data.item_id}.png`"
                                                     :alt="drop.item_data.display_name || drop.item_data.name"
                                                     class="object-contain"
                                                     @error="$event.target.style.display='none'" />
@@ -358,7 +358,7 @@ const displayStats = (stats) => {
                                                      drop.item_data ? 'hover:bg-rapanel-navy-50 dark:hover:bg-white/5 cursor-pointer' : 'cursor-default']">
                                             <div class="shrink-0 w-7 h-7 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
                                                 <img v-if="drop.item_data"
-                                                    :src="`/data/items/icons/${drop.item_data.item_id}.png`"
+                                                    :src="`/data/items/item/${drop.item_data.item_id}.png`"
                                                     :alt="drop.item_data.display_name || drop.item_data.name"
                                                     class="object-contain"
                                                     @error="$event.target.style.display='none'" />

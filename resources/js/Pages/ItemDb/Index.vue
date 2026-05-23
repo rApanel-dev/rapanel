@@ -40,7 +40,7 @@ watch([type], applyFilters);
 const { openItemDb } = useItemDbModal();
 
 // ── Icon / image paths ───────────────────────────────────────────────
-const iconSrc     = (item) => `/data/items/icons/${item.item_id}.png`;
+const iconSrc     = (item) => `/data/items/item/${item.item_id}.png`;
 const onIconError = (e)    => { e.target.style.display = 'none'; };
 
 // ── Type badge ───────────────────────────────────────────────────────

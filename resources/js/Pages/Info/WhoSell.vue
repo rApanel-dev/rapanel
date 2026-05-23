@@ -48,7 +48,7 @@ const sortIcon = (col) => {
     return sortDir.value === 'asc' ? 'asc' : 'desc';
 };
 
-const itemImg = (nameid) => `/data/items/icons/${nameid}.png`;
+const itemImg = (nameid) => `/data/items/item/${nameid}.png`;
 
 const formatPrice = (n) => Number(n).toLocaleString();
 

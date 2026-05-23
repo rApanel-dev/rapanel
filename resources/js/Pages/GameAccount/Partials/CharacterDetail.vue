@@ -103,7 +103,7 @@ const { openItemDb } = useItemDbModal();
                                     <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                                         <!-- Job Icon + Name + Class -->
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
-                                            <img :src="`/data/gameaccount/job_icons/icon_jobs_${char.class ?? 0}.png`" @error="onImgError" class="w-12 h-12 object-contain shrink-0" :alt="getJobName(char.class ?? 0)" />
+                                            <img :src="`/data/icon_jobs/icon_jobs_${char.class ?? 0}.png`" @error="onImgError" class="w-12 h-12 object-contain shrink-0" :alt="getJobName(char.class ?? 0)" />
                                             <div class="min-w-0">
                                                 <h4 class="font-display font-bold text-rapanel-blue text-base leading-tight truncate">{{ char.name }}</h4>
                                                 <p class="text-sm text-rapanel-navy-900 dark:text-white font-medium truncate">{{ getJobName(char.class ?? 0) }}</p>
@@ -347,9 +347,9 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-2">
                                                         <div class="relative shrink-0">
-                                                            <img :src="`/data/gameaccount/job_icons/icon_jobs_${m.class}.png`" @error="onImgError" class="w-5 h-5 object-contain block" :alt="getJobName(m.class)" />
+                                                            <img :src="`/data/icon_jobs/icon_jobs_${m.class}.png`" @error="onImgError" class="w-5 h-5 object-contain block" :alt="getJobName(m.class)" />
                                                             <img v-if="m.name === char.party_leader_name"
-                                                                src="/data/gameaccount/job_icons/ico_partyCrown.png"
+                                                                src="/data/icon_jobs/ico_partyCrown.png"
                                                                 class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 object-contain"
                                                                 alt="Leader"
                                                             />
@@ -393,7 +393,7 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ f.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                                     <div class="flex items-center gap-1.5">
-                                                        <img :src="`/data/gameaccount/job_icons/icon_jobs_${f.class}.png`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="getJobName(f.class)" />
+                                                        <img :src="`/data/icon_jobs/icon_jobs_${f.class}.png`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="getJobName(f.class)" />
                                                         <span>{{ getJobName(f.class) }}</span>
                                                     </div>
                                                 </td>
@@ -441,7 +441,7 @@ const { openItemDb } = useItemDbModal();
                                                 @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
                                             <td class="px-2 py-1.5 text-center cursor-pointer"
                                                 @click="openItemDb(item.nameid, item)">
-                                                <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
+                                                <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
                                             </td>
                                             <td class="px-3 py-1.5 cursor-pointer"
                                                 @click="openItemDb(item.nameid, item)">
@@ -496,7 +496,7 @@ const { openItemDb } = useItemDbModal();
                                                 @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
                                             <td class="px-2 py-1.5 text-center cursor-pointer"
                                                 @click="openItemDb(item.nameid, item)">
-                                                <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
+                                                <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
                                             </td>
                                             <td class="px-3 py-1.5 cursor-pointer"
                                                 @click="openItemDb(item.nameid, item)">

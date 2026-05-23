@@ -54,7 +54,7 @@ const priceStyle = (n) => {
 };
 
 const formatPrice = (n) => Number(n).toLocaleString();
-const itemImg     = (nameid) => `/data/items/icons/${nameid}.png`;
+const itemImg     = (nameid) => `/data/items/item/${nameid}.png`;
 
 const elementStyle = (el) => {
     if (el === 'Water') return 'bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/30 dark:bg-rapanel-blue/15';

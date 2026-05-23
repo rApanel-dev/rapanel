@@ -448,7 +448,7 @@ const { openItemDb } = useItemDbModal();
                                 <td class="px-4 py-3 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                                     <div class="flex items-center gap-1.5">
                                         <img
-                                            :src="`/data/gameaccount/job_icons/icon_jobs_${char.class}.png`"
+                                            :src="`/data/icon_jobs/icon_jobs_${char.class}.png`"
                                             @error="onImgError"
                                             class="w-5 h-5 object-contain shrink-0"
                                             :alt="getJobName(char.class)"
@@ -546,7 +546,7 @@ const { openItemDb } = useItemDbModal();
                                     @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
                                 <td class="px-3 py-1.5 text-center cursor-pointer"
                                     @click="openItemDb(item.nameid, item)">
-                                    <img :src="`/data/items/icons/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" :alt="item.name_english" />
+                                    <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" :alt="item.name_english" />
                                 </td>
                                 <td class="px-3 py-1.5 cursor-pointer"
                                     @click="openItemDb(item.nameid, item)">

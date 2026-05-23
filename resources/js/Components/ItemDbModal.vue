@@ -27,7 +27,7 @@ watch(itemDbItem, (val, oldVal) => {
     }
 });
 
-const imageSrc   = (item) => `/data/items/images/${item.item_id}.png`;
+const imageSrc   = (item) => `/data/items/collection/${item.item_id}.png`;
 const onImgError = (e)    => { e.target.style.display = 'none'; };
 
 // ── Card illustration ─────────────────────────────────────────────────
