@@ -19,7 +19,6 @@
 /public/data/items/icons/*.png
 /public/data/items/images/*.png
 /public/data/items/cards/*.png
-/public/data/items/cards/mvp/*.png
 /public/data/monsters/*.gif
 /public/data/maps/map/*.png
 /public/data/maps/map_sm/*.png
