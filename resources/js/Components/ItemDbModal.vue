@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import WhoSellShopModal from '@/Components/WhoSellShopModal.vue';
 
 const props = defineProps({
     item:        { type: Object, default: null },
@@ -15,9 +16,11 @@ const __   = (key) => page.props.translations?.[key] || key;
 const activeTab = ref('detail');
 watch(() => props.item, (val) => {
     if (val) {
-        activeTab.value = 'detail';
+        activeTab.value             = 'detail';
         illustrationAvailable.value = false;
         showIllustration.value      = false;
+        monstersData.value          = null;
+        tradeData.value             = null;
     }
 });
 
@@ -127,6 +130,90 @@ const tradeRestrictions = (p) => {
 };
 
 const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
+
+// ── Shop modal (Trade tab) ────────────────────────────────────────────
+const shopModal = ref(null);
+
+// ── Monsters tab ──────────────────────────────────────────────────────
+const monstersData    = ref(null);
+const monstersLoading = ref(false);
+const monstersSort    = ref('desc');
+const sortedMonsters  = computed(() => {
+    if (!monstersData.value?.length) return monstersData.value ?? [];
+    return [...monstersData.value].sort((a, b) =>
+        monstersSort.value === 'desc' ? b.rate - a.rate : a.rate - b.rate
+    );
+});
+
+// ── Trade tab ─────────────────────────────────────────────────────────
+const tradeData    = ref(null);
+const tradeLoading = ref(false);
+
+const loadMonsters = async () => {
+    if (monstersData.value !== null || monstersLoading.value) return;
+    monstersLoading.value = true;
+    try {
+        const res       = await fetch(route('info.item-db.monsters', props.item.item_id));
+        monstersData.value = await res.json();
+    } catch { monstersData.value = []; }
+    finally  { monstersLoading.value = false; }
+};
+
+const loadTrade = async () => {
+    if (tradeData.value !== null || tradeLoading.value) return;
+    tradeLoading.value = true;
+    try {
+        const res    = await fetch(route('info.item-db.trade', props.item.item_id));
+        tradeData.value = await res.json();
+    } catch { tradeData.value = []; }
+    finally  { tradeLoading.value = false; }
+};
+
+const switchToMonsters = () => { activeTab.value = 'monsters'; loadMonsters(); };
+const switchToTrade    = () => { activeTab.value = 'trade';    loadTrade(); };
+
+// ── Drop rate ─────────────────────────────────────────────────────────
+const fmtRate = (r) => {
+    if (!r) return '?';
+    if (r >= 10000) return '100%';
+    const p = r / 100;
+    return (Number.isInteger(p) ? p : parseFloat(p.toFixed(2))) + '%';
+};
+
+// ── Price tiers (Trade tab) ───────────────────────────────────────────
+const PRICE_TIERS = [
+    { min: 1,            max: 99,          color: '#000080', shadow: '#FF00FF' },
+    { min: 100,          max: 999,         color: '#0000FF', shadow: '#00FFFF' },
+    { min: 1_000,        max: 9_999,       color: '#FF0000', shadow: '#FFFF00' },
+    { min: 10_000,       max: 99_999,      color: '#FF00FF', shadow: null      },
+    { min: 100_000,      max: 999_999,     color: '#0000FF', shadow: null      },
+    { min: 1_000_000,    max: 9_999_999,   color: '#000000', shadow: '#00FF00' },
+    { min: 10_000_000,   max: 99_999_999,  color: '#FF0000', shadow: null      },
+    { min: 100_000_000,  max: 999_999_999, color: '#000000', shadow: '#BDB76B' },
+    { min: 1_000_000_000,max: Infinity,    color: '#FF0000', shadow: '#FF00FF' },
+];
+const priceStyle = (n) => {
+    const tier = PRICE_TIERS.find(t => n >= t.min && n <= t.max);
+    if (!tier) return {};
+    return { color: tier.color, textShadow: tier.shadow ? `1px 0 0 ${tier.shadow}` : undefined };
+};
+
+// ── Element badge (for monsters list) ────────────────────────────────
+const elementBadge = (el) => {
+    const map = {
+        Neutral: 'bg-white/5 text-gray-400 border-white/10',
+        Water:   'bg-blue-400/10 text-blue-400 border-blue-400/20',
+        Earth:   'bg-amber-700/10 text-amber-500 border-amber-700/20',
+        Fire:    'bg-red-500/10 text-red-400 border-red-500/20',
+        Wind:    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        Poison:  'bg-purple-500/10 text-purple-400 border-purple-500/20',
+        Holy:    'bg-yellow-400/10 text-yellow-300 border-yellow-400/20',
+        Dark:    'bg-violet-900/20 text-violet-400 border-violet-900/30',
+        Ghost:   'bg-slate-400/10 text-slate-400 border-slate-400/20',
+        Undead:  'bg-zinc-700/20 text-zinc-400 border-zinc-700/30',
+    };
+    return map[el] ?? 'bg-white/5 text-white/50 border-white/10';
+};
 </script>
 
 <template>
@@ -144,13 +231,13 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                 @click.self="emit('close')">
 
                 <div class="relative w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden
-                            rounded-t-2xl sm:rounded-2xl shadow-2xl bg-rapanel-navy-900 ring-1 ring-white/10">
+                            rounded-t-2xl sm:rounded-2xl shadow-2xl bg-white dark:bg-rapanel-navy-900 ring-1 ring-rapanel-navy-200 dark:ring-white/10">
 
                     <!-- Gold accent line -->
                     <div class="h-[3px] shrink-0 bg-gradient-to-r from-rapanel-gold via-rapanel-gold/50 to-transparent" />
 
                     <!-- ── Header ── -->
-                    <div class="flex items-center gap-4 px-5 py-4 shrink-0 bg-rapanel-navy-900">
+                    <div class="flex items-center gap-4 px-5 py-4 shrink-0 bg-white dark:bg-rapanel-navy-900">
                         <img :src="imageSrc(item)"
                              :alt="item.display_name || item.name"
                              class="shrink-0 w-[75px] h-[100px] object-contain rounded-xl"
@@ -164,14 +251,14 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                              @error="onIllustrationError" />
 
                         <div class="flex-1 min-w-0">
-                            <h2 class="font-bold text-white text-xl leading-tight">
+                            <h2 class="font-bold text-rapanel-navy-900 dark:text-white text-xl leading-tight">
                                 {{ item.display_name || item.name }}<template v-if="item.slots > 0"> [{{ item.slots }}]</template>
                             </h2>
-                            <p v-if="item.aegis_name" class="font-mono text-[11px] text-white/35 mt-0.5">
+                            <p v-if="item.aegis_name" class="font-mono text-[11px] text-rapanel-text-light/50 dark:text-white/35 mt-0.5">
                                 {{ item.aegis_name }}
                             </p>
                             <div class="flex items-center gap-2 mt-2 flex-wrap">
-                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-white/70">
+                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rapanel-navy-100 text-rapanel-text-light dark:bg-white/10 dark:text-white/70">
                                     ID: {{ item.item_id }}
                                 </span>
                                 <span v-if="item.type" :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full border tracking-wide', typeBadge(item.type)]">
@@ -191,7 +278,7 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
 
                         <button @click="emit('close')"
                             class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer
-                                   text-white/40 hover:text-white hover:bg-white/10 transition duration-150">
+                                   text-rapanel-text-light/40 dark:text-white/40 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition duration-150">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -199,60 +286,82 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                     </div>
 
                     <!-- ── Tab bar ── -->
-                    <div class="flex shrink-0 gap-1.5 px-4 pt-3 bg-rapanel-navy-900 border-b border-white/10 overflow-x-auto">
+                    <div class="flex shrink-0 bg-white dark:bg-rapanel-navy-900 border-b border-rapanel-navy-100 dark:border-white/10">
 
                         <button @click="activeTab = 'detail'"
-                            :class="activeTab === 'detail' ? 'bg-rapanel-gold text-rapanel-navy-900' : 'text-white/50 hover:text-white hover:bg-white/5'"
-                            class="flex items-start gap-2.5 px-4 py-2.5 rounded-t-xl text-left transition-all duration-150 shrink-0">
+                            :class="activeTab === 'detail' ? 'bg-rapanel-gold text-rapanel-navy-900' : 'text-rapanel-text-light/60 dark:text-white/50 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5'"
+                            class="flex-1 flex items-start gap-2.5 px-3 py-2.5 rounded-t-xl text-left transition-all duration-150 min-w-0">
                             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <div>
-                                <div class="text-sm font-bold leading-tight whitespace-nowrap">{{ __('Item Detail') }}</div>
-                                <div :class="activeTab === 'detail' ? 'text-rapanel-navy-900/60' : 'text-white/30'"
-                                     class="text-[10px] mt-0.5 leading-tight max-w-[160px] truncate">Stats, precios NPC y requisitos</div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-bold leading-tight truncate">{{ __('Item Detail') }}</div>
+                                <div :class="activeTab === 'detail' ? 'text-rapanel-navy-900/60' : 'text-rapanel-text-light/40 dark:text-white/30'"
+                                     class="text-[10px] mt-0.5 leading-tight truncate">Stats, precios NPC y requisitos</div>
                             </div>
                         </button>
 
-                        <div class="flex items-start gap-2.5 px-4 py-2.5 rounded-t-xl text-left shrink-0 text-white/25 cursor-default">
+                        <button @click="switchToMonsters()"
+                            :class="activeTab === 'monsters' ? 'bg-rapanel-gold text-rapanel-navy-900' : 'text-rapanel-text-light/60 dark:text-white/50 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5'"
+                            class="flex-1 flex items-start gap-2.5 px-3 py-2.5 rounded-t-xl text-left transition-all duration-150 min-w-0">
                             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0 0L12 17.743" />
                             </svg>
-                            <div>
-                                <div class="flex items-center gap-1.5 text-sm font-bold leading-tight whitespace-nowrap">
-                                    {{ __('Monsters') }}
-                                    <span class="text-[10px] bg-white/10 text-white/40 rounded-full w-4 h-4 flex items-center justify-center shrink-0">0</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 text-sm font-bold leading-tight">
+                                    <span class="truncate">{{ __('Monsters') }}</span>
+                                    <span v-if="monstersData !== null"
+                                        :class="activeTab === 'monsters' ? 'bg-rapanel-navy-900/30 text-rapanel-navy-900' : 'bg-rapanel-navy-100 text-rapanel-text-light dark:bg-white/10 dark:text-white/50'"
+                                        class="text-[10px] rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center shrink-0 font-bold">
+                                        {{ monstersData.length }}
+                                    </span>
+                                    <svg v-else-if="monstersLoading" class="w-3 h-3 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                    </svg>
                                 </div>
-                                <div class="text-[10px] text-white/20 mt-0.5 leading-tight max-w-[160px] truncate">Donde cae este ítem y probabilidades</div>
+                                <div :class="activeTab === 'monsters' ? 'text-rapanel-navy-900/60' : 'text-rapanel-text-light/30 dark:text-white/20'"
+                                     class="text-[10px] mt-0.5 leading-tight truncate">{{ __('Where this item drops from') }}</div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div class="flex items-start gap-2.5 px-4 py-2.5 rounded-t-xl text-left shrink-0 text-white/25 cursor-default">
+                        <button @click="switchToTrade()"
+                            :class="activeTab === 'trade' ? 'bg-rapanel-gold text-rapanel-navy-900' : 'text-rapanel-text-light/60 dark:text-white/50 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5'"
+                            class="flex-1 flex items-start gap-2.5 px-3 py-2.5 rounded-t-xl text-left transition-all duration-150 min-w-0">
                             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            <div>
-                                <div class="flex items-center gap-1.5 text-sm font-bold leading-tight whitespace-nowrap">
-                                    {{ __('Trade') }}
-                                    <span class="text-[10px] bg-white/10 text-white/40 rounded-full w-4 h-4 flex items-center justify-center shrink-0">0</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 text-sm font-bold leading-tight">
+                                    <span class="truncate">{{ __('Trade') }}</span>
+                                    <span v-if="tradeData !== null"
+                                        :class="activeTab === 'trade' ? 'bg-rapanel-navy-900/30 text-rapanel-navy-900' : 'bg-rapanel-navy-100 text-rapanel-text-light dark:bg-white/10 dark:text-white/50'"
+                                        class="text-[10px] rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center shrink-0 font-bold">
+                                        {{ tradeData.length }}
+                                    </span>
+                                    <svg v-else-if="tradeLoading" class="w-3 h-3 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                    </svg>
                                 </div>
-                                <div class="text-[10px] text-white/20 mt-0.5 leading-tight max-w-[160px] truncate">Mercado y tiendas del servidor</div>
+                                <div :class="activeTab === 'trade' ? 'text-rapanel-navy-900/60' : 'text-rapanel-text-light/30 dark:text-white/20'"
+                                     class="text-[10px] mt-0.5 leading-tight truncate">{{ __('Active player shops') }}</div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div class="flex items-start gap-2.5 px-4 py-2.5 rounded-t-xl text-left shrink-0 text-white/25 cursor-default">
+                        <div class="flex-1 flex items-start gap-2.5 px-3 py-2.5 rounded-t-xl text-left min-w-0 text-rapanel-text-light/30 dark:text-white/25 cursor-default">
                             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                             </svg>
-                            <div>
-                                <div class="text-sm font-bold leading-tight whitespace-nowrap">{{ __('Price History') }}</div>
-                                <div class="text-[10px] text-white/20 mt-0.5 leading-tight max-w-[160px] truncate">Tendencias recientes de precios</div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-bold leading-tight truncate">{{ __('Price History') }}</div>
+                                <div class="text-[10px] text-rapanel-text-light/25 dark:text-white/20 mt-0.5 leading-tight truncate">Tendencias recientes de precios</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- ── Body ── -->
-                    <div class="overflow-y-auto flex-1 p-5 bg-rapanel-navy-800/60">
+                    <div class="overflow-y-auto flex-1 p-5 bg-rapanel-navy-50 dark:bg-rapanel-navy-800/60">
 
                         <div v-if="activeTab === 'detail'" class="grid grid-cols-1 md:grid-cols-5 gap-4">
 
@@ -260,29 +369,29 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                             <div class="md:col-span-3 space-y-4">
 
                                 <!-- Descripción -->
-                                <div class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Game Description') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Game Description') }}</span>
                                     </div>
                                     <div class="px-4 py-4">
                                         <div v-if="item.description_html"
-                                             class="font-mono text-sm leading-relaxed text-white/85"
+                                             class="font-mono text-sm leading-relaxed text-rapanel-navy-900/90 dark:text-white/85"
                                              v-html="item.description_html" />
-                                        <p v-else class="text-sm text-white/40 italic">{{ __('No description available.') }}</p>
+                                        <p v-else class="text-sm text-rapanel-text-light/50 dark:text-white/40 italic">{{ __('No description available.') }}</p>
                                     </div>
                                 </div>
 
                                 <!-- Clases Permitidas -->
                                 <div v-if="allowedJobs(item.properties) || classRestrictions(item.properties)"
-                                     class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                     class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Allowed Classes') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Allowed Classes') }}</span>
                                     </div>
                                     <div v-if="allowedJobs(item.properties)" class="px-4 pt-3 pb-2 flex flex-wrap gap-1.5">
                                         <span v-for="job in allowedJobs(item.properties)" :key="job"
@@ -291,9 +400,9 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                                         </span>
                                     </div>
                                     <div v-if="classRestrictions(item.properties)"
-                                         :class="allowedJobs(item.properties) ? 'border-t border-white/[0.06]' : ''"
+                                         :class="allowedJobs(item.properties) ? 'border-t border-rapanel-navy-100 dark:border-white/[0.06]' : ''"
                                          class="px-4 pt-2 pb-3">
-                                        <p class="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1.5">{{ __('Class Tier') }}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-1.5">{{ __('Class Tier') }}</p>
                                         <div class="flex flex-wrap gap-1.5">
                                             <span v-for="cls in classRestrictions(item.properties)" :key="cls"
                                                   :class="['text-[10px] font-bold px-2 py-0.5 rounded-full border', classBadge(cls)]">
@@ -305,12 +414,12 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
 
                                 <!-- Script -->
                                 <div v-if="scriptValue(item.properties)"
-                                     class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                     class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Script') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Script') }}</span>
                                     </div>
                                     <pre class="px-4 py-4 text-xs font-mono text-emerald-400/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ scriptValue(item.properties) }}</pre>
                                 </div>
@@ -321,63 +430,63 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
 
                                 <!-- Atributos -->
                                 <div v-if="attrStats(item.properties).length"
-                                     class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                     class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Attributes') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Attributes') }}</span>
                                     </div>
-                                    <div class="divide-y divide-white/[0.06]">
+                                    <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                                         <div v-for="stat in attrStats(item.properties)" :key="stat.label"
                                              class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __(stat.label) }}</span>
-                                            <span class="text-sm font-bold text-white tabular-nums">{{ stat.value }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __(stat.label) }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ stat.value }}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Precios NPC -->
                                 <div v-if="item.properties?.Buy !== undefined || item.properties?.Sell !== undefined"
-                                     class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                     class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('NPC Prices') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('NPC Prices') }}</span>
                                     </div>
-                                    <div class="divide-y divide-white/[0.06]">
+                                    <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                                         <div class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Buy') }}</span>
-                                            <span class="text-sm font-bold text-white tabular-nums">{{ (item.properties.Buy ?? 0).toLocaleString() }}z</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Buy') }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ (item.properties.Buy ?? 0).toLocaleString() }}z</span>
                                         </div>
                                         <div class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Sell') }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Sell') }}</span>
                                             <span class="text-sm font-bold text-rapanel-gold tabular-nums">{{ (item.properties.Sell ?? 0).toLocaleString() }}z</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Información -->
-                                <div class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Information') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Information') }}</span>
                                     </div>
-                                    <div class="divide-y divide-white/[0.06]">
+                                    <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                                         <div v-if="item.type" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Type') }}</span>
-                                            <span class="text-sm font-bold text-white">{{ item.type }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Type') }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.type }}</span>
                                         </div>
                                         <div v-if="item.subtype" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Subtype') }}</span>
-                                            <span class="text-sm font-bold text-white">{{ item.subtype }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Subtype') }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.subtype }}</span>
                                         </div>
                                         <div v-if="item.slots > 0" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Slots') }}</span>
-                                            <span class="text-sm font-bold text-white">{{ item.slots }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Slots') }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.slots }}</span>
                                         </div>
                                         <div v-if="equipLocations(item.properties)" class="flex justify-between items-start gap-2 px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-white/40 shrink-0 mt-0.5">{{ __('Equip Location') }}</span>
@@ -389,35 +498,35 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                                             </div>
                                         </div>
                                         <div v-if="item.is_custom" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Custom') }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Custom') }}</span>
                                             <span class="text-sm font-bold text-rapanel-gold">✓</span>
                                         </div>
                                         <div v-if="itemGender(item.properties)" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Gender') }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Gender') }}</span>
                                             <span :class="['text-xs font-bold px-2 py-0.5 rounded-full border', item.properties.Gender === 'Male' ? 'bg-rapanel-blue/15 text-rapanel-blue border-rapanel-blue/25' : 'bg-pink-500/15 text-pink-400 border-pink-500/25']">
                                                 {{ __(item.properties.Gender) }}
                                             </span>
                                         </div>
                                         <div v-if="hasBuyingStore(item.properties)" class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('Buying Store') }}</span>
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Buying Store') }}</span>
                                             <span class="text-xs font-bold px-2 py-0.5 rounded-full border bg-rapanel-success/15 text-rapanel-success border-rapanel-success/25">✓</span>
                                         </div>
                                         <div class="flex justify-between items-center px-4 py-2.5">
-                                            <span class="text-[11px] font-black uppercase tracking-wider text-white/40">{{ __('On Server') }}</span>
-                                            <span v-if="serverCount !== null" class="text-sm font-bold text-white tabular-nums">{{ serverCount.toLocaleString() }}</span>
-                                            <span v-else class="w-16 h-4 rounded bg-white/10 animate-pulse inline-block" />
+                                            <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('On Server') }}</span>
+                                            <span v-if="serverCount !== null" class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ serverCount.toLocaleString() }}</span>
+                                            <span v-else class="w-16 h-4 rounded bg-rapanel-navy-100 dark:bg-white/10 animate-pulse inline-block" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Restricciones de Comercio -->
                                 <div v-if="tradeRestrictions(item.properties).length"
-                                     class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                                     class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-danger shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                         </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Trade Restrictions') }}</span>
+                                        <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Trade Restrictions') }}</span>
                                     </div>
                                     <div class="px-4 py-3 flex flex-wrap gap-1.5">
                                         <span v-for="r in tradeRestrictions(item.properties)" :key="r"
@@ -429,12 +538,138 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                             </div>
                         </div>
 
-                        <!-- Tabs futuros -->
+                        <!-- ── Monsters tab ── -->
+                        <div v-else-if="activeTab === 'monsters'">
+                            <div v-if="monstersLoading" class="flex items-center justify-center py-12">
+                                <svg class="animate-spin w-6 h-6 text-rapanel-gold" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                            </div>
+                            <template v-else-if="monstersData !== null">
+                                <div v-if="!monstersData.length" class="flex flex-col items-center justify-center py-16 text-center gap-3">
+                                    <svg class="w-10 h-10 text-rapanel-navy-200 dark:text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0 0L12 17.743" />
+                                    </svg>
+                                    <p class="text-rapanel-text-light/40 dark:text-white/30 text-sm">{{ __('No monsters drop this item.') }}</p>
+                                </div>
+                                <template v-else>
+                                    <!-- Sort toggle -->
+                                    <div class="flex items-center justify-end mb-3">
+                                        <div class="inline-flex items-center gap-0.5 bg-rapanel-navy-100/60 dark:bg-white/5 rounded-lg p-0.5 border border-rapanel-navy-100 dark:border-white/[0.08]">
+                                            <button @click="monstersSort = 'desc'"
+                                                :class="monstersSort === 'desc'
+                                                    ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
+                                                    : 'text-rapanel-text-light/50 dark:text-white/35 hover:text-rapanel-navy-900 dark:hover:text-white/70'"
+                                                class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150">
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"/>
+                                                </svg>
+                                                {{ __('Drop Rate') }}
+                                            </button>
+                                            <button @click="monstersSort = 'asc'"
+                                                :class="monstersSort === 'asc'
+                                                    ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
+                                                    : 'text-rapanel-text-light/50 dark:text-white/35 hover:text-rapanel-navy-900 dark:hover:text-white/70'"
+                                                class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150">
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M17.25 21l3.75-3.75"/>
+                                                </svg>
+                                                {{ __('Drop Rate') }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Grid 3 columnas -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        <div v-for="mob in sortedMonsters" :key="mob.id"
+                                            class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center gap-3 px-3 py-2.5">
+                                            <div :class="mob.is_mvp ? 'bg-rapanel-gold' : 'bg-rapanel-navy-300 dark:bg-rapanel-navy-600'"
+                                                 class="w-1 self-stretch rounded-full shrink-0" />
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <span class="text-xs font-bold text-rapanel-navy-900 dark:text-white leading-tight truncate">{{ mob.name }}</span>
+                                                    <span v-if="mob.is_mvp_drop"
+                                                        class="text-[9px] font-black uppercase px-1 py-0.5 rounded-full border bg-rapanel-gold/15 text-rapanel-gold border-rapanel-gold/30 shrink-0">
+                                                        MVP
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-rapanel-text-light/60 dark:text-white/40 flex-wrap">
+                                                    <span class="font-mono">Lv.{{ mob.level }}</span>
+                                                    <span :class="['px-1 py-0 rounded border text-[9px] font-bold leading-4', elementBadge(mob.element)]">{{ mob.element }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <div :class="['text-sm font-bold tabular-nums', mob.rate >= 5000 ? 'text-rapanel-success' : mob.rate >= 500 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60']">
+                                                    {{ fmtRate(mob.rate) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+                        </div>
+
+                        <!-- ── Trade tab ── -->
+                        <div v-else-if="activeTab === 'trade'">
+                            <div v-if="tradeLoading" class="flex items-center justify-center py-12">
+                                <svg class="animate-spin w-6 h-6 text-rapanel-gold" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                            </div>
+                            <template v-else-if="tradeData !== null">
+                                <div v-if="!tradeData.length" class="flex flex-col items-center justify-center py-16 text-center gap-3">
+                                    <svg class="w-10 h-10 text-rapanel-navy-200 dark:text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <p class="text-rapanel-text-light/40 dark:text-white/30 text-sm">{{ __('No active shops selling this item.') }}</p>
+                                </div>
+                                <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div v-for="shop in tradeData" :key="`${shop.vending_id}-${shop.price}-${shop.amount}`"
+                                        class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 px-4 py-3">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="text-sm font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ shop.shop_title }}</span>
+                                                    <span v-if="shop.refine > 0"
+                                                        class="text-[9px] font-black px-1.5 py-0.5 rounded-full border bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/20 shrink-0">
+                                                        +{{ shop.refine }}
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 mt-1 text-[10px] text-rapanel-text-light/60 dark:text-white/40 flex-wrap">
+                                                    <span>{{ shop.char_name }}</span>
+                                                    <span>·</span>
+                                                    <span class="font-mono">{{ shop.map }} ({{ shop.x }},{{ shop.y }})</span>
+                                                </div>
+                                            </div>
+                                            <div class="shrink-0 flex items-center gap-3">
+                                                <div class="text-right">
+                                                    <div class="text-sm font-bold tabular-nums" :style="priceStyle(shop.price)">{{ Number(shop.price).toLocaleString() }}z</div>
+                                                    <div class="text-[10px] text-rapanel-text-light/60 dark:text-white/40">×{{ shop.amount }}</div>
+                                                </div>
+                                                <button @click="shopModal?.open(shop.vending_id)"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-semibold border transition-all duration-150 select-none cursor-pointer
+                                                           bg-rapanel-blue/8 text-rapanel-blue border-rapanel-blue/25 hover:bg-rapanel-blue/15 hover:border-rapanel-blue/40
+                                                           dark:bg-rapanel-gold/8 dark:text-rapanel-gold dark:border-rapanel-gold/25 dark:hover:bg-rapanel-gold/15 dark:hover:border-rapanel-gold/40">
+                                                    <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3.004 3.004 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/>
+                                                    </svg>
+                                                    {{ __('View Shop') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- ── Price History (coming soon) ── -->
                         <div v-else class="flex flex-col items-center justify-center py-16 text-center gap-3">
-                            <svg class="w-10 h-10 text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                            <svg class="w-10 h-10 text-rapanel-navy-200 dark:text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <p class="text-white/30 text-sm">{{ __('Coming soon') }}</p>
+                            <p class="text-rapanel-text-light/40 dark:text-white/30 text-sm">{{ __('Coming soon') }}</p>
                         </div>
                     </div>
                 </div>
@@ -448,10 +683,10 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
                     leave-from-class="opacity-100"
                     leave-to-class="opacity-0">
                     <div v-if="showIllustration"
-                        class="absolute inset-0 z-10 flex items-center justify-center bg-rapanel-navy-900/95 rounded-t-2xl sm:rounded-2xl"
+                        class="absolute inset-0 z-10 flex items-center justify-center bg-white/95 dark:bg-rapanel-navy-900/95 rounded-t-2xl sm:rounded-2xl"
                         @click.self="showIllustration = false">
                         <button @click="showIllustration = false"
-                            class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition">
+                            class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg text-rapanel-text-light/40 dark:text-white/40 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -465,6 +700,7 @@ const hasBuyingStore = (p) => p?.Flags?.BuyingStore === true;
             </div>
         </Transition>
     </Teleport>
+    <WhoSellShopModal ref="shopModal" />
 </template>
 
 <style scoped>

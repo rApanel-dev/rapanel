@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ItemDb;
+use App\Models\MobDb;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -58,5 +60,87 @@ class ItemDbController extends Controller
                      + $db->table('guild_storage')->where('nameid', $itemId)->sum('amount');
 
         return response()->json(array_merge($item->toArray(), ['server_count' => (int) $serverCount]));
+    }
+
+    public function monsters(int $itemId): JsonResponse
+    {
+        $item = ItemDb::where('item_id', $itemId)->firstOrFail(['item_id', 'aegis_name']);
+
+        if (!$item->aegis_name) {
+            return response()->json([]);
+        }
+
+        $aegis = $item->aegis_name;
+
+        $mobs = MobDb::query()
+            ->where(function ($q) use ($aegis) {
+                $q->whereRaw("JSON_SEARCH(LOWER(drops), 'one', LOWER(?), NULL, '\$[*].item') IS NOT NULL", [$aegis])
+                  ->orWhereRaw("JSON_SEARCH(LOWER(mvp_drops), 'one', LOWER(?), NULL, '\$[*].item') IS NOT NULL", [$aegis]);
+            })
+            ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'element', 'race', 'drops', 'mvp_drops'])
+            ->orderBy('level')
+            ->get()
+            ->map(function ($mob) use ($aegis) {
+                $rate      = null;
+                $isMvpDrop = false;
+
+                foreach ($mob->drops ?? [] as $d) {
+                    if (strcasecmp($d['item'] ?? '', $aegis) === 0) {
+                        $rate = $d['rate'];
+                        break;
+                    }
+                }
+
+                if ($rate === null) {
+                    foreach ($mob->mvp_drops ?? [] as $d) {
+                        if (strcasecmp($d['item'] ?? '', $aegis) === 0) {
+                            $rate      = $d['rate'];
+                            $isMvpDrop = true;
+                            break;
+                        }
+                    }
+                }
+
+                return [
+                    'id'          => $mob->id,
+                    'name'        => $mob->name,
+                    'level'       => $mob->level,
+                    'hp'          => $mob->hp,
+                    'is_mvp'      => $mob->is_mvp,
+                    'element'     => $mob->element,
+                    'race'        => $mob->race,
+                    'rate'        => $rate,
+                    'is_mvp_drop' => $isMvpDrop,
+                ];
+            });
+
+        return response()->json($mobs->values());
+    }
+
+    public function trade(int $itemId): JsonResponse
+    {
+        $rows = DB::connection('mysql_main')
+            ->table('vending_items as vi')
+            ->join('vendings as v', 'v.id', '=', 'vi.vending_id')
+            ->join('cart_inventory as ci', 'ci.id', '=', 'vi.cartinventory_id')
+            ->join('char as c', 'c.char_id', '=', 'v.char_id')
+            ->where('ci.nameid', $itemId)
+            ->select([
+                'v.id as vending_id',
+                'v.title as shop_title',
+                'c.name as char_name',
+                'v.map',
+                'v.x',
+                'v.y',
+                'ci.refine',
+                'vi.amount',
+                'vi.price',
+            ])
+            ->orderBy('vi.price')
+            ->limit(100)
+            ->get()
+            ->toArray();
+
+        return response()->json($rows);
     }
 }

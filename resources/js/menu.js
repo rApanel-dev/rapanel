@@ -23,6 +23,7 @@ export const visitorMenuItems = [
       { name: 'Who Sell',  route: 'info.who-sell', icon: '🏪' },
       { name: 'MvP Cards', route: 'info.mvp-card', icon: '🃏' },
       { name: 'Item DB',   route: 'info.item-db',  icon: '🔎' },
+      { name: 'Mob DB',    route: 'info.mob-db',   icon: '👾' },
     ],
   },
   {

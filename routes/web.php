@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\NewsCommentController as AdminNewsCommentControll
 use App\Http\Controllers\Admin\ItemDbController as AdminItemDbController;
 use App\Http\Controllers\Admin\MobDbController as AdminMobDbController;
 use App\Http\Controllers\ItemDbController;
+use App\Http\Controllers\MobDbController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -50,8 +51,12 @@ Route::prefix('info')->name('info.')->group(function() {
     Route::get('/who-sell', [WhoSellController::class, 'index'])->name('who-sell');
     Route::get('/who-sell/shop/{vendingId}', [WhoSellController::class, 'show'])->name('who-sell.shop');
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
+    Route::get('/mob-db', [MobDbController::class, 'index'])->name('mob-db');
+    Route::get('/mob-db/{mobId}', [MobDbController::class, 'show'])->name('mob-db.show')->where('mobId', '[0-9]+');
     Route::get('/item-db', [ItemDbController::class, 'index'])->name('item-db');
     Route::get('/item-db/{itemId}', [ItemDbController::class, 'show'])->name('item-db.show')->where('itemId', '[0-9]+');
+    Route::get('/item-db/{itemId}/monsters', [ItemDbController::class, 'monsters'])->name('item-db.monsters')->where('itemId', '[0-9]+');
+    Route::get('/item-db/{itemId}/trade', [ItemDbController::class, 'trade'])->name('item-db.trade')->where('itemId', '[0-9]+');
 });
 
 // Rutas de Ranking
