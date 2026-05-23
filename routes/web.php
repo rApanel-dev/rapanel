@@ -152,9 +152,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('item-db',       [AdminItemDbController::class, 'destroy'])->name('item-db.destroy');
 
     // Mob DB admin
-    Route::get('mob-db',           [AdminMobDbController::class, 'index'])->name('mob-db.index');
-    Route::post('mob-db/import',   [AdminMobDbController::class, 'import'])->name('mob-db.import');
-    Route::delete('mob-db',        [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
+    Route::get('mob-db',                [AdminMobDbController::class, 'index'])->name('mob-db.index');
+    Route::post('mob-db/import',        [AdminMobDbController::class, 'import'])->name('mob-db.import');
+    Route::post('mob-db/import-sql',    [AdminMobDbController::class, 'importSql'])->name('mob-db.import-sql');
+    Route::delete('mob-db',             [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
 });
 
 // Noticias públicas

@@ -12,13 +12,14 @@ import CharacterDetail from '@/Pages/GameAccount/Partials/CharacterDetail.vue';
 import ViewActivityLogs from '@/Components/ViewActivityLogs.vue';
 import DeleteGameAccountForm from '@/Components/DeleteGameAccountForm.vue';
 import { getJobName, formatNum, onImgError, itemLabel } from '@/Composables/useRoHelpers';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import BgMain from '@/Components/BgMain.vue';
 import ActionButton from '@/Components/ActionButton.vue';
 import Footer from '@/Components/Footer.vue';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
+import MobDbModal  from '@/Components/MobDbModal.vue';
 
 const props = defineProps({
     gameAccount: Object,
@@ -248,7 +249,7 @@ const confirmPrefUpdate = () => {
 const getCharPref = (charId) => props.charPreferences?.[charId] ?? null;
 
 // Item DB modal
-const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
+const { openItemDb } = useItemDbModal();
 
 </script>
 
@@ -575,7 +576,6 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
         </main>
 
         <!-- ===== ITEM DB MODAL ===== -->
-        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
         <!-- ===== CHARACTER DETAIL OVERLAY ===== -->
         <CharacterDetail
@@ -810,4 +810,6 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
     </div>
 
     <Footer />
+    <ItemDbModal />
+    <MobDbModal />
 </template>

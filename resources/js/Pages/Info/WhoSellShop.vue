@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal';
 
 const props = defineProps({
@@ -46,7 +45,7 @@ const elementStyle = (el) => {
 const copiedRow = ref(null);
 let copyTimer   = null;
 
-const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
+const { openItemDb } = useItemDbModal();
 
 const copyNavigation = () => {
     const cmd = `/navigation ${props.shop.map} ${props.shop.x}/${props.shop.y}`;
@@ -215,7 +214,6 @@ const copyNavigation = () => {
 
         </div>
 
-        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
     </MainLayout>
 </template>

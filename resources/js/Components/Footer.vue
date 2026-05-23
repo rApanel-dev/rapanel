@@ -19,7 +19,7 @@ const currentYear = new Date().getFullYear();
                 <!-- Left: copyright (vertical) -->
                 <div class="flex flex-col gap-0.5 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
                     <span>© {{ currentYear }} <span class="font-bold">{{ $page.props.serverName }}</span></span>
-                    <span>{{ __('Powered by') }} <span class="text-rapanel-blue font-semibold">rApanel</span></span>
+                    <span>{{ __('Powered by') }} <span class="text-rapanel-blue font-semibold">KhrizPlayCL</span></span>
                 </div>
 
                 <!-- Center: made with love -->

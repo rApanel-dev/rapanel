@@ -77,7 +77,7 @@ class ItemDbController extends Controller
                 $q->whereRaw("JSON_SEARCH(LOWER(drops), 'one', LOWER(?), NULL, '\$[*].item') IS NOT NULL", [$aegis])
                   ->orWhereRaw("JSON_SEARCH(LOWER(mvp_drops), 'one', LOWER(?), NULL, '\$[*].item') IS NOT NULL", [$aegis]);
             })
-            ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'element', 'race', 'drops', 'mvp_drops'])
+            ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'class', 'element', 'race', 'drops', 'mvp_drops'])
             ->orderBy('level')
             ->get()
             ->map(function ($mob) use ($aegis) {
@@ -107,6 +107,7 @@ class ItemDbController extends Controller
                     'level'       => $mob->level,
                     'hp'          => $mob->hp,
                     'is_mvp'      => $mob->is_mvp,
+                    'class'       => $mob->class,
                     'element'     => $mob->element,
                     'race'        => $mob->race,
                     'rate'        => $rate,

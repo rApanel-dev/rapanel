@@ -2,8 +2,7 @@
 import { ref, watch } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
-import { useItemDbModal } from '@/Composables/useItemDbModal.js';
+import { useMobDbModal }  from '@/Composables/useMobDbModal.js';
 
 const props = defineProps({
     mobs:     Object,
@@ -84,44 +83,8 @@ const raceBadge = (r) => {
 };
 
 // ── Mob Detail Modal ──────────────────────────────────────────────────
-const selectedMob    = ref(null);
-const mobDetail      = ref(null);
-const detailLoading  = ref(false);
+const { openMobDb } = useMobDbModal();
 
-const openMob = async (mob) => {
-    selectedMob.value  = mob;
-    mobDetail.value    = null;
-    detailLoading.value = true;
-    try {
-        const res     = await fetch(route('info.mob-db.show', mob.id));
-        mobDetail.value = await res.json();
-    } catch { /* silencioso */ }
-    finally { detailLoading.value = false; }
-};
-
-const closeMob = () => { selectedMob.value = null; mobDetail.value = null; };
-
-const fmtRate = (r) => {
-    if (!r) return '?';
-    if (r >= 10000) return '100%';
-    const p = r / 100;
-    return (Number.isInteger(p) ? p : parseFloat(p.toFixed(2))) + '%';
-};
-
-const statLabels = {
-    str: 'STR', agi: 'AGI', vit: 'VIT', int: 'INT', dex: 'DEX', luk: 'LUK',
-    attack: 'ATK', attack2: 'ATK2', defense: 'DEF', magic_defense: 'MDEF',
-    attack_range: 'Atk Range', walk_speed: 'Walk Speed', ai: 'AI',
-};
-
-const displayStats = (stats) => {
-    if (!stats) return [];
-    const keys = ['str','agi','vit','int','dex','luk','attack','attack2','defense','magic_defense','attack_range','walk_speed'];
-    return keys.filter(k => stats[k] !== undefined).map(k => ({ label: statLabels[k], value: stats[k] }));
-};
-
-// ── ItemDb modal para drops ───────────────────────────────────────────
-const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
 </script>
 
 <template>
@@ -195,45 +158,57 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
             <div v-if="mobs.data.length"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
+                class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5">
 
                 <button v-for="mob in mobs.data" :key="mob.id"
-                    @click="openMob(mob)"
+                    @click="openMobDb(mob)"
                     class="group bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 text-left w-full">
 
                     <!-- Barra de acento superior según clase -->
                     <div :class="classBg(mob)" class="h-[3px] w-full" />
 
-                    <div class="p-3">
-                        <!-- Nombre + badge MVP/Boss -->
-                        <div class="flex items-start justify-between gap-1 mb-1.5">
-                            <p class="text-[12px] font-semibold text-rapanel-navy-900 dark:text-white leading-tight line-clamp-2">
-                                {{ mob.name }}
-                            </p>
-                            <span v-if="classBadgeStyle(mob)"
-                                :class="['text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border shrink-0 ml-1', classBadgeStyle(mob)]">
-                                {{ mob.is_mvp ? 'MVP' : __('Boss') }}
-                            </span>
+                    <div class="p-3 flex items-center gap-2.5">
+
+                        <!-- Imagen del mob -->
+                        <div class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center overflow-hidden">
+                            <img :src="`/data/monsters/${mob.id}.gif`"
+                                 :alt="mob.name"
+                                 class="max-w-full max-h-full object-contain"
+                                 @error="$event.target.style.display = 'none'" />
                         </div>
 
-                        <!-- ID + Level -->
-                        <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums mb-0.5">
-                            #{{ mob.id }} · Lv. {{ mob.level }}
-                        </div>
+                        <!-- Datos -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Nombre + badge MVP/Boss -->
+                            <div class="flex items-start justify-between gap-1 mb-1">
+                                <p class="text-[11px] font-semibold text-rapanel-navy-900 dark:text-white leading-tight line-clamp-2">
+                                    {{ mob.name }}
+                                </p>
+                                <span v-if="classBadgeStyle(mob)"
+                                    :class="['text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border shrink-0 ml-1', classBadgeStyle(mob)]">
+                                    {{ mob.is_mvp ? 'MVP' : __('Boss') }}
+                                </span>
+                            </div>
 
-                        <!-- HP -->
-                        <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums mb-2">
-                            HP: {{ mob.hp.toLocaleString() }}
-                        </div>
+                            <!-- ID + Level -->
+                            <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums mb-0.5">
+                                #{{ mob.id }} · Lv. {{ mob.level }}
+                            </div>
 
-                        <!-- Badges element + race -->
-                        <div class="flex flex-wrap gap-1">
-                            <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', elementBadge(mob.element)]">
-                                {{ mob.element }}
-                            </span>
-                            <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', raceBadge(mob.race)]">
-                                {{ mob.race }}
-                            </span>
+                            <!-- HP -->
+                            <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums mb-1.5">
+                                HP: {{ mob.hp.toLocaleString() }}
+                            </div>
+
+                            <!-- Badges element + race -->
+                            <div class="flex flex-wrap gap-1">
+                                <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', elementBadge(mob.element)]">
+                                    {{ mob.element }}
+                                </span>
+                                <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', raceBadge(mob.race)]">
+                                    {{ mob.race }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </button>
@@ -265,187 +240,6 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
             </div>
         </div>
 
-        <!-- ── Mob Detail Modal ── -->
-        <Teleport to="body">
-            <Transition
-                enter-active-class="transition duration-200 ease-out"
-                enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100"
-                leave-active-class="transition duration-150 ease-in"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95">
-
-                <div v-if="selectedMob"
-                    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
-                    @click.self="closeMob">
-
-                    <div class="relative w-full sm:max-w-3xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden
-                                rounded-t-2xl sm:rounded-2xl shadow-2xl bg-rapanel-navy-900 ring-1 ring-white/10">
-
-                        <!-- Barra de acento top -->
-                        <div :class="classBg(selectedMob)" class="h-[3px] shrink-0" />
-
-                        <!-- Header -->
-                        <div class="flex items-center gap-4 px-5 py-4 shrink-0">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <h2 class="font-bold text-white text-xl leading-tight">{{ selectedMob.name }}</h2>
-                                    <span v-if="classBadgeStyle(selectedMob)"
-                                        :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full border', classBadgeStyle(selectedMob)]">
-                                        {{ selectedMob.is_mvp ? 'MVP' : __('Boss') }}
-                                    </span>
-                                </div>
-                                <div class="flex items-center gap-3 mt-1 flex-wrap text-[11px] text-white/50">
-                                    <span class="font-mono">ID: {{ selectedMob.id }}</span>
-                                    <span>Lv. {{ selectedMob.level }}</span>
-                                    <span>HP: {{ selectedMob.hp.toLocaleString() }}</span>
-                                    <span :class="['px-1.5 py-0.5 rounded-full border text-[10px]', elementBadge(selectedMob.element)]">{{ selectedMob.element }}</span>
-                                    <span :class="['px-1.5 py-0.5 rounded-full border text-[10px]', raceBadge(selectedMob.race)]">{{ selectedMob.race }}</span>
-                                    <span v-if="selectedMob.size" class="bg-white/5 text-white/50 border-white/10 px-1.5 py-0.5 rounded-full border text-[10px]">{{ selectedMob.size }}</span>
-                                </div>
-                            </div>
-
-                            <button @click="closeMob"
-                                class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer text-white/40 hover:text-white hover:bg-white/10 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Body scrollable -->
-                        <div class="overflow-y-auto flex-1 px-5 pb-5 space-y-4 bg-rapanel-navy-800/60">
-
-                            <!-- Loading spinner -->
-                            <div v-if="detailLoading" class="flex items-center justify-center py-10">
-                                <svg class="animate-spin w-6 h-6 text-rapanel-gold" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                                </svg>
-                            </div>
-
-                            <template v-else-if="mobDetail">
-
-                                <!-- Stats -->
-                                <div v-if="displayStats(mobDetail.stats).length"
-                                    class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-                                        <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Stats') }}</span>
-                                    </div>
-                                    <div class="grid grid-cols-3 sm:grid-cols-4 divide-x divide-y divide-white/[0.06]">
-                                        <div v-for="s in displayStats(mobDetail.stats)" :key="s.label"
-                                            class="flex flex-col items-center py-3 px-2">
-                                            <span class="text-[10px] font-black uppercase tracking-wider text-white/35">{{ s.label }}</span>
-                                            <span class="text-sm font-bold text-white tabular-nums mt-0.5">{{ s.value }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Drops -->
-                                <div v-if="mobDetail.drops?.length"
-                                    class="bg-rapanel-navy-900 rounded-xl border border-white/10 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-                                        <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
-                                        <span class="font-semibold text-sm text-white">{{ __('Drops') }}</span>
-                                        <span class="text-[10px] bg-white/10 text-white/50 rounded-full px-1.5 py-0.5 font-bold">{{ mobDetail.drops.length }}</span>
-                                    </div>
-                                    <div class="divide-y divide-white/[0.06]">
-                                        <button v-for="drop in mobDetail.drops" :key="drop.item"
-                                            :disabled="!drop.item_data"
-                                            @click="drop.item_data && openItemDb(drop.item_data.item_id, drop.item_data)"
-                                            :class="['w-full flex items-center gap-3 px-4 py-2.5 text-left transition', drop.item_data ? 'hover:bg-white/5 cursor-pointer' : 'cursor-default']">
-
-                                            <!-- Icono -->
-                                            <div class="shrink-0 w-8 h-8 rounded-lg bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
-                                                <img v-if="drop.item_data"
-                                                    :src="`/data/items/icons/${drop.item_data.item_id}.png`"
-                                                    :alt="drop.item_data.display_name || drop.item_data.name"
-                                                    class="object-contain"
-                                                    @error="$event.target.style.display='none'" />
-                                                <svg v-else class="w-4 h-4 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                </svg>
-                                            </div>
-
-                                            <!-- Nombre -->
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-sm text-white truncate">
-                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}
-                                                </p>
-                                                <p v-if="drop.item_data" class="text-[10px] text-white/35 font-mono">{{ drop.item }}</p>
-                                            </div>
-
-                                            <!-- Rate -->
-                                            <span :class="[
-                                                'text-sm font-bold tabular-nums shrink-0',
-                                                drop.rate >= 5000 ? 'text-rapanel-success' : drop.rate >= 500 ? 'text-rapanel-gold' : 'text-white/60'
-                                            ]">{{ fmtRate(drop.rate) }}</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- MVP Drops -->
-                                <div v-if="mobDetail.mvp_drops?.length"
-                                    class="bg-rapanel-navy-900 rounded-xl border border-rapanel-gold/20 overflow-hidden">
-                                    <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-gold/20">
-                                        <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                        </svg>
-                                        <span class="font-semibold text-sm text-rapanel-gold">{{ __('MVP Drops') }}</span>
-                                        <span class="text-[10px] bg-rapanel-gold/15 text-rapanel-gold border border-rapanel-gold/30 rounded-full px-1.5 py-0.5 font-bold">{{ mobDetail.mvp_drops.length }}</span>
-                                    </div>
-                                    <div class="divide-y divide-white/[0.06]">
-                                        <button v-for="drop in mobDetail.mvp_drops" :key="drop.item"
-                                            :disabled="!drop.item_data"
-                                            @click="drop.item_data && openItemDb(drop.item_data.item_id, drop.item_data)"
-                                            :class="['w-full flex items-center gap-3 px-4 py-2.5 text-left transition', drop.item_data ? 'hover:bg-white/5 cursor-pointer' : 'cursor-default']">
-
-                                            <div class="shrink-0 w-8 h-8 rounded-lg bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
-                                                <img v-if="drop.item_data"
-                                                    :src="`/data/items/icons/${drop.item_data.item_id}.png`"
-                                                    :alt="drop.item_data.display_name || drop.item_data.name"
-                                                    class="object-contain"
-                                                    @error="$event.target.style.display='none'" />
-                                                <svg v-else class="w-4 h-4 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-sm text-white truncate">
-                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}
-                                                </p>
-                                                <p v-if="drop.item_data" class="text-[10px] text-white/35 font-mono">{{ drop.item }}</p>
-                                            </div>
-
-                                            <span :class="[
-                                                'text-sm font-bold tabular-nums shrink-0',
-                                                drop.rate >= 5000 ? 'text-rapanel-success' : drop.rate >= 500 ? 'text-rapanel-gold' : 'text-white/60'
-                                            ]">{{ fmtRate(drop.rate) }}</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Sin drops -->
-                                <div v-if="!mobDetail.drops?.length && !mobDetail.mvp_drops?.length"
-                                    class="flex flex-col items-center justify-center py-8 text-center gap-2">
-                                    <p class="text-white/30 text-sm">{{ __('No drops data') }}</p>
-                                </div>
-
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </Transition>
-        </Teleport>
-
-        <!-- ItemDbModal para drops clickeables -->
-        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
     </MainLayout>
 </template>

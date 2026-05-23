@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 
-// Mapeo de tipo numérico del emulador a string legible
 const EMULATOR_TYPE = {
     0: 'Healing', 1: 'Healing',
     2: 'Usable',  3: 'Etc', 4: 'Etc',
@@ -9,21 +8,14 @@ const EMULATOR_TYPE = {
     18: 'Armor',
 };
 
-export function useItemDbModal() {
-    const itemDbItem    = ref(null);
-    const itemDbCount   = ref(null);
+// Module-level refs — singleton compartido entre componentes
+const itemDbItem  = ref(null);
+const itemDbCount = ref(null);
 
-    /**
-     * Abre el modal buscando el item en ra_item_db.
-     * Si no existe (admin no importó los yml), muestra el fallback del emulador.
-     *
-     * @param {number} nameid
-     * @param {object} fallback  Campos disponibles: name_english|item_name, item_slots|slots, item_type
-     */
+export function useItemDbModal() {
     const openItemDb = async (nameid, fallback = {}) => {
         const isForged = fallback.card0 === 255;
 
-        // Abre inmediatamente con datos del emulador
         itemDbItem.value = {
             item_id:          nameid,
             name:             fallback.name_english ?? fallback.item_name ?? fallback.display_name ?? fallback.name ?? `Item #${nameid}`,
@@ -47,7 +39,6 @@ export function useItemDbModal() {
                 itemDbItem.value  = isForged ? { ...data, slots: 0 } : data;
                 itemDbCount.value = data.server_count ?? null;
             }
-            // 404 → mantiene fallback silenciosamente
         } catch { /* silencioso */ }
     };
 

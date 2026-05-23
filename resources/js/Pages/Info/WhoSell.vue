@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
 import WhoSellShopModal from '@/Components/WhoSellShopModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal';
 
@@ -98,7 +97,7 @@ const elementStyle = (el) => {
     return '';
 };
 
-const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
+const { openItemDb } = useItemDbModal();
 </script>
 
 <template>
@@ -371,7 +370,6 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
         <!-- ── Modal tienda ── -->
         <WhoSellShopModal ref="shopModal" />
 
-        <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 
     </MainLayout>
 </template>

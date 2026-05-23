@@ -1,7 +1,9 @@
 <script setup>
-import Header from '@/Components/Header.vue';
-import BgMain from '@/Components/BgMain.vue';
-import Footer from '@/Components/Footer.vue';
+import Header     from '@/Components/Header.vue';
+import BgMain     from '@/Components/BgMain.vue';
+import Footer     from '@/Components/Footer.vue';
+import ItemDbModal from '@/Components/ItemDbModal.vue';
+import MobDbModal  from '@/Components/MobDbModal.vue';
 
 defineProps({
     showBg: { type: Boolean, default: false },
@@ -24,5 +26,7 @@ defineProps({
         </main>
 
         <Footer />
+        <ItemDbModal />
+        <MobDbModal />
     </div>
 </template>

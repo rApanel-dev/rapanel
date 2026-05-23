@@ -98,10 +98,11 @@ class MobDbController extends Controller
                     'ai'                  => $mob['Ai']                 ?? 6,
                 ], fn($v) => $v !== null);
 
-                $drops = array_map(fn($d) => [
-                    'item' => $d['Item'] ?? '',
-                    'rate' => $d['Rate'] ?? 0,
-                ], $mob['Drops'] ?? []);
+                $drops = array_map(fn($d) => array_filter([
+                    'item'    => $d['Item'] ?? '',
+                    'rate'    => $d['Rate'] ?? 0,
+                    'nosteal' => !empty($d['StealProtected']) ? true : null,
+                ], fn($v) => $v !== null), $mob['Drops'] ?? []);
 
                 $mvpDrops = array_map(fn($d) => [
                     'item' => $d['Item'] ?? '',

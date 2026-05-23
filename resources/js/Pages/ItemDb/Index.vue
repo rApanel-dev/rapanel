@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
+import { useItemDbModal } from '@/Composables/useItemDbModal.js';
 
 const props = defineProps({
     items:   Object,
@@ -37,21 +37,7 @@ watch(search, () => {
 watch([type], applyFilters);
 
 // ── Detail modal ─────────────────────────────────────────────────────
-const selectedItem = ref(null);
-const serverCount  = ref(null);
-
-const openDetail = async (item) => {
-    selectedItem.value = item;
-    serverCount.value  = null;
-
-    try {
-        const res  = await fetch(route('info.item-db.show', item.item_id));
-        const data = await res.json();
-        serverCount.value = data.server_count ?? null;
-    } catch { /* silencioso */ }
-};
-
-const closeDetail = () => { selectedItem.value = null; serverCount.value = null; };
+const { openItemDb } = useItemDbModal();
 
 // ── Icon / image paths ───────────────────────────────────────────────
 const iconSrc     = (item) => `/data/items/icons/${item.item_id}.png`;
@@ -129,7 +115,7 @@ const typeBadge = (t) => {
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
 
                 <button v-for="item in items.data" :key="item.item_id"
-                    @click="openDetail(item)"
+                    @click="openItemDb(item.item_id, item)"
                     class="group bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm flex items-center gap-3 px-3 py-2.5 hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 text-left w-full">
 
                     <!-- Icono -->
@@ -185,7 +171,6 @@ const typeBadge = (t) => {
         </div>
 
         <!-- ── Detail Modal ── -->
-        <ItemDbModal :item="selectedItem" :server-count="serverCount" @close="closeDetail" />
 
 
     </MainLayout>

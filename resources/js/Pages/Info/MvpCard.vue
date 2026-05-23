@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
+import { useItemDbModal } from '@/Composables/useItemDbModal.js';
 
 const props = defineProps({
     cards: { type: Array, default: () => [] },
@@ -26,28 +26,7 @@ const totalInServer = computed(() => props.cards.reduce((sum, c) => sum + c.tota
 const imgSrc = (card) => `/data/items/cards/${card.id}.png`;
 
 // ── Detail modal ─────────────────────────────────────────────────────
-const selectedItem  = ref(null);
-const serverCount   = ref(null);
-const loadingItemId = ref(null);
-
-const openDetail = async (card) => {
-    if (loadingItemId.value) return;
-    loadingItemId.value = card.id;
-    selectedItem.value  = null;
-    serverCount.value   = null;
-
-    try {
-        const res  = await fetch(route('info.item-db.show', card.id));
-        const data = await res.json();
-        serverCount.value  = data.server_count ?? null;
-        selectedItem.value = data;
-    } catch { /* silencioso */ }
-    finally {
-        loadingItemId.value = null;
-    }
-};
-
-const closeDetail = () => { selectedItem.value = null; serverCount.value = null; };
+const { openItemDb } = useItemDbModal();
 </script>
 
 <template>
@@ -111,26 +90,17 @@ const closeDetail = () => { selectedItem.value = null; serverCount.value = null;
                 class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
 
                 <button v-for="card in sorted" :key="card.id"
-                    @click="openDetail(card)"
-                    :disabled="loadingItemId === card.id"
-                    class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 group text-left cursor-pointer disabled:opacity-60 pt-[3px] px-[3px]">
+                    @click="openItemDb(card.id, card)"
+                    class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 group text-left cursor-pointer pt-[3px] px-[3px]">
 
                     <!-- Ilustración retrato 3:4 -->
-                    <div class="w-full aspect-[3/4] overflow-hidden rounded-t-xl bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center relative">
+                    <div class="w-full aspect-[3/4] overflow-hidden rounded-t-xl bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center">
                         <img
                             :src="imgSrc(card)"
                             :alt="card.name"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             @error="$event.target.style.display='none'"
                         />
-                        <!-- Spinner mientras carga el modal -->
-                        <div v-if="loadingItemId === card.id"
-                            class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl">
-                            <svg class="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                            </svg>
-                        </div>
                     </div>
 
                     <!-- Nombre + contador -->
@@ -162,9 +132,6 @@ const closeDetail = () => { selectedItem.value = null; serverCount.value = null;
             </div>
 
         </div>
-
-        <!-- ── Detail Modal ── -->
-        <ItemDbModal :item="selectedItem" :server-count="serverCount" @close="closeDetail" />
 
     </MainLayout>
 </template>

@@ -2,7 +2,6 @@
 import { usePage } from '@inertiajs/vue3';
 import { getJobName, isCartClass, formatNum, formatMap, onImgError, itemLabel } from '@/Composables/useRoHelpers';
 import ActionButton from '@/Components/ActionButton.vue';
-import ItemDbModal from '@/Components/ItemDbModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal';
 
 const props = defineProps({
@@ -22,7 +21,7 @@ const getCardName = (id) => {
 
 const barPct = (cur, max) => max > 0 ? Math.min(100, Math.round(cur / max * 100)) : 0;
 
-const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
+const { openItemDb } = useItemDbModal();
 </script>
 
 <template>
@@ -527,5 +526,4 @@ const { itemDbItem, itemDbCount, openItemDb, closeItemDb } = useItemDbModal();
         </Transition>
     </Teleport>
 
-    <ItemDbModal :item="itemDbItem" :server-count="itemDbCount" @close="closeItemDb" />
 </template>

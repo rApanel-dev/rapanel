@@ -2,30 +2,33 @@
 import { ref, watch, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import WhoSellShopModal from '@/Components/WhoSellShopModal.vue';
-
-const props = defineProps({
-    item:        { type: Object, default: null },
-    serverCount: { type: Number, default: null },
-});
-
-const emit = defineEmits(['close']);
+import { useItemDbModal } from '@/Composables/useItemDbModal.js';
+import { useMobDbModal }  from '@/Composables/useMobDbModal.js';
 
 const page = usePage();
 const __   = (key) => page.props.translations?.[key] || key;
 
+const { itemDbItem, itemDbCount, closeItemDb } = useItemDbModal();
+const { openMobDb } = useMobDbModal();
+
 const activeTab = ref('detail');
-watch(() => props.item, (val) => {
+watch(itemDbItem, (val, oldVal) => {
     if (val) {
-        activeTab.value             = 'detail';
-        illustrationAvailable.value = false;
-        showIllustration.value      = false;
-        monstersData.value          = null;
-        tradeData.value             = null;
+        const idChanged = val.item_id !== oldVal?.item_id;
+        if (idChanged) {
+            activeTab.value             = 'detail';
+            illustrationAvailable.value = false;
+            showIllustration.value      = false;
+            monstersData.value          = null;
+            tradeData.value             = null;
+            loadMonsters();
+            loadTrade();
+        }
     }
 });
 
-const imageSrc    = (item) => `/data/items/images/${item.item_id}.png`;
-const onImgError  = (e)    => { e.target.style.display = 'none'; };
+const imageSrc   = (item) => `/data/items/images/${item.item_id}.png`;
+const onImgError = (e)    => { e.target.style.display = 'none'; };
 
 // ── Card illustration ─────────────────────────────────────────────────
 const illustrationAvailable = ref(false);
@@ -148,12 +151,19 @@ const sortedMonsters  = computed(() => {
 // ── Trade tab ─────────────────────────────────────────────────────────
 const tradeData    = ref(null);
 const tradeLoading = ref(false);
+const tradeSort    = ref('asc');
+const sortedTrade  = computed(() => {
+    if (!tradeData.value?.length) return tradeData.value ?? [];
+    return [...tradeData.value].sort((a, b) =>
+        tradeSort.value === 'asc' ? a.price - b.price : b.price - a.price
+    );
+});
 
 const loadMonsters = async () => {
     if (monstersData.value !== null || monstersLoading.value) return;
     monstersLoading.value = true;
     try {
-        const res       = await fetch(route('info.item-db.monsters', props.item.item_id));
+        const res          = await fetch(route('info.item-db.monsters', itemDbItem.value.item_id));
         monstersData.value = await res.json();
     } catch { monstersData.value = []; }
     finally  { monstersLoading.value = false; }
@@ -163,7 +173,7 @@ const loadTrade = async () => {
     if (tradeData.value !== null || tradeLoading.value) return;
     tradeLoading.value = true;
     try {
-        const res    = await fetch(route('info.item-db.trade', props.item.item_id));
+        const res       = await fetch(route('info.item-db.trade', itemDbItem.value.item_id));
         tradeData.value = await res.json();
     } catch { tradeData.value = []; }
     finally  { tradeLoading.value = false; }
@@ -198,6 +208,13 @@ const priceStyle = (n) => {
     return { color: tier.color, textShadow: tier.shadow ? `1px 0 0 ${tier.shadow}` : undefined };
 };
 
+// ── Mob bar / badge helpers (monsters list) ──────────────────────────
+const mobBarClass = (mob) => {
+    if (mob.is_mvp)           return 'bg-rapanel-gold';
+    if (mob.class === 'Boss') return 'bg-orange-500';
+    return 'bg-rapanel-navy-300 dark:bg-rapanel-navy-600';
+};
+
 // ── Element badge (for monsters list) ────────────────────────────────
 const elementBadge = (el) => {
     const map = {
@@ -226,9 +243,9 @@ const elementBadge = (el) => {
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-95">
 
-            <div v-if="item"
+            <div v-if="itemDbItem"
                 class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
-                @click.self="emit('close')">
+                @click.self="closeItemDb()">
 
                 <div class="relative w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden
                             rounded-t-2xl sm:rounded-2xl shadow-2xl bg-white dark:bg-rapanel-navy-900 ring-1 ring-rapanel-navy-200 dark:ring-white/10">
@@ -238,31 +255,31 @@ const elementBadge = (el) => {
 
                     <!-- ── Header ── -->
                     <div class="flex items-center gap-4 px-5 py-4 shrink-0 bg-white dark:bg-rapanel-navy-900">
-                        <img :src="imageSrc(item)"
-                             :alt="item.display_name || item.name"
+                        <img :src="imageSrc(itemDbItem)"
+                             :alt="itemDbItem.display_name || itemDbItem.name"
                              class="shrink-0 w-[75px] h-[100px] object-contain rounded-xl"
                              @error="onImgError" />
 
                         <!-- preload silencioso para detectar si existe la ilustración -->
-                        <img v-if="item.type === 'Card'"
-                             :src="cardIllustrationSrc(item)"
+                        <img v-if="itemDbItem.type === 'Card'"
+                             :src="cardIllustrationSrc(itemDbItem)"
                              class="hidden"
                              @load="onIllustrationLoad"
                              @error="onIllustrationError" />
 
                         <div class="flex-1 min-w-0">
                             <h2 class="font-bold text-rapanel-navy-900 dark:text-white text-xl leading-tight">
-                                {{ item.display_name || item.name }}<template v-if="item.slots > 0"> [{{ item.slots }}]</template>
+                                {{ itemDbItem.display_name || itemDbItem.name }}<template v-if="itemDbItem.slots > 0"> [{{ itemDbItem.slots }}]</template>
                             </h2>
-                            <p v-if="item.aegis_name" class="font-mono text-[11px] text-rapanel-text-light/50 dark:text-white/35 mt-0.5">
-                                {{ item.aegis_name }}
+                            <p v-if="itemDbItem.aegis_name" class="font-mono text-[11px] text-rapanel-text-light/50 dark:text-white/35 mt-0.5">
+                                {{ itemDbItem.aegis_name }}
                             </p>
                             <div class="flex items-center gap-2 mt-2 flex-wrap">
                                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rapanel-navy-100 text-rapanel-text-light dark:bg-white/10 dark:text-white/70">
-                                    ID: {{ item.item_id }}
+                                    ID: {{ itemDbItem.item_id }}
                                 </span>
-                                <span v-if="item.type" :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full border tracking-wide', typeBadge(item.type)]">
-                                    {{ item.type }}
+                                <span v-if="itemDbItem.type" :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full border tracking-wide', typeBadge(itemDbItem.type)]">
+                                    {{ itemDbItem.type }}
                                 </span>
                                 <button v-if="illustrationAvailable"
                                     @click="showIllustration = true"
@@ -276,7 +293,7 @@ const elementBadge = (el) => {
                             </div>
                         </div>
 
-                        <button @click="emit('close')"
+                        <button @click="closeItemDb()"
                             class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer
                                    text-rapanel-text-light/40 dark:text-white/40 hover:text-rapanel-navy-900 dark:hover:text-white hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition duration-150">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -297,7 +314,7 @@ const elementBadge = (el) => {
                             <div class="min-w-0">
                                 <div class="text-sm font-bold leading-tight truncate">{{ __('Item Detail') }}</div>
                                 <div :class="activeTab === 'detail' ? 'text-rapanel-navy-900/60' : 'text-rapanel-text-light/40 dark:text-white/30'"
-                                     class="text-[10px] mt-0.5 leading-tight truncate">Stats, precios NPC y requisitos</div>
+                                     class="text-[10px] mt-0.5 leading-tight truncate">{{ __('Stats, NPC prices and requirements') }}</div>
                             </div>
                         </button>
 
@@ -355,7 +372,7 @@ const elementBadge = (el) => {
                             </svg>
                             <div class="min-w-0">
                                 <div class="text-sm font-bold leading-tight truncate">{{ __('Price History') }}</div>
-                                <div class="text-[10px] text-rapanel-text-light/25 dark:text-white/20 mt-0.5 leading-tight truncate">Tendencias recientes de precios</div>
+                                <div class="text-[10px] text-rapanel-text-light/25 dark:text-white/20 mt-0.5 leading-tight truncate">{{ __('Recent price trends') }}</div>
                             </div>
                         </div>
                     </div>
@@ -377,15 +394,15 @@ const elementBadge = (el) => {
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Game Description') }}</span>
                                     </div>
                                     <div class="px-4 py-4">
-                                        <div v-if="item.description_html"
+                                        <div v-if="itemDbItem.description_html"
                                              class="font-mono text-sm leading-relaxed text-rapanel-navy-900/90 dark:text-white/85"
-                                             v-html="item.description_html" />
+                                             v-html="itemDbItem.description_html" />
                                         <p v-else class="text-sm text-rapanel-text-light/50 dark:text-white/40 italic">{{ __('No description available.') }}</p>
                                     </div>
                                 </div>
 
                                 <!-- Clases Permitidas -->
-                                <div v-if="allowedJobs(item.properties) || classRestrictions(item.properties)"
+                                <div v-if="allowedJobs(itemDbItem.properties) || classRestrictions(itemDbItem.properties)"
                                      class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
                                     <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -393,18 +410,18 @@ const elementBadge = (el) => {
                                         </svg>
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Allowed Classes') }}</span>
                                     </div>
-                                    <div v-if="allowedJobs(item.properties)" class="px-4 pt-3 pb-2 flex flex-wrap gap-1.5">
-                                        <span v-for="job in allowedJobs(item.properties)" :key="job"
+                                    <div v-if="allowedJobs(itemDbItem.properties)" class="px-4 pt-3 pb-2 flex flex-wrap gap-1.5">
+                                        <span v-for="job in allowedJobs(itemDbItem.properties)" :key="job"
                                               :class="['text-[10px] font-bold px-2 py-0.5 rounded-full border', jobBadge(job)]">
                                             {{ job }}
                                         </span>
                                     </div>
-                                    <div v-if="classRestrictions(item.properties)"
-                                         :class="allowedJobs(item.properties) ? 'border-t border-rapanel-navy-100 dark:border-white/[0.06]' : ''"
+                                    <div v-if="classRestrictions(itemDbItem.properties)"
+                                         :class="allowedJobs(itemDbItem.properties) ? 'border-t border-rapanel-navy-100 dark:border-white/[0.06]' : ''"
                                          class="px-4 pt-2 pb-3">
                                         <p class="text-[9px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-1.5">{{ __('Class Tier') }}</p>
                                         <div class="flex flex-wrap gap-1.5">
-                                            <span v-for="cls in classRestrictions(item.properties)" :key="cls"
+                                            <span v-for="cls in classRestrictions(itemDbItem.properties)" :key="cls"
                                                   :class="['text-[10px] font-bold px-2 py-0.5 rounded-full border', classBadge(cls)]">
                                                 {{ classLabel[cls] ?? cls.replace(/_/g, ' ') }}
                                             </span>
@@ -413,7 +430,7 @@ const elementBadge = (el) => {
                                 </div>
 
                                 <!-- Script -->
-                                <div v-if="scriptValue(item.properties)"
+                                <div v-if="scriptValue(itemDbItem.properties)"
                                      class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
                                     <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -421,7 +438,7 @@ const elementBadge = (el) => {
                                         </svg>
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Script') }}</span>
                                     </div>
-                                    <pre class="px-4 py-4 text-xs font-mono text-emerald-400/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ scriptValue(item.properties) }}</pre>
+                                    <pre class="px-4 py-4 text-xs font-mono text-emerald-400/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ scriptValue(itemDbItem.properties) }}</pre>
                                 </div>
                             </div>
 
@@ -429,7 +446,7 @@ const elementBadge = (el) => {
                             <div class="md:col-span-2 space-y-3">
 
                                 <!-- Atributos -->
-                                <div v-if="attrStats(item.properties).length"
+                                <div v-if="attrStats(itemDbItem.properties).length"
                                      class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
                                     <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -438,7 +455,7 @@ const elementBadge = (el) => {
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Attributes') }}</span>
                                     </div>
                                     <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
-                                        <div v-for="stat in attrStats(item.properties)" :key="stat.label"
+                                        <div v-for="stat in attrStats(itemDbItem.properties)" :key="stat.label"
                                              class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __(stat.label) }}</span>
                                             <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ stat.value }}</span>
@@ -447,7 +464,7 @@ const elementBadge = (el) => {
                                 </div>
 
                                 <!-- Precios NPC -->
-                                <div v-if="item.properties?.Buy !== undefined || item.properties?.Sell !== undefined"
+                                <div v-if="itemDbItem.properties?.Buy !== undefined || itemDbItem.properties?.Sell !== undefined"
                                      class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
                                     <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -458,11 +475,11 @@ const elementBadge = (el) => {
                                     <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                                         <div class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Buy') }}</span>
-                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ (item.properties.Buy ?? 0).toLocaleString() }}z</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ (itemDbItem.properties.Buy ?? 0).toLocaleString() }}z</span>
                                         </div>
                                         <div class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Sell') }}</span>
-                                            <span class="text-sm font-bold text-rapanel-gold tabular-nums">{{ (item.properties.Sell ?? 0).toLocaleString() }}z</span>
+                                            <span class="text-sm font-bold text-rapanel-gold tabular-nums">{{ (itemDbItem.properties.Sell ?? 0).toLocaleString() }}z</span>
                                         </div>
                                     </div>
                                 </div>
@@ -476,51 +493,51 @@ const elementBadge = (el) => {
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Information') }}</span>
                                     </div>
                                     <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
-                                        <div v-if="item.type" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="itemDbItem.type" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Type') }}</span>
-                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.type }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ itemDbItem.type }}</span>
                                         </div>
-                                        <div v-if="item.subtype" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="itemDbItem.subtype" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Subtype') }}</span>
-                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.subtype }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ itemDbItem.subtype }}</span>
                                         </div>
-                                        <div v-if="item.slots > 0" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="itemDbItem.slots > 0" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Slots') }}</span>
-                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ item.slots }}</span>
+                                            <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ itemDbItem.slots }}</span>
                                         </div>
-                                        <div v-if="equipLocations(item.properties)" class="flex justify-between items-start gap-2 px-4 py-2.5">
+                                        <div v-if="equipLocations(itemDbItem.properties)" class="flex justify-between items-start gap-2 px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-white/40 shrink-0 mt-0.5">{{ __('Equip Location') }}</span>
                                             <div class="flex flex-wrap gap-1 justify-end">
-                                                <span v-for="loc in equipLocations(item.properties)" :key="loc"
+                                                <span v-for="loc in equipLocations(itemDbItem.properties)" :key="loc"
                                                       :class="['text-[10px] font-bold px-2 py-0.5 rounded-full border', locationBadge(loc)]">
                                                     {{ locationLabel[loc] ?? loc.replace(/_/g, ' ') }}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div v-if="item.is_custom" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="itemDbItem.is_custom" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Custom') }}</span>
                                             <span class="text-sm font-bold text-rapanel-gold">✓</span>
                                         </div>
-                                        <div v-if="itemGender(item.properties)" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="itemGender(itemDbItem.properties)" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Gender') }}</span>
-                                            <span :class="['text-xs font-bold px-2 py-0.5 rounded-full border', item.properties.Gender === 'Male' ? 'bg-rapanel-blue/15 text-rapanel-blue border-rapanel-blue/25' : 'bg-pink-500/15 text-pink-400 border-pink-500/25']">
-                                                {{ __(item.properties.Gender) }}
+                                            <span :class="['text-xs font-bold px-2 py-0.5 rounded-full border', itemDbItem.properties.Gender === 'Male' ? 'bg-rapanel-blue/15 text-rapanel-blue border-rapanel-blue/25' : 'bg-pink-500/15 text-pink-400 border-pink-500/25']">
+                                                {{ __(itemDbItem.properties.Gender) }}
                                             </span>
                                         </div>
-                                        <div v-if="hasBuyingStore(item.properties)" class="flex justify-between items-center px-4 py-2.5">
+                                        <div v-if="hasBuyingStore(itemDbItem.properties)" class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('Buying Store') }}</span>
                                             <span class="text-xs font-bold px-2 py-0.5 rounded-full border bg-rapanel-success/15 text-rapanel-success border-rapanel-success/25">✓</span>
                                         </div>
                                         <div class="flex justify-between items-center px-4 py-2.5">
                                             <span class="text-[11px] font-black uppercase tracking-wider text-rapanel-text-light/60 dark:text-white/40">{{ __('On Server') }}</span>
-                                            <span v-if="serverCount !== null" class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ serverCount.toLocaleString() }}</span>
+                                            <span v-if="itemDbCount !== null" class="text-sm font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ itemDbCount.toLocaleString() }}</span>
                                             <span v-else class="w-16 h-4 rounded bg-rapanel-navy-100 dark:bg-white/10 animate-pulse inline-block" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Restricciones de Comercio -->
-                                <div v-if="tradeRestrictions(item.properties).length"
+                                <div v-if="tradeRestrictions(itemDbItem.properties).length"
                                      class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
                                     <div class="flex items-center gap-2 px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/10">
                                         <svg class="w-4 h-4 text-rapanel-danger shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -529,7 +546,7 @@ const elementBadge = (el) => {
                                         <span class="font-semibold text-sm text-rapanel-navy-900 dark:text-white">{{ __('Trade Restrictions') }}</span>
                                     </div>
                                     <div class="px-4 py-3 flex flex-wrap gap-1.5">
-                                        <span v-for="r in tradeRestrictions(item.properties)" :key="r"
+                                        <span v-for="r in tradeRestrictions(itemDbItem.properties)" :key="r"
                                               class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/20">
                                             {{ r }}
                                         </span>
@@ -582,16 +599,35 @@ const elementBadge = (el) => {
 
                                     <!-- Grid 3 columnas -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                        <div v-for="mob in sortedMonsters" :key="mob.id"
-                                            class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center gap-3 px-3 py-2.5">
-                                            <div :class="mob.is_mvp ? 'bg-rapanel-gold' : 'bg-rapanel-navy-300 dark:bg-rapanel-navy-600'"
-                                                 class="w-1 self-stretch rounded-full shrink-0" />
+                                        <button v-for="mob in sortedMonsters" :key="mob.id"
+                                            @click="openMobDb(mob)"
+                                            class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center gap-2.5 px-3 py-2.5 text-left w-full transition hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 hover:shadow-sm">
+                                            <!-- Barra de acento vertical -->
+                                            <div :class="mobBarClass(mob)" class="w-1 self-stretch rounded-full shrink-0" />
+                                            <!-- GIF del mob -->
+                                            <div class="shrink-0 w-10 h-10 flex items-center justify-center overflow-hidden">
+                                                <img :src="`/data/monsters/${mob.id}.gif`"
+                                                     :alt="mob.name"
+                                                     class="max-w-full max-h-full object-contain"
+                                                     @error="$event.target.style.display = 'none'" />
+                                            </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-1.5 flex-wrap">
                                                     <span class="text-xs font-bold text-rapanel-navy-900 dark:text-white leading-tight truncate">{{ mob.name }}</span>
-                                                    <span v-if="mob.is_mvp_drop"
+                                                    <!-- Badge MVP (el mob es MVP) -->
+                                                    <span v-if="mob.is_mvp"
                                                         class="text-[9px] font-black uppercase px-1 py-0.5 rounded-full border bg-rapanel-gold/15 text-rapanel-gold border-rapanel-gold/30 shrink-0">
                                                         MVP
+                                                    </span>
+                                                    <!-- Badge Boss -->
+                                                    <span v-else-if="mob.class === 'Boss'"
+                                                        class="text-[9px] font-black uppercase px-1 py-0.5 rounded-full border bg-orange-500/15 text-orange-400 border-orange-500/30 shrink-0">
+                                                        Boss
+                                                    </span>
+                                                    <!-- Indicador: item cae en tabla MVP drops -->
+                                                    <span v-if="mob.is_mvp_drop"
+                                                        class="text-[8px] font-black uppercase px-1 py-px rounded border bg-amber-500/10 text-amber-500 border-amber-500/20 shrink-0">
+                                                        ★ MVP Drop
                                                     </span>
                                                 </div>
                                                 <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-rapanel-text-light/60 dark:text-white/40 flex-wrap">
@@ -604,7 +640,7 @@ const elementBadge = (el) => {
                                                     {{ fmtRate(mob.rate) }}
                                                 </div>
                                             </div>
-                                        </div>
+                                        </button>
                                     </div>
                                 </template>
                             </template>
@@ -625,8 +661,34 @@ const elementBadge = (el) => {
                                     </svg>
                                     <p class="text-rapanel-text-light/40 dark:text-white/30 text-sm">{{ __('No active shops selling this item.') }}</p>
                                 </div>
-                                <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <div v-for="shop in tradeData" :key="`${shop.vending_id}-${shop.price}-${shop.amount}`"
+                                <template v-else>
+                                    <!-- Sort toggle -->
+                                    <div class="flex items-center justify-end mb-3">
+                                        <div class="inline-flex items-center gap-0.5 bg-rapanel-navy-100/60 dark:bg-white/5 rounded-lg p-0.5 border border-rapanel-navy-100 dark:border-white/[0.08]">
+                                            <button @click="tradeSort = 'asc'"
+                                                :class="tradeSort === 'asc'
+                                                    ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
+                                                    : 'text-rapanel-text-light/50 dark:text-white/35 hover:text-rapanel-navy-900 dark:hover:text-white/70'"
+                                                class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150">
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"/>
+                                                </svg>
+                                                {{ __('Price') }}
+                                            </button>
+                                            <button @click="tradeSort = 'desc'"
+                                                :class="tradeSort === 'desc'
+                                                    ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
+                                                    : 'text-rapanel-text-light/50 dark:text-white/35 hover:text-rapanel-navy-900 dark:hover:text-white/70'"
+                                                class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150">
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M17.25 21l3.75-3.75"/>
+                                                </svg>
+                                                {{ __('Price') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div v-for="shop in sortedTrade" :key="`${shop.vending_id}-${shop.price}-${shop.amount}`"
                                         class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 px-4 py-3">
                                         <div class="flex items-center justify-between gap-3">
                                             <div class="flex-1 min-w-0">
@@ -660,7 +722,8 @@ const elementBadge = (el) => {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    </div>
+                                </template>
                             </template>
                         </div>
 
@@ -691,8 +754,8 @@ const elementBadge = (el) => {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
-                        <img :src="cardIllustrationSrc(item)"
-                             :alt="item.display_name || item.name"
+                        <img :src="cardIllustrationSrc(itemDbItem)"
+                             :alt="itemDbItem.display_name || itemDbItem.name"
                              class="max-h-[80vh] max-w-[90%] object-contain drop-shadow-2xl" />
                     </div>
                 </Transition>
