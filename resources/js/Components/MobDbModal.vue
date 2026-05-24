@@ -1,13 +1,19 @@
 <script setup>
+import { ref, computed, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { useItemDbModal } from '@/Composables/useItemDbModal.js';
 import { useMobDbModal }  from '@/Composables/useMobDbModal.js';
+import { useModalStack }  from '@/Composables/useModalStack.js';
 
 const page = usePage();
 const __   = (key) => page.props.translations?.[key] || key;
 
 const { selectedMob, mobDetail, detailLoading, mobTab, closeMobDb } = useMobDbModal();
 const { openItemDb } = useItemDbModal();
+
+const { acquire } = useModalStack();
+const modalZ = ref(60);
+watch(() => selectedMob.value, (val) => { if (val) modalZ.value = acquire(); });
 
 const fmtRate = (r) => {
     if (!r) return '?';
@@ -62,6 +68,24 @@ const raceBadge = (r) => {
     return map[r] ?? 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-white/5 dark:text-white/50 dark:border-white/10';
 };
 
+const spawnSort = ref('desc');
+const sortedSpawns = computed(() => {
+    const list = [...(mobDetail.value?.spawns ?? [])];
+    return list.sort((a, b) =>
+        spawnSort.value === 'desc'
+            ? b.total_amount - a.total_amount
+            : a.total_amount - b.total_amount
+    );
+});
+
+const fmtDelay = (ms) => {
+    if (!ms || ms <= 0) return __('Instantly');
+    if (ms < 60_000)     return `${Math.round(ms / 1_000)} ${__('sec')}`;
+    if (ms < 3_600_000)  return `${Math.round(ms / 60_000)} ${__('min')}`;
+    if (ms < 86_400_000) return `${Math.round(ms / 3_600_000)} ${__('h')}`;
+    return `${Math.round(ms / 86_400_000)} ${__('d')}`;
+};
+
 const statLabels = {
     str: 'STR', agi: 'AGI', vit: 'VIT', int: 'INT', dex: 'DEX', luk: 'LUK',
     attack: 'ATK', attack2: 'ATK2', defense: 'DEF', magic_defense: 'MDEF',
@@ -89,7 +113,8 @@ const displayStats = (stats) => {
             leave-to-class="opacity-0 scale-95">
 
             <div v-if="selectedMob"
-                class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
+                class="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
+                :style="{ zIndex: modalZ }"
                 @click.self="closeMobDb">
 
                 <div class="relative w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden
@@ -388,16 +413,78 @@ const displayStats = (stats) => {
                         </div>
 
                         <!-- ── Tab: Mapa de Respawn ── -->
-                        <div v-else-if="mobTab === 'map'"
-                             class="flex flex-col items-center justify-center py-16 text-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl bg-rapanel-navy-100 dark:bg-white/5 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-rapanel-navy-300 dark:text-white/20" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
+                        <div v-else-if="mobDetail && mobTab === 'map'">
+
+                            <!-- Sin spawns -->
+                            <div v-if="!mobDetail.spawns?.length"
+                                class="flex flex-col items-center justify-center py-16 text-center gap-4">
+                                <div class="w-16 h-16 rounded-2xl bg-rapanel-navy-100 dark:bg-white/5 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-rapanel-navy-300 dark:text-white/20" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                    </svg>
+                                </div>
+                                <p class="text-rapanel-text-light/50 dark:text-white/30 text-sm">{{ __('No spawn locations found.') }}</p>
                             </div>
-                            <div>
-                                <p class="text-rapanel-navy-900 dark:text-white font-semibold text-sm">{{ __('Coming soon') }}</p>
-                                <p class="text-rapanel-text-light/50 dark:text-white/30 text-xs mt-1">Los datos de spawn todavía no están disponibles.</p>
+
+                            <!-- Grid de mapas -->
+                            <div v-else>
+
+                                <!-- Barra de controles -->
+                                <div class="flex items-center justify-between mb-3 gap-2">
+                                    <p class="text-xs text-rapanel-text-light dark:text-white/40">
+                                        {{ mobDetail.spawns.length }} {{ __('maps') }}
+                                    </p>
+                                    <div class="flex items-center gap-1">
+                                        <button @click="spawnSort = 'desc'"
+                                            :class="spawnSort === 'desc'
+                                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'"
+                                            class="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[10px] font-bold transition">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                            </svg>
+                                            {{ __('Most') }}
+                                        </button>
+                                        <button @click="spawnSort = 'asc'"
+                                            :class="spawnSort === 'asc'
+                                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'"
+                                            class="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[10px] font-bold transition">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                                            </svg>
+                                            {{ __('Least') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Cards compactas: 4 columnas -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <a v-for="spawn in sortedSpawns" :key="spawn.map_name"
+                                        :href="`/info/map-db/${spawn.map_name}`"
+                                        class="group flex items-center gap-2.5 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-2 hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200">
+
+                                        <!-- Thumbnail pequeño -->
+                                        <div class="shrink-0 w-12 h-12 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.04] overflow-hidden relative">
+                                            <img :src="`/data/maps/${spawn.map_name}.png`"
+                                                :alt="spawn.map_name"
+                                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                                                @error="$event.target.style.display='none'" />
+                                            <div v-if="spawn.random_amount > 0 && spawn.placed_points === 0"
+                                                class="absolute inset-0 flex items-center justify-center bg-amber-500/20">
+                                                <span class="text-[7px] font-black text-amber-500 uppercase tracking-wide leading-none text-center">{{ __('Random') }}</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Info -->
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-[10px] font-bold text-rapanel-navy-900 dark:text-white truncate leading-tight">{{ spawn.map_name }}</p>
+                                            <p class="text-base font-black text-rapanel-blue tabular-nums leading-tight mt-0.5">
+                                                ×{{ spawn.total_amount }}
+                                            </p>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

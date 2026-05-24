@@ -29,8 +29,10 @@ use App\Http\Controllers\NewsReactionController;
 use App\Http\Controllers\Admin\NewsCommentController as AdminNewsCommentController;
 use App\Http\Controllers\Admin\ItemDbController as AdminItemDbController;
 use App\Http\Controllers\Admin\MobDbController as AdminMobDbController;
+use App\Http\Controllers\Admin\MapDbController as AdminMapDbController;
 use App\Http\Controllers\ItemDbController;
 use App\Http\Controllers\MobDbController;
+use App\Http\Controllers\MapDbController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -53,6 +55,8 @@ Route::prefix('info')->name('info.')->group(function() {
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
     Route::get('/mob-db', [MobDbController::class, 'index'])->name('mob-db');
     Route::get('/mob-db/{mobId}', [MobDbController::class, 'show'])->name('mob-db.show')->where('mobId', '[0-9]+');
+    Route::get('/map-db', [MapDbController::class, 'index'])->name('map-db');
+    Route::get('/map-db/{mapName}', [MapDbController::class, 'show'])->name('map-db.show')->where('mapName', '[a-zA-Z0-9_@]+');
     Route::get('/item-db', [ItemDbController::class, 'index'])->name('item-db');
     Route::get('/item-db/{itemId}', [ItemDbController::class, 'show'])->name('item-db.show')->where('itemId', '[0-9]+');
     Route::get('/item-db/{itemId}/monsters', [ItemDbController::class, 'monsters'])->name('item-db.monsters')->where('itemId', '[0-9]+');
@@ -156,6 +160,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('mob-db/import',        [AdminMobDbController::class, 'import'])->name('mob-db.import');
     Route::post('mob-db/import-sql',    [AdminMobDbController::class, 'importSql'])->name('mob-db.import-sql');
     Route::delete('mob-db',             [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
+
+    // Map DB admin
+    Route::get('map-db',                              [AdminMapDbController::class, 'index'])->name('map-db.index');
+    Route::post('map-db/import-map-cache',            [AdminMapDbController::class, 'importMapCache'])->name('map-db.import-map-cache');
+    Route::post('map-db/import-spawns',               [AdminMapDbController::class, 'importSpawns'])->name('map-db.import-spawns');
+    Route::delete('map-db/map-cache',                 [AdminMapDbController::class, 'destroyMapCache'])->name('map-db.destroy-map-cache');
+    Route::delete('map-db/spawns',                    [AdminMapDbController::class, 'destroySpawns'])->name('map-db.destroy-spawns');
+    Route::delete('map-db/{mapName}/spawns',          [AdminMapDbController::class, 'destroyMapSpawns'])->name('map-db.destroy-map-spawns')->where('mapName', '[a-zA-Z0-9_@]+');
 });
 
 // Noticias públicas

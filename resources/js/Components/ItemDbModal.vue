@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import WhoSellShopModal from '@/Components/WhoSellShopModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal.js';
 import { useMobDbModal }  from '@/Composables/useMobDbModal.js';
+import { useModalStack }  from '@/Composables/useModalStack.js';
 
 const page = usePage();
 const __   = (key) => page.props.translations?.[key] || key;
@@ -11,9 +12,13 @@ const __   = (key) => page.props.translations?.[key] || key;
 const { itemDbItem, itemDbCount, closeItemDb } = useItemDbModal();
 const { openMobDb } = useMobDbModal();
 
+const { acquire } = useModalStack();
+const modalZ = ref(60);
+
 const activeTab = ref('detail');
 watch(itemDbItem, (val, oldVal) => {
     if (val) {
+        modalZ.value = acquire();
         const idChanged = val.item_id !== oldVal?.item_id;
         if (idChanged) {
             activeTab.value             = 'detail';
@@ -244,7 +249,8 @@ const elementBadge = (el) => {
             leave-to-class="opacity-0 scale-95">
 
             <div v-if="itemDbItem"
-                class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
+                class="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 bg-rapanel-navy-900/80 backdrop-blur-sm"
+                :style="{ zIndex: modalZ }"
                 @click.self="closeItemDb()">
 
                 <div class="relative w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden

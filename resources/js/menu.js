@@ -24,6 +24,7 @@ export const visitorMenuItems = [
       { name: 'MvP Cards', route: 'info.mvp-card', icon: '🃏' },
       { name: 'Item DB',   route: 'info.item-db',  icon: '🔎' },
       { name: 'Mob DB',    route: 'info.mob-db',   icon: '👾' },
+      { name: 'Map DB',    route: 'info.map-db',   icon: '🗺️' },
     ],
   },
   {

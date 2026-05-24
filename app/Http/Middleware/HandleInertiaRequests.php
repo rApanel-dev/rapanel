@@ -68,10 +68,17 @@ class HandleInertiaRequests extends Middleware
                 return $this->fetchDiscordStatus();
             }),
 
-            'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error'   => fn () => $request->session()->get('error'),
-            ],
+            'flash' => fn () => array_filter([
+                'success'         => $request->session()->get('success'),
+                'error'           => $request->session()->get('error'),
+                'maps_imported'   => $request->session()->get('maps_imported'),
+                'maps_expected'   => $request->session()->get('maps_expected'),
+                'spawns_imported' => $request->session()->get('spawns_imported'),
+                'spawns_failed'   => $request->session()->get('spawns_failed'),
+                'maps_affected'   => $request->session()->get('maps_affected'),
+                'maps_detail'     => $request->session()->get('maps_detail'),
+                'skipped_lines'   => $request->session()->get('skipped_lines'),
+            ], fn ($v) => $v !== null),
         ];
     }
 

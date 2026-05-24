@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemDb;
 use App\Models\MobDb;
+use App\Models\SpawnEntry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,6 +75,20 @@ class MobDbController extends Controller
 
         $data['drops']     = $enrich($mob->drops     ?? []);
         $data['mvp_drops'] = $enrich($mob->mvp_drops ?? []);
+
+        $data['spawns'] = SpawnEntry::where('mob_id', $id)
+            ->select(
+                'map_name',
+                DB::raw('SUM(amount) as total_amount'),
+                DB::raw('COUNT(*) as spawn_points'),
+                DB::raw('MIN(delay1) as min_delay'),
+                DB::raw('SUM(CASE WHEN x = 0 AND y = 0 AND rx = 0 AND ry = 0 THEN amount ELSE 0 END) as random_amount'),
+                DB::raw('SUM(CASE WHEN x != 0 OR y != 0 OR rx != 0 OR ry != 0 THEN 1 ELSE 0 END) as placed_points')
+            )
+            ->groupBy('map_name')
+            ->orderBy('map_name')
+            ->get()
+            ->toArray();
 
         return response()->json($data);
     }
