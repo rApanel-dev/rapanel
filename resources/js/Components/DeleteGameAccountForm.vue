@@ -16,13 +16,15 @@ const props = defineProps({
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
 
-const isAdmin = computed(() => page.props.auth?.user?.role === 'Admin');
+const isAdmin      = computed(() => page.props.auth?.user?.role === 'Admin');
+const hasTwoFactor = computed(() => !!page.props.auth?.user?.two_factor_confirmed_at);
 
 const confirmingAccountDeletion = ref(false);
-const step = ref(1); // Controlamos el paso actual
+const step = ref(1);
 
 const form = useForm({
-    password: '',
+    password:  '',
+    totp_code: '',
 });
 
 const openModal = () => {
@@ -101,24 +103,38 @@ const deleteAccount = () => {
                     </div>
 
                     <div class="mt-6">
-                        <InputLabel for="password" :value="__('Master Account Password')" class="text-rapanel-text-light dark:text-rapanel-text-dark font-bold" />
-                        <TextInput
-                            id="password"
-                            v-model="form.password"
-                            type="password"
-                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-rapanel-navy-800 text-rapanel-text-light dark:text-white focus:ring-rapanel-danger focus:border-rapanel-danger"
-                            :placeholder="__('Master Account Password')"
-                            @keyup.enter="deleteAccount"
-                        />
-                        <InputError :message="form.errors.password" class="mt-2" />
+                        <template v-if="hasTwoFactor">
+                            <InputLabel for="delete_totp" :value="__('Code from your authenticator app')" class="text-rapanel-blue font-bold" />
+                            <TextInput
+                                id="delete_totp"
+                                v-model="form.totp_code"
+                                type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                                class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-blue/30 focus:ring-rapanel-danger focus:border-rapanel-danger tracking-widest text-center"
+                                :placeholder="__('6-digit code')"
+                                @keyup.enter="deleteAccount"
+                            />
+                            <InputError :message="form.errors.totp_code" class="mt-2" />
+                        </template>
+                        <template v-else>
+                            <InputLabel for="password" :value="__('Master Account Password')" class="text-rapanel-text-light dark:text-rapanel-text-dark font-bold" />
+                            <TextInput
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-rapanel-navy-800 text-rapanel-text-light dark:text-white focus:ring-rapanel-danger focus:border-rapanel-danger"
+                                :placeholder="__('Master Account Password')"
+                                @keyup.enter="deleteAccount"
+                            />
+                            <InputError :message="form.errors.password" class="mt-2" />
+                        </template>
                     </div>
 
                     <div class="mt-6 flex justify-end">
                         <SecondaryButton @click="step = 1">{{ __('Back') }}</SecondaryButton>
                         <DangerButton
                             class="ms-3"
-                            :class="{ 'opacity-25': form.processing || !form.password }"
-                            :disabled="form.processing || !form.password"
+                            :class="{ 'opacity-25': form.processing || (!hasTwoFactor && !form.password) || (hasTwoFactor && form.totp_code.length !== 6) }"
+                            :disabled="form.processing || (!hasTwoFactor && !form.password) || (hasTwoFactor && form.totp_code.length !== 6)"
                             @click="deleteAccount"
                         >
                             {{ __('Confirm Deletion') }}

@@ -78,6 +78,9 @@ class TwoFactorChallengeController extends Controller
         Auth::login($user, $remember);
         $request->session()->regenerate();
 
+        // Registra el momento de verificación para habilitar acceso al panel admin
+        $request->session()->put('two_factor_verified_at', now()->timestamp);
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 }

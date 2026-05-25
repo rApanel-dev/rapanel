@@ -13,21 +13,34 @@ class MapDbController extends Controller
 {
     public function index(Request $request): Response
     {
-        $mapsWithSpawns = SpawnEntry::select('map_name')->distinct()->pluck('map_name');
+        $bgMap = [
+            'dungeon' => fn($q) => $q->where('background_bmp', 'like', 'dungeon%'),
+            'field'   => fn($q) => $q->where('background_bmp', 'like', 'field%'),
+            'village' => fn($q) => $q->where('background_bmp', 'like', 'village%'),
+            'siege'   => fn($q) => $q->where('background_bmp', 'siege'),
+            'special' => fn($q) => $q->where('background_bmp', 'like', 'noname%'),
+            'other'   => fn($q) => $q->whereNull('background_bmp'),
+        ];
 
-        $maps = MapSize::whereIn('map_name', $mapsWithSpawns)
-            ->withCount('spawns')
-            ->when(
-                $request->search,
-                fn($q) => $q->where('map_name', 'like', '%' . $request->search . '%')
-            )
+        $bgType = $request->bg_type;
+
+        $maps = MapSize::withCount('spawns')
+            ->when($request->search, function ($q) use ($request) {
+                $term = '%' . $request->search . '%';
+                $q->where(fn($q2) => $q2->where('map_name', 'like', $term)
+                                        ->orWhere('display_name', 'like', $term));
+            })
+            ->when(isset($bgMap[$bgType]), $bgMap[$bgType] ?? fn($q) => $q)
             ->orderBy('map_name')
             ->paginate(48)
             ->withQueryString();
 
         return Inertia::render('Info/MapDb/Index', [
             'maps'    => $maps,
-            'filters' => ['search' => $request->search ?? ''],
+            'filters' => [
+                'search'  => $request->search ?? '',
+                'bg_type' => $bgType ?? '',
+            ],
         ]);
     }
 
@@ -70,7 +83,8 @@ class MapDbController extends Controller
         }, $rawSpawns);
 
         return Inertia::render('Info/MapDb/Show', [
-            'mapName' => $mapName,
+            'mapName'     => $mapName,
+            'displayName' => $mapSize->display_name,
             'mapSize' => [
                 'width'  => $mapSize->width,
                 'height' => $mapSize->height,

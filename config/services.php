@@ -57,6 +57,7 @@ return [
         'require_email_verify' => env('RA_REQUIRE_EMAIL_VERIFY', false),
         '2fa_enabled'          => env('RA_2FA_ENABLED', false),
         '2fa_force_admins'     => env('RA_2FA_FORCE_ADMINS', false),
+        'inactivity_timeout'   => (int) env('RA_INACTIVITY_TIMEOUT', 30),
         'login_ip'   => env('RA_LOGIN_IP', '127.0.0.1'),
         'login_port' => env('RA_LOGIN_PORT', 6900),
     ],

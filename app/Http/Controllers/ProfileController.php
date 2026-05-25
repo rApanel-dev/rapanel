@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangeEmailRequest;
+use PragmaRX\Google2FA\Google2FA;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\GameAccount;
 use App\Models\User;
@@ -77,7 +78,16 @@ class ProfileController extends Controller
 
     public function changeEmail(ChangeEmailRequest $request): RedirectResponse
     {
-        $user     = $request->user();
+        $user = $request->user();
+
+        // Si tiene 2FA, verificar el código TOTP (la validación de formato ya pasó en el FormRequest)
+        if ($user->hasTwoFactorEnabled()) {
+            $valid = (new Google2FA())->verifyKey(decrypt($user->two_factor_secret), $request->totp_code, 2);
+            if (! $valid) {
+                return back()->withErrors(['totp_code' => __('The provided two factor authentication code was invalid.')]);
+            }
+        }
+
         $oldEmail = $user->email;
         $newEmail = $request->validated('email');
 
@@ -121,12 +131,24 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate(
-            ['password' => ['required', 'current_password']],
-            ['password.current_password' => __('The provided password does not match your current password.')]
-        );
+        $user     = $request->user();
+        $rules    = ['password' => ['required', 'current_password']];
+        $messages = ['password.current_password' => __('The provided password does not match your current password.')];
 
-        $user = $request->user();
+        if ($user->hasTwoFactorEnabled()) {
+            $rules['totp_code']             = ['required', 'string', 'digits:6'];
+            $messages['totp_code.required'] = __('Please enter your authenticator code.');
+            $messages['totp_code.digits']   = __('The provided two factor authentication code was invalid.');
+        }
+
+        $request->validate($rules, $messages);
+
+        if ($user->hasTwoFactorEnabled()) {
+            $valid = (new Google2FA())->verifyKey(decrypt($user->two_factor_secret), $request->totp_code, 2);
+            if (! $valid) {
+                return back()->withErrors(['totp_code' => __('The provided two factor authentication code was invalid.')]);
+            }
+        }
 
         if (config('services.ra.require_email_verify', false)) {
             $url = URL::temporarySignedRoute(

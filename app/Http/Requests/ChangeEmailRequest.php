@@ -10,7 +10,7 @@ class ChangeEmailRequest extends FormRequest
 {
     public function rules(): array
     {
-        return [
+        $emailRules = [
             'email' => [
                 'required',
                 'string',
@@ -20,8 +20,19 @@ class ChangeEmailRequest extends FormRequest
                 'confirmed',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            'current_password' => ['required', 'current_password'],
         ];
+
+        // Con 2FA activo: se requieren contraseña Y código TOTP
+        if ($this->user()->hasTwoFactorEnabled()) {
+            return array_merge($emailRules, [
+                'current_password' => ['required', 'current_password'],
+                'totp_code'        => ['required', 'string', 'digits:6'],
+            ]);
+        }
+
+        return array_merge($emailRules, [
+            'current_password' => ['required', 'current_password'],
+        ]);
     }
 
     public function messages(): array
@@ -29,6 +40,8 @@ class ChangeEmailRequest extends FormRequest
         return [
             'current_password.required'         => __('You must confirm your password to change your email address.'),
             'current_password.current_password' => __('The provided password does not match your current password.'),
+            'totp_code.required'                => __('Please enter your authenticator code.'),
+            'totp_code.digits'                  => __('The provided two factor authentication code was invalid.'),
             'email.unique'                      => __('This email address is already in use.'),
             'email.confirmed'                   => __('The email confirmation does not match.'),
         ];

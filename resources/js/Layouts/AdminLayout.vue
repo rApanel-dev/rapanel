@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import FlashMessages from '@/Components/FlashMessages.vue';
+import InactivityWarning from '@/Components/InactivityWarning.vue';
+import { useInactivityTimer } from '@/Composables/useInactivityTimer';
 import {
     HomeIcon,
     UserCircleIcon,
@@ -58,6 +60,10 @@ const safeRoute = (name) => {
 const userInitial = computed(() =>
     page.props.auth.user?.name?.charAt(0)?.toUpperCase() ?? 'A'
 );
+
+const timeout = computed(() => page.props.inactivityTimeout ?? 30);
+const { showWarning, countdown, stayActive } = useInactivityTimer(timeout.value, true);
+const doLogout = () => router.post(route('logout'));
 </script>
 
 <template>
@@ -199,4 +205,11 @@ const userInitial = computed(() =>
             </main>
         </div>
     </div>
+
+    <InactivityWarning
+        v-if="showWarning"
+        :countdown="countdown"
+        :on-stay="stayActive"
+        :on-logout="doLogout"
+    />
 </template>

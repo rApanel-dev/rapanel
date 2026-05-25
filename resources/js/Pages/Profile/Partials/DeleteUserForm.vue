@@ -6,7 +6,7 @@ import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps({
     status: { type: String, default: null },
@@ -18,8 +18,11 @@ const __ = (key) => page.props.translations?.[key] || key;
 const confirmingUserDeletion = ref(false);
 const emailSent              = ref(false);
 const passwordInput          = ref(null);
+const totpInput              = ref(null);
 
-const form = useForm({ password: '' });
+const hasTwoFactor = computed(() => !!page.props.auth?.user?.two_factor_confirmed_at);
+
+const form = useForm({ password: '', totp_code: '' });
 
 const confirmUserDeletion = () => {
     emailSent.value = false;
@@ -34,7 +37,10 @@ const deleteUser = () => {
             // Eliminación directa (RA_REQUIRE_EMAIL_VERIFY=false) → redirige a /
             // Si hubo email, el status ya fue detectado por el watcher
         },
-        onError: () => passwordInput.value?.focus(),
+        onError: () => {
+            if (form.errors.totp_code) totpInput.value?.focus();
+            else passwordInput.value?.focus();
+        },
         onFinish: () => form.reset(),
     });
 };
@@ -89,16 +95,33 @@ watch(
                             class="block w-full bg-white dark:bg-rapanel-navy-800"
                             :placeholder="__('Password')"
                             autocomplete="new-password"
-                            @keyup.enter="deleteUser"
+                            @keyup.enter="!hasTwoFactor && deleteUser()"
                         />
                         <InputError :message="form.errors.password" class="mt-1.5" />
+                    </div>
+
+                    <div v-if="hasTwoFactor">
+                        <InputLabel for="del_totp" :value="__('Code from your authenticator app')" />
+                        <TextInput
+                            id="del_totp"
+                            ref="totpInput"
+                            v-model="form.totp_code"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            maxlength="6"
+                            class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 tracking-widest text-center"
+                            :placeholder="__('6-digit code')"
+                            @keyup.enter="deleteUser"
+                        />
+                        <InputError :message="form.errors.totp_code" class="mt-1.5" />
                     </div>
 
                     <div class="flex justify-end gap-3 pt-1">
                         <SecondaryButton @click="closeModal">{{ __('Cancel') }}</SecondaryButton>
                         <DangerButton
                             :class="{ 'opacity-25': form.processing }"
-                            :disabled="form.processing"
+                            :disabled="form.processing || !form.password || (hasTwoFactor && form.totp_code.length !== 6)"
                             @click="deleteUser"
                         >
                             {{ __('Delete Account') }}

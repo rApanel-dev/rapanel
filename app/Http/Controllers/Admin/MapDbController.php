@@ -29,16 +29,17 @@ class MapDbController extends Controller
             'is_pre'      => str_starts_with($raw, 'pre'),
         ];
 
-        $allowedSorts = ['map_name', 'width', 'updated_at', 'spawns_count', 'spawns_max_updated_at'];
+        $allowedSorts = ['map_name', 'display_name', 'width', 'updated_at', 'spawns_count', 'spawns_max_updated_at'];
         $sort      = in_array($request->sort, $allowedSorts) ? $request->sort : 'map_name';
         $direction = $request->direction === 'desc' ? 'desc' : 'asc';
 
         $mapList = MapSize::withCount('spawns')
             ->withMax('spawns', 'updated_at')
-            ->when(
-                $request->search,
-                fn($q) => $q->where('map_name', 'like', '%' . $request->search . '%')
-            )
+            ->when($request->search, function ($q) use ($request) {
+                $term = '%' . $request->search . '%';
+                $q->where(fn($q2) => $q2->where('map_name', 'like', $term)
+                                        ->orWhere('display_name', 'like', $term));
+            })
             ->orderBy($sort, $direction)
             ->paginate(40)
             ->withQueryString();
@@ -152,6 +153,78 @@ class MapDbController extends Controller
             'maps_affected'   => count($affectedMaps),
             'maps_detail'     => $mapsDetail,
             'skipped_lines'   => $skipped,
+        ]);
+    }
+
+    public function importMapInfo(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'map_info' => 'required|file|max:20480|mimes:lua,txt',
+        ]);
+
+        set_time_limit(0);
+
+        $content = file_get_contents($request->file('map_info')->getRealPath());
+
+        if (empty($content)) {
+            return back()->withErrors(['map_info' => __('The file is empty or could not be read.')]);
+        }
+
+        // Match each map entry block (handles one level of nesting for signName)
+        preg_match_all(
+            '/\["([^"]+)\.rsw"\]\s*=\s*\{(?:[^{}]|\{[^{}]*\})*\}/s',
+            $content,
+            $blocks,
+            PREG_SET_ORDER
+        );
+
+        if (empty($blocks)) {
+            return back()->withErrors(['map_info' => __('No map entries found. Make sure this is a valid mapInfo.lua file.')]);
+        }
+
+        $rows    = [];
+        $matched = 0;
+
+        foreach ($blocks as $block) {
+            $mapName = $block[1]; // key without .rsw
+            $body    = $block[0]; // full match for field extraction
+
+            preg_match('/displayName\s*=\s*"([^"]*)"/', $body, $dn);
+            preg_match('/backgroundBmp\s*=\s*"([^"]*)"/', $body, $bg);
+
+            $displayName   = isset($dn[1]) && $dn[1] !== '' ? $dn[1] : null;
+            $backgroundBmp = isset($bg[1]) && $bg[1] !== '' ? $bg[1] : null;
+
+            if ($displayName === null && $backgroundBmp === null) {
+                continue;
+            }
+
+            $rows[$mapName] = [
+                'display_name'   => $displayName,
+                'background_bmp' => $backgroundBmp,
+            ];
+            $matched++;
+        }
+
+        if (empty($rows)) {
+            return back()->withErrors(['map_info' => __('No display names found in the file.')]);
+        }
+
+        // Only update maps already in map_sizes
+        $updated = 0;
+        foreach (array_chunk($rows, 500, true) as $chunk) {
+            $updated += MapSize::whereIn('map_name', array_keys($chunk))
+                ->get(['map_name'])
+                ->each(function ($map) use ($chunk) {
+                    $map->update($chunk[$map->map_name]);
+                })
+                ->count();
+        }
+
+        return back()->with([
+            'success'       => __('Map info imported successfully.'),
+            'maps_matched'  => $updated,
+            'maps_parsed'   => $matched,
         ]);
     }
 

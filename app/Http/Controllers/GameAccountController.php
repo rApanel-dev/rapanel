@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use PragmaRX\Google2FA\Google2FA;
 
 class GameAccountController extends Controller
 {
@@ -341,14 +342,32 @@ class GameAccountController extends Controller
         ]);
     }
 
+    private function verifyIdentity(Request $request): ?array
+    {
+        $user = Auth::user();
+
+        if ($user->hasTwoFactorEnabled()) {
+            $request->validate(['totp_code' => ['required', 'string', 'digits:6']]);
+            $valid = (new Google2FA())->verifyKey(decrypt($user->two_factor_secret), $request->totp_code, 2);
+            if (!$valid) {
+                return ['totp_code' => __('The provided two factor authentication code was invalid.')];
+            }
+        } else {
+            $request->validate(['password' => ['required', 'string']]);
+            if (!Hash::check($request->password, $user->password)) {
+                return ['password' => __('The provided password does not match our records.')];
+            }
+        }
+
+        return null;
+    }
+
     public function changeGender(Request $request, int $accountId)
     {
         $isAdmin = Auth::user()->role === 'Admin';
 
-        $request->validate(['password' => ['required', 'string']]);
-
-        if (!Hash::check($request->password, Auth::user()->password)) {
-            return back()->withErrors(['password' => __('The provided password does not match our records.')]);
+        if ($errors = $this->verifyIdentity($request)) {
+            return back()->withErrors($errors);
         }
 
         $query = GameAccount::where('account_id', $accountId);
@@ -460,17 +479,13 @@ class GameAccountController extends Controller
         $isAdmin = Auth::user()->role === 'Admin';
 
         $request->validate([
-            'current_password' => ['required', 'string'],
-            'password'         => ['required', 'confirmed', 'min:4', 'max:32'],
+            'password' => ['required', 'confirmed', 'min:4', 'max:32'],
         ], [
-            'current_password.required' => __('Please enter your master account password.'),
-            'password.confirmed'        => __('The password confirmation does not match.'),
+            'password.confirmed' => __('The password confirmation does not match.'),
         ]);
 
-        if (!Hash::check($request->current_password, Auth::user()->password)) {
-            return back()->withErrors([
-                'current_password' => __('The provided password does not match our records.')
-            ]);
+        if ($errors = $this->verifyIdentity($request)) {
+            return back()->withErrors($errors);
         }
 
         $query = GameAccount::where('account_id', $account_id);
@@ -545,10 +560,8 @@ class GameAccountController extends Controller
     {
         $isAdmin = Auth::user()->role === 'Admin';
 
-        $request->validate(['password' => ['required', 'string']]);
-
-        if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => __('The provided password does not match our records.')]);
+        if ($errors = $this->verifyIdentity($request)) {
+            return back()->withErrors($errors);
         }
 
         $query = GameAccount::where('account_id', $account_id);

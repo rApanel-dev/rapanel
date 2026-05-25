@@ -4,18 +4,22 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
 
 const passwordInput        = ref(null);
 const currentPasswordInput = ref(null);
+const totpInput            = ref(null);
+
+const hasTwoFactor = computed(() => !!page.props.auth?.user?.two_factor_confirmed_at);
 
 const form = useForm({
     current_password:      '',
     password:              '',
     password_confirmation: '',
+    totp_code:             '',
 });
 
 const updatePassword = () => {
@@ -30,6 +34,10 @@ const updatePassword = () => {
             if (form.errors.current_password) {
                 form.reset('current_password');
                 currentPasswordInput.value.focus();
+            }
+            if (form.errors.totp_code) {
+                form.reset('totp_code');
+                totpInput.value?.focus();
             }
         },
     });
@@ -50,6 +58,22 @@ const updatePassword = () => {
                 autocomplete="current-password"
             />
             <InputError :message="form.errors.current_password" class="mt-1.5" />
+        </div>
+
+        <div v-if="hasTwoFactor">
+            <InputLabel for="upd_totp" :value="__('Code from your authenticator app')" />
+            <TextInput
+                id="upd_totp"
+                ref="totpInput"
+                v-model="form.totp_code"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 tracking-widest text-center"
+                :placeholder="__('6-digit code')"
+            />
+            <InputError :message="form.errors.totp_code" class="mt-1.5" />
         </div>
 
         <div>

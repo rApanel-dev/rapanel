@@ -4,10 +4,25 @@ import BgMain     from '@/Components/BgMain.vue';
 import Footer     from '@/Components/Footer.vue';
 import ItemDbModal from '@/Components/ItemDbModal.vue';
 import MobDbModal  from '@/Components/MobDbModal.vue';
+import InactivityWarning from '@/Components/InactivityWarning.vue';
+import { useInactivityTimer } from '@/Composables/useInactivityTimer';
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineProps({
     showBg: { type: Boolean, default: false },
 });
+
+const page            = usePage();
+const isAuthenticated = computed(() => !!page.props.auth?.user);
+const timeout         = computed(() => page.props.inactivityTimeout ?? 30);
+
+const { showWarning, countdown, stayActive } = useInactivityTimer(
+    timeout.value,
+    isAuthenticated.value,
+);
+
+const doLogout = () => { import('@inertiajs/vue3').then(({ router }) => router.post(route('logout'))); };
 </script>
 
 <template>
@@ -28,5 +43,12 @@ defineProps({
         <Footer />
         <ItemDbModal />
         <MobDbModal />
+
+        <InactivityWarning
+            v-if="showWarning"
+            :countdown="countdown"
+            :on-stay="stayActive"
+            :on-logout="doLogout"
+        />
     </div>
 </template>

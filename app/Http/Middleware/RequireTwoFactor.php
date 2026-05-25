@@ -18,8 +18,7 @@ class RequireTwoFactor
             config('services.ra.2fa_force_admins') &&
             ! $user->hasTwoFactorEnabled()
         ) {
-            // Permitir acceso solo a las rutas de 2FA y perfil para que pueda configurarlo
-            $allowed = ['two-factor.show', 'two-factor.enable', 'profile.edit', 'logout'];
+            $allowed = ['two-factor.show', 'two-factor.enable', 'two-factor.recovery-codes', 'logout'];
 
             if (! in_array($request->route()?->getName(), $allowed)) {
                 return redirect()->route('two-factor.show')

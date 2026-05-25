@@ -40,6 +40,29 @@ const submitMapCache = () => {
     });
 };
 
+// ── Map Info (mapInfo.lua) form ────────────────────────────────────────
+const mapInfoForm  = useForm({ map_info: null });
+const mapInfoInput = ref(null);
+const mapInfoFile  = ref('');
+
+const onMapInfoChange = (e) => {
+    const file = e.target.files?.[0] ?? null;
+    mapInfoForm.map_info = file;
+    mapInfoFile.value    = file?.name ?? '';
+};
+
+const submitMapInfo = () => {
+    mapInfoForm.post(route('admin.map-db.import-map-info'), {
+        forceFormData: true,
+        onSuccess: () => {
+            router.reload({ only: ['stats', 'mapList'] });
+            mapInfoForm.reset();
+            mapInfoFile.value = '';
+            if (mapInfoInput.value) mapInfoInput.value.value = '';
+        },
+    });
+};
+
 // ── Spawn files form ───────────────────────────────────────────────────
 const spawnForm  = useForm({ spawn_files: null });
 const spawnInput = ref(null);
@@ -261,6 +284,58 @@ const sortState = (col) => {
                         </div>
                     </div>
                 </form>
+
+                <!-- ── Divider ── -->
+                <div class="mx-6 border-t border-rapanel-navy-100 dark:border-white/[0.07]" />
+
+                <!-- ── mapInfo.lua form ── -->
+                <form @submit.prevent="submitMapInfo" class="px-6 py-5 space-y-4">
+                    <div>
+                        <p class="text-xs font-bold text-rapanel-navy-900 dark:text-white mb-0.5">{{ __('Map Display Names') }}</p>
+                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark">
+                            {{ __('Imports display names and background info from') }} <span class="font-mono">system/mapInfo.lua</span>.
+                            {{ __('Only updates maps already in the cache.') }}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-2">
+                            mapInfo.lua <span class="text-rapanel-danger">*</span>
+                        </label>
+                        <input ref="mapInfoInput" type="file" accept=".lua,.txt" required @change="onMapInfoChange"
+                            class="w-full text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 transition" />
+                        <div v-if="mapInfoFile" class="mt-2">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rapanel-blue/10 text-rapanel-blue text-[10px] font-bold border border-rapanel-blue/20">
+                                {{ mapInfoFile }}
+                            </span>
+                        </div>
+                        <p v-if="mapInfoForm.errors.map_info" class="mt-1 text-xs text-rapanel-danger">{{ mapInfoForm.errors.map_info }}</p>
+                    </div>
+                    <button type="submit" :disabled="mapInfoForm.processing"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-rapanel-blue text-white text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
+                        <svg v-if="mapInfoForm.processing" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        {{ mapInfoForm.processing ? __('Importing...') : __('Import Map Names') }}
+                    </button>
+                    <div v-if="flash.maps_matched !== undefined"
+                        class="rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden">
+                        <div class="h-[3px] bg-rapanel-success" />
+                        <div class="px-4 py-3">
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div>
+                                    <p class="text-xl font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ flash.maps_matched }}</p>
+                                    <p class="text-[10px] uppercase tracking-wide text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('maps updated') }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ flash.maps_parsed }}</p>
+                                    <p class="text-[10px] uppercase tracking-wide text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('entries in file') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
             </div>
 
             <!-- Spawn files -->
@@ -390,6 +465,19 @@ const sortState = (col) => {
                                 </button>
                             </th>
                             <th class="px-4 py-2.5 text-left">
+                                <button @click="doSort('display_name')" class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest transition"
+                                    :class="sortState('display_name') !== 'none' ? 'text-rapanel-blue' : 'text-rapanel-text-light/60 dark:text-white/40 hover:text-rapanel-navy-900 dark:hover:text-white'">
+                                    {{ __('Display Name') }}
+                                    <span class="inline-flex flex-col gap-px leading-none">
+                                        <svg class="w-2 h-1.5" viewBox="0 0 8 5" fill="currentColor" :class="sortState('display_name') === 'asc' ? 'opacity-100' : 'opacity-30'"><path d="M4 0L8 5H0L4 0Z"/></svg>
+                                        <svg class="w-2 h-1.5" viewBox="0 0 8 5" fill="currentColor" :class="sortState('display_name') === 'desc' ? 'opacity-100' : 'opacity-30'"><path d="M4 5L0 0H8L4 5Z"/></svg>
+                                    </span>
+                                </button>
+                            </th>
+                            <th class="px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/60 dark:text-white/40">
+                                {{ __('Background') }}
+                            </th>
+                            <th class="px-4 py-2.5 text-left">
                                 <button @click="doSort('width')" class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest transition"
                                     :class="sortState('width') !== 'none' ? 'text-rapanel-blue' : 'text-rapanel-text-light/60 dark:text-white/40 hover:text-rapanel-navy-900 dark:hover:text-white'">
                                     {{ __('Dimensions') }}
@@ -437,6 +525,17 @@ const sortState = (col) => {
                             class="hover:bg-rapanel-navy-50/50 dark:hover:bg-white/[0.02] transition">
                             <td class="px-4 py-2.5">
                                 <span class="font-mono text-xs font-bold text-rapanel-navy-900 dark:text-white">{{ map.map_name }}</span>
+                            </td>
+                            <td class="px-4 py-2.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark">
+                                <span v-if="map.display_name" class="text-rapanel-navy-900 dark:text-white">{{ map.display_name }}</span>
+                                <span v-else class="text-rapanel-text-light/30 dark:text-white/20">—</span>
+                            </td>
+                            <td class="px-4 py-2.5">
+                                <span v-if="map.background_bmp"
+                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rapanel-navy-100 dark:bg-white/[0.06] text-rapanel-text-light dark:text-rapanel-text-dark border border-rapanel-navy-100 dark:border-white/[0.08]">
+                                    {{ map.background_bmp }}
+                                </span>
+                                <span v-else class="text-xs text-rapanel-text-light/30 dark:text-white/20">—</span>
                             </td>
                             <td class="px-4 py-2.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums">
                                 {{ map.width }}×{{ map.height }}

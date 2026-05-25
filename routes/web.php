@@ -34,6 +34,7 @@ use App\Http\Controllers\ItemDbController;
 use App\Http\Controllers\MobDbController;
 use App\Http\Controllers\MapDbController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Admin\AdminTwoFactorVerifyController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -53,11 +54,11 @@ Route::get('/', function () {
 Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads');
 Route::get('/downloads/{download:slug}', [DownloadController::class, 'show'])->name('downloads.show');
 Route::get('/downloads/{download:slug}/get', [DownloadController::class, 'download'])->name('downloads.get');
-Route::get('/donations', function() { return Inertia::render('Home'); })->name('donations');
+Route::get('/donations', fn() => Inertia::render('ComingSoon', ['title' => 'Donations']))->name('donations');
 
 // Rutas de Información
 Route::prefix('info')->name('info.')->group(function() {
-    Route::get('/wiki', function() { return Inertia::render('Home'); })->name('wiki');
+    Route::get('/wiki', fn() => Inertia::render('ComingSoon', ['title' => 'Wiki']))->name('wiki');
     Route::get('/who-sell', [WhoSellController::class, 'index'])->name('who-sell');
     Route::get('/who-sell/shop/{vendingId}', [WhoSellController::class, 'show'])->name('who-sell.shop');
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
@@ -73,21 +74,21 @@ Route::prefix('info')->name('info.')->group(function() {
 
 // Rutas de Ranking
 Route::prefix('rank')->name('rank.')->group(function() {
-    Route::get('/battleground', function() { return Inertia::render('Home'); })->name('battleground');
-    Route::get('/woe-damage', function() { return Inertia::render('Home'); })->name('woe-damage');
-    Route::get('/woe', function() { return Inertia::render('Home'); })->name('woe');
-    Route::get('/mvps', function() { return Inertia::render('Home'); })->name('mvps');
-    Route::get('/pvp', function() { return Inertia::render('Home'); })->name('pvp');
-    Route::get('/cashpoints', function() { return Inertia::render('Home'); })->name('cashpoints');
-    Route::get('/zeny', function() { return Inertia::render('Home'); })->name('zeny');
-    Route::get('/playtime', function() { return Inertia::render('Home'); })->name('playtime');
-    Route::get('/leveling', function() { return Inertia::render('Home'); })->name('leveling');
+    Route::get('/battleground', fn() => Inertia::render('ComingSoon', ['title' => 'Battlegrounds']))->name('battleground');
+    Route::get('/woe-damage', fn() => Inertia::render('ComingSoon', ['title' => 'Guild vs Guild']))->name('woe-damage');
+    Route::get('/woe', fn() => Inertia::render('ComingSoon', ['title' => 'War of Emperium']))->name('woe');
+    Route::get('/mvps', fn() => Inertia::render('ComingSoon', ['title' => 'MvP']))->name('mvps');
+    Route::get('/pvp', fn() => Inertia::render('ComingSoon', ['title' => 'PvP']))->name('pvp');
+    Route::get('/cashpoints', fn() => Inertia::render('ComingSoon', ['title' => 'Cash']))->name('cashpoints');
+    Route::get('/zeny', fn() => Inertia::render('ComingSoon', ['title' => 'Zeny']))->name('zeny');
+    Route::get('/playtime', fn() => Inertia::render('ComingSoon', ['title' => 'Playtime']))->name('playtime');
+    Route::get('/leveling', fn() => Inertia::render('ComingSoon', ['title' => 'Level']))->name('leveling');
 });
 
 // ==========================================
 // RUTAS PROTEGIDAS (Solo usuarios logueados)
 // ==========================================
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'require2fa'])->group(function () {
     
     // 2. MODIFICAMOS ESTA RUTA PARA USAR EL CONTROLADOR
     // MASTER ACCOUNT: URL de rApanel, pero nombre interno 'dashboard' de Laravel Auth
@@ -96,26 +97,26 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
     // NUEVAS RUTAS DEL MENÚ DE USUARIO
-    Route::get('/transfer', function() { return Inertia::render('Dashboard'); })->name('account.transfer');
-    Route::get('/vote', function() { return Inertia::render('Dashboard'); })->name('vote');
+    Route::get('/transfer', fn() => Inertia::render('ComingSoon', ['title' => 'Transfer']))->name('account.transfer');
+    Route::get('/vote', fn() => Inertia::render('ComingSoon', ['title' => 'Vote']))->name('vote');
 
     // PERFIL DE USUARIO
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/email', [ProfileController::class, 'changeEmail'])->name('profile.email');
+    Route::put('/profile/email', [ProfileController::class, 'changeEmail'])->middleware('throttle:5,5')->name('profile.email');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Crear cuenta de juego
     Route::post('/game-accounts', [GameAccountController::class, 'store'])->name('game-accounts.store');
 
     // Actualizar contraseña cuenta de juego
-    Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->name('game-accounts.password.update');
+    Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->middleware('throttle:5,5')->name('game-accounts.password.update');
 
     // Logs cuentas de juego
     Route::get('/game-accounts/{account_id}/logs', [GameAccountController::class, 'logs'])->name('game-accounts.logs');
 
     // Eliminar cuenta de juego
-    Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->name('game-accounts.destroy');
+    Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->middleware('throttle:5,10')->name('game-accounts.destroy');
 
     // Ruta para generar/obtener el token de reclamación (debe ir ANTES del wildcard)
     Route::get('/game-accounts/claim-token', [DashboardController::class, 'getClaimToken'])->name('game-accounts.claim.token');
@@ -124,7 +125,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/game-accounts/{account_id}', [GameAccountController::class, 'show'])->name('game-accounts.show');
 
     // Cambio de género de cuenta de juego
-    Route::put('/game-accounts/{account_id}/gender', [GameAccountController::class, 'changeGender'])->name('game-accounts.gender');
+    Route::put('/game-accounts/{account_id}/gender', [GameAccountController::class, 'changeGender'])->middleware('throttle:5,5')->name('game-accounts.gender');
 
     // Acciones de personaje
     Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
@@ -136,7 +137,14 @@ Route::middleware('auth')->group(function () {
 // ==========================================
 // RUTAS DE ADMINISTRACIÓN
 // ==========================================
-Route::middleware(['auth', 'admin', 'require2fa'])->prefix('admin')->name('admin.')->group(function () {
+
+// Verificación 2FA para sesión admin (sin admin.2fa para poder acceder a confirmar)
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/verify-2fa',  [AdminTwoFactorVerifyController::class, 'create'])->name('admin.verify-2fa');
+    Route::post('/verify-2fa', [AdminTwoFactorVerifyController::class, 'store'])->middleware('throttle:5,1')->name('admin.verify-2fa.store');
+});
+
+Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/',              [AdminController::class,         'dashboard'])->name('dashboard');
     Route::get('/users',                     [AdminUserController::class, 'index'])->name('users.index');
     Route::put('/users/{user}',              [AdminUserController::class, 'update'])->name('users.update');
@@ -174,6 +182,7 @@ Route::middleware(['auth', 'admin', 'require2fa'])->prefix('admin')->name('admin
     Route::get('map-db',                              [AdminMapDbController::class, 'index'])->name('map-db.index');
     Route::post('map-db/import-map-cache',            [AdminMapDbController::class, 'importMapCache'])->name('map-db.import-map-cache');
     Route::post('map-db/import-spawns',               [AdminMapDbController::class, 'importSpawns'])->name('map-db.import-spawns');
+    Route::post('map-db/import-map-info',             [AdminMapDbController::class, 'importMapInfo'])->name('map-db.import-map-info');
     Route::delete('map-db/map-cache',                 [AdminMapDbController::class, 'destroyMapCache'])->name('map-db.destroy-map-cache');
     Route::delete('map-db/spawns',                    [AdminMapDbController::class, 'destroySpawns'])->name('map-db.destroy-spawns');
     Route::delete('map-db/{mapName}/spawns',          [AdminMapDbController::class, 'destroyMapSpawns'])->name('map-db.destroy-map-spawns')->where('mapName', '[a-zA-Z0-9_@]+');

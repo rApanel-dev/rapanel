@@ -6,9 +6,10 @@ import MobDbModal from '@/Components/MobDbModal.vue';
 import { useMobDbModal } from '@/Composables/useMobDbModal.js';
 
 const props = defineProps({
-    mapName: String,
-    mapSize: Object,   // { width, height }
-    spawns:  Array,
+    mapName:     String,
+    displayName: { type: String, default: null },
+    mapSize:     Object,   // { width, height }
+    spawns:      Array,
 });
 
 const page = usePage();
@@ -224,7 +225,7 @@ const formatDelay = (ms) => {
 </script>
 
 <template>
-    <Head :title="mapName + ' — ' + __('Map DB')" />
+    <Head :title="(displayName || mapName) + ' — ' + __('Map DB')" />
     <MainLayout :show-bg="true">
 
         <!-- Header -->
@@ -243,7 +244,10 @@ const formatDelay = (ms) => {
                 </div>
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <h1 class="text-2xl font-black text-rapanel-navy-900 dark:text-white tracking-tight font-mono">{{ mapName }}</h1>
+                        <h1 class="text-2xl font-black text-rapanel-navy-900 dark:text-white tracking-tight">
+                            {{ displayName || mapName }}
+                        </h1>
+                        <p v-if="displayName" class="font-mono text-xs text-rapanel-text-light/60 dark:text-white/40 mt-0.5">{{ mapName }}</p>
                         <p class="mt-0.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark tabular-nums">
                             {{ mapSize.width }}×{{ mapSize.height }} &nbsp;·&nbsp;
                             {{ placedSpawns.length }} {{ __('placed spawns') }} &nbsp;·&nbsp;

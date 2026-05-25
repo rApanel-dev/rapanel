@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])
         ->name('two-factor.challenge');
-    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])
+        ->middleware('throttle:5,1');
 });
 
 Route::middleware('guest')->group(function () {
@@ -29,12 +30,14 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:5,1')
         ->name('password.email');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
@@ -62,15 +65,21 @@ Route::middleware('auth')->group(function () {
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    Route::put('password', [PasswordController::class, 'update'])
+        ->middleware('throttle:5,5')
+        ->name('password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
     // Gestión de 2FA en perfil
     Route::get('two-factor', [TwoFactorController::class, 'show'])->name('two-factor.show');
-    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
-    Route::delete('two-factor', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])
+        ->middleware('throttle:5,1')
+        ->name('two-factor.enable');
+    Route::delete('two-factor', [TwoFactorController::class, 'disable'])
+        ->middleware('throttle:5,1')
+        ->name('two-factor.disable');
     Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])
         ->name('two-factor.recovery-codes');
 });

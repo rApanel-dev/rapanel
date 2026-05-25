@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'discordServerId' => config('services.discord.server_id'),
             'twoFactorEnabled'     => config('services.ra.2fa_enabled', false),
             'twoFactorForceAdmins' => config('services.ra.2fa_force_admins', false),
+            'inactivityTimeout'    => config('services.ra.inactivity_timeout', 30),
 
             'latestNews' => Cache::remember('home_latest_news', 120, function () {
                 return News::published()
