@@ -8,8 +8,17 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+
+// Desafío 2FA durante el proceso de login (sin sesión auth completa)
+Route::middleware('guest')->group(function () {
+    Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])
+        ->name('two-factor.challenge');
+    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -57,4 +66,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Gestión de 2FA en perfil
+    Route::get('two-factor', [TwoFactorController::class, 'show'])->name('two-factor.show');
+    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+    Route::delete('two-factor', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])
+        ->name('two-factor.recovery-codes');
 });

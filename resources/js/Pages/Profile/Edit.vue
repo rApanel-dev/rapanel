@@ -68,6 +68,28 @@ const __ = (key) => page.props.translations?.[key] || key;
                 </div>
             </div>
 
+            <!-- ===== CARD: TWO FACTOR AUTHENTICATION ===== -->
+            <div v-if="page.props.twoFactorEnabled"
+                 class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-base font-display font-bold uppercase tracking-widest text-rapanel-navy-900 dark:text-white">
+                            {{ __('Two Factor Authentication') }}
+                        </h3>
+                        <p class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 mt-0.5">
+                            {{ __('Add an extra layer of security to your account.') }}
+                        </p>
+                    </div>
+                    <Link :href="route('two-factor.show')"
+                        class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                        {{ __('Manage') }}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </Link>
+                </div>
+            </div>
+
             <!-- ===== CARD: UPDATE PASSWORD ===== -->
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-xl dark:shadow-black/30 overflow-hidden">
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10">

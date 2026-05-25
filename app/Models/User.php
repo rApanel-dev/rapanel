@@ -27,9 +27,9 @@ use Illuminate\Notifications\Notifiable;
     'api_token'
 ])]
 #[Hidden([
-    'password', 
-    'remember_token', 
-    'two_factor_secret', 
+    'password',
+    'remember_token',
+    'two_factor_secret',
     'two_factor_recovery_codes',
     'api_token'
 ])]
@@ -53,10 +53,24 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'last_login'        => 'datetime',
-            'password'          => 'hashed',
+            'email_verified_at'        => 'datetime',
+            'last_login'               => 'datetime',
+            'two_factor_confirmed_at'  => 'datetime',
+            'password'                 => 'hashed',
         ];
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return ! is_null($this->two_factor_confirmed_at);
+    }
+
+    public function twoFactorRecoveryCodes(): array
+    {
+        if (! $this->two_factor_recovery_codes) {
+            return [];
+        }
+        return json_decode(decrypt($this->two_factor_recovery_codes), true) ?? [];
     }
 
     /**

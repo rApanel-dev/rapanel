@@ -136,7 +136,7 @@ Route::middleware('auth')->group(function () {
 // ==========================================
 // RUTAS DE ADMINISTRACIÓN
 // ==========================================
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'require2fa'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/',              [AdminController::class,         'dashboard'])->name('dashboard');
     Route::get('/users',                     [AdminUserController::class, 'index'])->name('users.index');
     Route::put('/users/{user}',              [AdminUserController::class, 'update'])->name('users.update');
