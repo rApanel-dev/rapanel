@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail; // <-- Descomentado
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,12 +17,13 @@ use Illuminate\Notifications\Notifiable;
     'last_ip',
     'last_login',
     'country',
+    'locale',
     'birthdate',
     'password',
-    'donation_points', 
-    'vote_points', 
-    'role', 
-    'status', 
+    'donation_points',
+    'vote_points',
+    'role',
+    'status',
     'api_token'
 ])]
 #[Hidden([
@@ -52,21 +54,31 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'last_login'        => 'datetime',
+            'password'          => 'hashed',
         ];
     }
 
     /**
      * MAGIA DEL .ENV: Comprueba si el usuario tiene su correo verificado.
      */
-    public function hasVerifiedEmail()
+    public function sendEmailVerificationNotification(): void
     {
-        // Si el panel NO requiere verificación desde el .env, le decimos a Laravel que "ya está verificado"
-        if (env('RA_REQUIRE_EMAIL_VERIFY', false) === false) {
+        $notification = new VerifyEmailNotification;
+
+        if ($this->locale) {
+            $notification = $notification->locale($this->locale);
+        }
+
+        $this->notify($notification);
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        if (! config('services.ra.require_email_verify', false)) {
             return true;
         }
 
-        // Si es true, hace el comportamiento normal de Laravel (revisa si la fecha no es nula)
         return ! is_null($this->email_verified_at);
     }
     /**

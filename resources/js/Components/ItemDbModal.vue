@@ -5,6 +5,7 @@ import WhoSellShopModal from '@/Components/WhoSellShopModal.vue';
 import { useItemDbModal } from '@/Composables/useItemDbModal.js';
 import { useMobDbModal }  from '@/Composables/useMobDbModal.js';
 import { useModalStack }  from '@/Composables/useModalStack.js';
+import { useSafeHtml }    from '@/Composables/useSafeHtml.js';
 
 const page = usePage();
 const __   = (key) => page.props.translations?.[key] || key;
@@ -13,6 +14,8 @@ const { itemDbItem, itemDbCount, closeItemDb } = useItemDbModal();
 const { openMobDb } = useMobDbModal();
 
 const { acquire } = useModalStack();
+const { sanitizeItemDesc } = useSafeHtml();
+const safeItemDesc = computed(() => sanitizeItemDesc(itemDbItem.value?.description_html));
 const modalZ = ref(60);
 
 const activeTab = ref('detail');
@@ -402,7 +405,7 @@ const elementBadge = (el) => {
                                     <div class="px-4 py-4">
                                         <div v-if="itemDbItem.description_html"
                                              class="font-mono text-sm leading-relaxed text-rapanel-navy-900/90 dark:text-white/85"
-                                             v-html="itemDbItem.description_html" />
+                                             v-html="safeItemDesc" />
                                         <p v-else class="text-sm text-rapanel-text-light/50 dark:text-white/40 italic">{{ __('No description available.') }}</p>
                                     </div>
                                 </div>

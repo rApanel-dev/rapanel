@@ -54,6 +54,9 @@ return [
         'bank_enabled'       => env('RA_BANK_ENABLED', false),
         'cashpoints_enabled' => env('RA_CASHPOINTS_ENABLED', false),
         'log_path'           => env('RA_LOG_PATH', null),
+        'require_email_verify' => env('RA_REQUIRE_EMAIL_VERIFY', false),
+        'login_ip'   => env('RA_LOGIN_IP', '127.0.0.1'),
+        'login_port' => env('RA_LOGIN_PORT', 6900),
     ],
 
 ];

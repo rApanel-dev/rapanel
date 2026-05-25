@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Download;
 use App\Models\DownloadCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -92,10 +93,17 @@ class DownloadController extends Controller
         }
 
         if ($download->is_external_url_hidden) {
-            $fileName = $download->file_name ?? basename($download->file_url);
-            return response()->streamDownload(function () use ($download) {
-                echo file_get_contents($download->file_url);
-            }, $fileName);
+            $fileName = $download->file_name ?? basename(parse_url($download->file_url, PHP_URL_PATH) ?? 'download');
+            $response = Http::timeout(30)->get($download->file_url);
+
+            abort_if(! $response->successful(), 502);
+
+            $body        = $response->body();
+            $contentType = $response->header('Content-Type') ?? 'application/octet-stream';
+
+            return response()->streamDownload(function () use ($body) {
+                echo $body;
+            }, $fileName, ['Content-Type' => $contentType]);
         }
 
         return redirect($download->file_url);

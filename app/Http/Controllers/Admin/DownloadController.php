@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Download;
 use App\Models\DownloadCategory;
+use App\Rules\SafeExternalUrl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -64,7 +65,7 @@ class DownloadController extends Controller
             'image'                  => 'nullable|image|max:2048',
             'is_external'            => 'boolean',
             'is_external_url_hidden' => 'boolean',
-            'file_url'               => 'required_if:is_external,true|nullable|url|max:2048',
+            'file_url'               => ['required_if:is_external,true', 'nullable', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeExternalUrl],
             'file_name'              => 'nullable|string|max:255',
             'file'                   => 'required_if:is_external,false|nullable|file|max:524288', // 512MB
             'is_only_auth'           => 'boolean',
@@ -126,7 +127,7 @@ class DownloadController extends Controller
             'image'                  => 'nullable|image|max:2048',
             'is_external'            => 'boolean',
             'is_external_url_hidden' => 'boolean',
-            'file_url'               => 'required_if:is_external,true|nullable|url|max:2048',
+            'file_url'               => ['required_if:is_external,true', 'nullable', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeExternalUrl],
             'file_name'              => 'nullable|string|max:255',
             'file'                   => 'nullable|file|max:524288',
             'is_only_auth'           => 'boolean',

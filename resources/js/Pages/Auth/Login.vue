@@ -29,7 +29,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head :title="__('Log in')" />
+    <Head :title="__('Log in')"><meta name="robots" content="noindex, nofollow"></Head>
 
     <MainLayout :show-bg="true">
         <div class="flex items-center justify-center px-4 py-12">

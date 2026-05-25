@@ -87,11 +87,9 @@ class HandleInertiaRequests extends Middleware
      */
     private function checkRAthenaStatus(): bool
     {
-        // Leemos las variables que me pasaste de tu .env
-        $ip   = env('RA_LOGIN_IP', '127.0.0.1');
-        $port = env('RA_LOGIN_PORT', 6900);
+        $ip   = config('services.ra.login_ip', '127.0.0.1');
+        $port = config('services.ra.login_port', 6900);
 
-        // Intentamos conexión rápida (timeout 1 segundo)
         $connection = @fsockopen($ip, $port, $errno, $errstr, 1);
 
         if ($connection) {

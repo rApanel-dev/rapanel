@@ -30,7 +30,7 @@ class DashboardController extends Controller
             'gameAccounts' => $user->gameAccounts()
                 ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state', 'created_at')
                 ->get(),
-            'maxAccounts' => (int) env('RA_MAX_GAME_ACCOUNTS', 3),
+            'maxAccounts' => (int) config('services.ra.max_accounts', 3),
             'viewedUser'  => [
                 'id'     => $user->id,
                 'name'   => $user->name,

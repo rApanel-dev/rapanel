@@ -94,7 +94,7 @@ const __ = (key) => page.props.translations?.[key] || key;
                     </p>
                 </div>
                 <div class="p-6">
-                    <DeleteUserForm />
+                    <DeleteUserForm :status="status" />
                 </div>
             </div>
 

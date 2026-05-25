@@ -7,28 +7,28 @@ import CountryFlag from 'vue-country-flag-next';
 const currentLocale = computed(() => usePage().props.locale || 'en');
 
 const languages = [
-    { code: 'en', name: 'English', flag: 'us' },
-    { code: 'es', name: 'Español', flag: 'es' },
+    { code: 'en', name: 'English',   flag: 'us' },
+    { code: 'es', name: 'Español',   flag: 'es' },
     { code: 'pt', name: 'Português', flag: 'pt' },
-    { code: 'fr', name: 'Français', flag: 'fr' },
+    { code: 'fr', name: 'Français',  flag: 'fr' },
 ];
 
 const changeLocale = (locale) => {
     router.get(route('setlang', locale), {}, {
         preserveScroll: true,
-        onSuccess: () => {
-            localStorage.setItem("lang", locale);
-        },
+        onSuccess: () => localStorage.setItem("lang", locale),
     });
 };
 </script>
 
 <template>
     <Menu as="div" class="relative inline-block text-left">
-        <MenuButton class="flex items-center justify-center w-10 h-10 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition overflow-hidden">
-            <div class="scale-110"> <CountryFlag 
-                    :country="currentLocale === 'en' ? 'us' : currentLocale" 
-                    size="normal" 
+        <MenuButton class="flex items-center justify-center w-10 h-10 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition">
+            <div style="width:28px;height:21px;overflow:hidden;border-radius:3px;flex-shrink:0">
+                <CountryFlag
+                    :country="currentLocale === 'en' ? 'us' : currentLocale"
+                    size="big"
+                    :style="{ margin: '0', transform: 'scale(0.538)', transformOrigin: 'top left', display: 'block' }"
                 />
             </div>
         </MenuButton>
@@ -51,8 +51,12 @@ const changeLocale = (locale) => {
                                 'group flex w-full items-center px-4 py-2 text-sm transition'
                             ]"
                         >
-                            <div class="mr-3 scale-75">
-                                <CountryFlag :country="lang.flag" size="normal" />
+                            <div style="width:32px;height:24px;overflow:hidden;border-radius:3px;flex-shrink:0;margin-right:12px">
+                                <CountryFlag
+                                    :country="lang.flag"
+                                    size="big"
+                                    :style="{ margin: '0', transform: 'scale(0.615)', transformOrigin: 'top left', display: 'block' }"
+                                />
                             </div>
                             {{ lang.name }}
                         </button>
@@ -62,10 +66,3 @@ const changeLocale = (locale) => {
         </transition>
     </Menu>
 </template>
-
-<style scoped>
-/* Esto quita márgenes fantasma que la librería de banderas añade a veces */
-.vue-country-flag {
-    margin: 0 !important;
-}
-</style>

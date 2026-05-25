@@ -1,2 +1,4 @@
+# Este archivo es reemplazado dinámicamente por la ruta /robots.txt de Laravel.
+# Ver: resources/views/robots.blade.php
 User-agent: *
 Disallow:

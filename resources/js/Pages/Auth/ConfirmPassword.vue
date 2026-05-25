@@ -21,7 +21,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head :title="__('Confirm Password')" />
+    <Head :title="__('Confirm Password')"><meta name="robots" content="noindex, nofollow"></Head>
 
     <MainLayout :show-bg="true">
         <div class="flex items-center justify-center px-4 py-12">

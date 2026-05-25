@@ -27,7 +27,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head :title="__('Register')" />
+    <Head :title="__('Register')"><meta name="robots" content="noindex, nofollow"></Head>
 
     <MainLayout :show-bg="true">
         <div class="flex items-center justify-center px-4 py-12">

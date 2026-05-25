@@ -114,4 +114,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification
+    |--------------------------------------------------------------------------
+    | Tiempo en minutos que tiene el usuario para verificar su email.
+    | Pasado este tiempo el link expira y debe solicitar uno nuevo.
+    */
+
+    'verification' => [
+        'expire' => 10,
+    ],
+
 ];

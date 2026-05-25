@@ -33,6 +33,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user          = Auth::user();
+        $sessionLocale = session('locale');
+
+        if ($user->locale && $user->locale !== $sessionLocale) {
+            // El usuario tenía preferencia guardada → restaurarla a la sesión
+            session(['locale' => $user->locale]);
+            app()->setLocale($user->locale);
+        } elseif ($sessionLocale && ! $user->locale) {
+            // El usuario no tenía preferencia guardada → persistir la de la sesión
+            $user->update(['locale' => $sessionLocale]);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

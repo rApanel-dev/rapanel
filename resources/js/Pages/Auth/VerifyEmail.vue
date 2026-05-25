@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted, watch } from 'vue';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 
 const props = defineProps({
     status: { type: String },
@@ -18,10 +18,33 @@ const submit = () => {
 };
 
 const verificationLinkSent = computed(() => props.status === 'verification-link-sent');
+
+// Polling: detecta verificación desde otro dispositivo
+let pollTimer = null;
+
+onMounted(() => {
+    pollTimer = setInterval(() => {
+        router.reload({ only: ['auth'] });
+    }, 4000);
+});
+
+onUnmounted(() => {
+    clearInterval(pollTimer);
+});
+
+watch(
+    () => page.props.auth.user?.email_verified_at,
+    (verifiedAt) => {
+        if (verifiedAt) {
+            clearInterval(pollTimer);
+            router.visit(route('dashboard'));
+        }
+    }
+);
 </script>
 
 <template>
-    <Head :title="__('Email Verification')" />
+    <Head :title="__('Email Verification')"><meta name="robots" content="noindex, nofollow"></Head>
 
     <MainLayout :show-bg="true">
         <div class="flex items-center justify-center px-4 py-12">
@@ -60,7 +83,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                                 {{ __('Resend Verification Email') }}
                             </PrimaryButton>
 
-                            <p class="text-center text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+<p class="text-center text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
                                 {{ __('Wrong account?') }}
                                 <Link
                                     :href="route('logout')"

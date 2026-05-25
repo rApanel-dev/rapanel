@@ -2,6 +2,7 @@
 import { Head, Link, usePage, useForm, router } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import { computed, ref } from 'vue';
+import { useSafeHtml } from '@/Composables/useSafeHtml';
 
 const props = defineProps({
     news:     Object,
@@ -11,6 +12,9 @@ const props = defineProps({
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
+
+const { sanitizeNews } = useSafeHtml();
+const safeBody = computed(() => sanitizeNews(props.news?.body));
 
 const auth = computed(() => page.props.auth?.user ?? null);
 const isAdmin = computed(() => auth.value?.role === 'Admin');
@@ -135,7 +139,7 @@ const deleteComment = (commentId) => {
                         <!-- Body -->
                         <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 sm:p-8">
                             <div class="news-body text-rapanel-text-light dark:text-rapanel-text-dark"
-                                 v-html="news.body" />
+                                 v-html="safeBody" />
 
                             <!-- Like button -->
                             <div class="mt-6 pt-5 border-t border-rapanel-navy-100 dark:border-white/[0.07] flex items-center gap-3">

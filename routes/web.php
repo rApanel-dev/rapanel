@@ -33,6 +33,14 @@ use App\Http\Controllers\Admin\MapDbController as AdminMapDbController;
 use App\Http\Controllers\ItemDbController;
 use App\Http\Controllers\MobDbController;
 use App\Http\Controllers\MapDbController;
+use App\Http\Controllers\SitemapController;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    $content = view('robots')->render();
+    return response($content, 200, ['Content-Type' => 'text/plain']);
+});
 
 Route::get('/', function () {
     return Inertia::render('Home', [        
@@ -94,6 +102,7 @@ Route::middleware('auth')->group(function () {
     // PERFIL DE USUARIO
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/email', [ProfileController::class, 'changeEmail'])->name('profile.email');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Crear cuenta de juego
@@ -181,10 +190,17 @@ Route::get('/guild-emblem/{guild_id}', [GuildController::class, 'emblem'])
     ->where('guild_id', '[0-9]+')
     ->name('guild.emblem');
 
+Route::get('profile/delete-confirm/{id}/{hash}', [ProfileController::class, 'confirmDeletion'])
+    ->middleware(['signed', 'throttle:3,1'])
+    ->name('profile.delete-confirm');
+
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'es', 'pt', 'fr'])) {
         Session::put('locale', $locale);
         App::setLocale($locale);
+        if (auth()->check()) {
+            auth()->user()->update(['locale' => $locale]);
+        }
     }
     return back();
 })->name('setlang');
