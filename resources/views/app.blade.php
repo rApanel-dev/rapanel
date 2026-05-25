@@ -21,6 +21,17 @@
         $ogImgV    = $fv('images/web_share.jpg');
         $appName   = config('app.name', 'rApanel');
         $appUrl    = config('app.url');
+        $jsonLd    = json_encode([
+            '@context'            => 'https://schema.org',
+            '@type'               => 'WebApplication',
+            'name'                => $appName,
+            'url'                 => $appUrl,
+            'description'         => 'Panel de control para servidores Ragnarok Online rAthena/Hercules.',
+            'applicationCategory' => 'GameApplication',
+            'operatingSystem'     => 'Web Browser',
+            'inLanguage'          => ['en', 'es', 'pt', 'fr'],
+            'offers'              => ['@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD'],
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     @endphp
 
     {{-- Primary meta --}}
@@ -50,23 +61,7 @@
     <meta name="twitter:image:alt" content="{{ $appName }} — Ragnarok Online Server Panel">
 
     {{-- JSON-LD Structured Data --}}
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": {!! json_encode($appName) !!},
-        "url": {!! json_encode($appUrl) !!},
-        "description": "Panel de control para servidores Ragnarok Online rAthena/Hercules.",
-        "applicationCategory": "GameApplication",
-        "operatingSystem": "Web Browser",
-        "inLanguage": ["en", "es", "pt", "fr"],
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        }
-    }
-    </script>
+    <script type="application/ld+json">{!! $jsonLd !!}</script>
 
     {{-- Favicons & PWA --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $fv('icons/apple-touch-icon.png') }}">
