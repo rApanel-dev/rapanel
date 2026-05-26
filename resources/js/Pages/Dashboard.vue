@@ -146,7 +146,8 @@ const openClaimModal = () => {
                     </h3>
                 </div>
                 
-                <div class="overflow-x-auto">
+                <!-- Tabla: md+ -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-rapanel-text-light/80 dark:text-rapanel-text-dark uppercase text-xs font-bold">
                             <tr>
@@ -155,7 +156,7 @@ const openClaimModal = () => {
                                 <th class="px-6 py-4 text-center">{{ __('Login Count') }}</th>
                                 <th class="px-6 py-4 text-center">{{ __('Last Login') }}</th>
                                 <th class="px-6 py-4 text-center">{{ __('Last IP') }}</th>
-                                <th class="px-6 py-4 text-center">{{ __('Created') }}</th>   
+                                <th class="px-6 py-4 text-center">{{ __('Created') }}</th>
                                 <th class="px-6 py-4 text-center">{{ __('Status') }}</th>
                                 <th class="px-6 py-4 text-center">{{ __('Actions') }}</th>
                             </tr>
@@ -172,15 +173,9 @@ const openClaimModal = () => {
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">{{ account.logincount }}</td>
-                                <td class="px-6 py-4 text-center text-xs italic">
-                                    {{ account.lastlogin || __('Never') }}
-                                </td>
-                                <td class="px-6 py-4 text-center text-xs italic">
-                                    {{ account.last_ip || __('Unknown') }}
-                                </td>
-                                <td class="px-6 py-4 text-center text-xs italic">
-                                    {{ account.created_at || __('Unknown') }}
-                                </td>
+                                <td class="px-6 py-4 text-center text-xs italic">{{ account.lastlogin || __('Never') }}</td>
+                                <td class="px-6 py-4 text-center text-xs italic">{{ account.last_ip || __('Unknown') }}</td>
+                                <td class="px-6 py-4 text-center text-xs italic">{{ account.created_at || __('Unknown') }}</td>
                                 <td class="px-6 py-4 text-center">
                                     <StatusBadge
                                         :variant="account.state === 0 ? 'success' : 'danger'"
@@ -209,6 +204,48 @@ const openClaimModal = () => {
                             />
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Cards: móvil -->
+                <div class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-white/10">
+                    <div v-if="gameAccountsCount === 0" class="px-6 py-10 text-center text-sm text-rapanel-text-light/50 dark:text-white/30">
+                        {{ __('No game accounts found. Create or claim your first one above!') }}
+                    </div>
+                    <div v-for="account in gameAccounts" :key="account.userid"
+                         class="px-5 py-4 flex items-center justify-between gap-3 hover:bg-rapanel-navy-50/40 dark:hover:bg-white/[0.02] transition-colors">
+                        <div class="min-w-0 flex-1">
+                            <!-- Nombre + género -->
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="font-bold text-rapanel-blue truncate">{{ account.userid }}</span>
+                                <span v-if="account.sex === 'M'" class="text-blue-400 text-base leading-none shrink-0">♂</span>
+                                <span v-else class="text-pink-400 text-base leading-none shrink-0">♀</span>
+                            </div>
+                            <!-- Meta: último login + IP -->
+                            <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-rapanel-text-light/55 dark:text-white/35">
+                                <span>{{ __('Last Login') }}: <span class="italic">{{ account.lastlogin || __('Never') }}</span></span>
+                                <span>{{ __('Login Count') }}: {{ account.logincount }}</span>
+                            </div>
+                        </div>
+                        <!-- Status + acción -->
+                        <div class="flex flex-col items-end gap-2 shrink-0">
+                            <StatusBadge
+                                :variant="account.state === 0 ? 'success' : 'danger'"
+                                :label="account.state === 0 ? __('Active') : __('Banned')"
+                                size="sm"
+                                dot
+                            />
+                            <Link
+                                :href="route('game-accounts.show', account.account_id)"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {{ __('View') }}
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

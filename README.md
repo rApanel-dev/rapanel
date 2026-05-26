@@ -173,16 +173,18 @@ Panel code always uses `DB::table('users')` (no prefix in the code — Laravel a
 
 ## Optional: Game Asset Setup
 
-The panel can display item icons, illustrations, and card images if you place them in `public/data/`:
+The panel can display item icons, illustrations, card images, and more if you place them in `public/data/`:
 
 ```
 public/data/
 ├── items/
-│   ├── icons/          # Item icons      → /data/items/icons/{item_id}.png
-│   ├── images/         # Item images     → /data/items/images/{item_id}.png
-│   └── cards/          # Card art        → /data/items/cards/{item_id}.png
-└── gameaccount/
-    └── job_icons/      # Job class icons
+│   ├── item/           # Item icons         → /data/items/item/{nameid}.png
+│   ├── collection/     # Item illustrations → /data/items/collection/{nameid}.png
+│   └── cards/          # Card art           → /data/items/cards/{nameid}.png
+├── icon_jobs/          # Job class icons    → /data/icon_jobs/icon_jobs_{class}.png
+├── maps/               # Map previews       → /data/maps/{map}.png
+├── monsters/           # Monster sprites    → /data/monsters/{id}.png
+└── gameaccount/        # Feature icons (bank, VIP, cash points, etc.)
 ```
 
 These folders are git-ignored — you manage the files independently.
@@ -198,6 +200,9 @@ The admin panel includes importers for rAthena databases. Go to **Admin → Item
 | Item DB (YML) | All `item_db_*.yml` files from your game mode folder — select them all at once. Pre-renewal has 3 files; renewal may have more. | `db/re/` or `db/pre-re/` |
 | Item DB (LUA) | `itemInfo.lua` — optional, enriches display names | client `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` or `db/pre-re/` |
+| Map DB — Cache | `map_cache.dat` — imports map dimensions (width/height) | `db/map_cache.dat` |
+| Map DB — Spawns | One or more `mob_db_*.yml` or spawn files | `db/re/` or `db/pre-re/` |
+| Map DB — Info | `mapInfo.lua` — optional, enriches map display names | client `data/luafiles514/lua files/datainfo/` |
 
 Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and Normal monster cards and lets you toggle which ones are visible on the public page.
 
@@ -209,8 +214,10 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 - Register a master (panel) account and link it to existing rAthena accounts via a claim token
 - Create new rAthena game accounts (up to the configured limit)
 - Change game account password and gender
+- Two-factor authentication (TOTP / authenticator app)
 - View characters with job, stats, equipment, inventory, cart, and storage
 - Reset character position and appearance
+- Mobile-responsive interface — installable as a PWA on Android and iOS
 
 ### Public pages
 - **News** — with reactions and comments

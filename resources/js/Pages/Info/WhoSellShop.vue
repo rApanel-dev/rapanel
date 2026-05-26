@@ -116,81 +116,86 @@ const copyNavigation = () => {
         <!-- ── Content ── -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-            <!-- Tabla -->
+            <!-- Tabla / Cards -->
             <div v-if="items.length" class="bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
+
+                <!-- Tabla: md+ -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-left">
-                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark">
-                                    {{ __('Item') }}
-                                </th>
-                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark text-center">
-                                    {{ __('Qty') }}
-                                </th>
-                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark text-right">
-                                    {{ __('Price') }}
-                                </th>
+                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Item') }}</th>
+                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark text-center">{{ __('Qty') }}</th>
+                                <th class="px-4 py-3 text-xs font-black uppercase tracking-widest text-rapanel-text-light dark:text-rapanel-text-dark text-right">{{ __('Price') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.05]">
-                            <tr v-for="(item, i) in items" :key="i"
-                                class="hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.03] transition-colors duration-150">
-
-                                <!-- Item -->
+                            <tr v-for="(item, i) in items" :key="i" class="hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.03] transition-colors duration-150">
                                 <td class="px-4 py-3">
-                                    <div class="flex items-center gap-3 cursor-pointer"
-                                         @click="openItemDb(item.nameid, item)">
-                                        <img :src="itemImg(item.nameid)" :alt="item.item_name"
-                                             class="w-9 h-9 object-contain shrink-0"
-                                             @error="$event.target.style.display='none'" />
+                                    <div class="flex items-center gap-3 cursor-pointer" @click="openItemDb(item.nameid, item)">
+                                        <img :src="itemImg(item.nameid)" :alt="item.item_name" class="w-9 h-9 object-contain shrink-0" @error="$event.target.style.display='none'" />
                                         <div class="min-w-0">
                                             <div class="flex items-center gap-1.5 flex-wrap">
                                                 <span v-if="item.refine > 0" class="text-xs font-black text-rapanel-blue shrink-0">+{{ item.refine }}</span>
                                                 <span class="font-semibold text-rapanel-navy-900 dark:text-white text-sm">{{ item.item_name }}</span>
                                                 <span v-if="item.slots > 0" class="text-xs font-semibold text-rapanel-text-light/50 dark:text-white/35 shrink-0">[{{ item.slots }}]</span>
                                             </div>
-                                            <!-- Forged badges -->
                                             <div v-if="item.forged" class="flex flex-wrap gap-1 mt-1">
-                                                <span v-if="item.forged.stars_label" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">
-                                                    {{ item.forged.stars_label }}
-                                                </span>
-                                                <span v-if="item.forged.element" :class="['inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold border', elementStyle(item.forged.element)]">
-                                                    {{ item.forged.element }}
-                                                </span>
-                                                <span v-if="item.forged.creator_name" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-navy-100 dark:bg-white/10 text-rapanel-text-light dark:text-white/60 border border-rapanel-navy-200 dark:border-white/15">
-                                                    {{ item.forged.creator_name }}
-                                                </span>
+                                                <span v-if="item.forged.stars_label" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">{{ item.forged.stars_label }}</span>
+                                                <span v-if="item.forged.element" :class="['inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold border', elementStyle(item.forged.element)]">{{ item.forged.element }}</span>
+                                                <span v-if="item.forged.creator_name" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-navy-100 dark:bg-white/10 text-rapanel-text-light dark:text-white/60 border border-rapanel-navy-200 dark:border-white/15">{{ item.forged.creator_name }}</span>
                                             </div>
-                                            <!-- Card badges -->
                                             <div v-else-if="item.cards.length" class="flex flex-wrap gap-1 mt-1">
-                                                <span v-for="card in item.cards" :key="card.id" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">
-                                                    {{ card.name }}
-                                                </span>
+                                                <span v-for="card in item.cards" :key="card.id" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">{{ card.name }}</span>
                                             </div>
-                                            <div class="mt-0.5">
-                                                <span class="text-[10px] text-rapanel-text-light/40 dark:text-white/25">ID: {{ item.nameid }}</span>
-                                            </div>
+                                            <div class="mt-0.5"><span class="text-[10px] text-rapanel-text-light/40 dark:text-white/25">ID: {{ item.nameid }}</span></div>
                                         </div>
                                     </div>
                                 </td>
-
-                                <!-- Qty -->
                                 <td class="px-4 py-3 text-center">
-                                    <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-md text-xs font-bold bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-text-light dark:text-rapanel-text-dark border border-rapanel-navy-200 dark:border-white/10">
-                                        {{ item.amount }}
-                                    </span>
+                                    <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-md text-xs font-bold bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-text-light dark:text-rapanel-text-dark border border-rapanel-navy-200 dark:border-white/10">{{ item.amount }}</span>
                                 </td>
-
-                                <!-- Price -->
                                 <td class="px-4 py-3 whitespace-nowrap text-right">
                                     <span class="font-bold" :style="priceStyle(item.price)">{{ formatPrice(item.price) }}</span>
                                     <span class="text-[10px] font-semibold text-rapanel-text-light dark:text-rapanel-text-dark ml-1">Z</span>
                                 </td>
-
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Cards: móvil -->
+                <div class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-white/[0.05]">
+                    <div v-for="(item, i) in items" :key="i"
+                         class="px-4 py-4 flex items-start gap-3 hover:bg-rapanel-navy-50/50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                         @click="openItemDb(item.nameid, item)">
+                        <img :src="itemImg(item.nameid)" :alt="item.item_name"
+                             class="w-10 h-10 object-contain shrink-0 mt-0.5"
+                             @error="$event.target.style.display='none'" />
+                        <div class="flex-1 min-w-0">
+                            <!-- Nombre -->
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span v-if="item.refine > 0" class="text-xs font-black text-rapanel-blue shrink-0">+{{ item.refine }}</span>
+                                <span class="font-semibold text-rapanel-navy-900 dark:text-white text-sm">{{ item.item_name }}</span>
+                                <span v-if="item.slots > 0" class="text-xs font-semibold text-rapanel-text-light/50 dark:text-white/35">[{{ item.slots }}]</span>
+                            </div>
+                            <!-- Badges -->
+                            <div v-if="item.forged" class="flex flex-wrap gap-1 mt-1">
+                                <span v-if="item.forged.stars_label" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">{{ item.forged.stars_label }}</span>
+                                <span v-if="item.forged.element" :class="['inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold border', elementStyle(item.forged.element)]">{{ item.forged.element }}</span>
+                                <span v-if="item.forged.creator_name" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-navy-100 dark:bg-white/10 text-rapanel-text-light dark:text-white/60 border border-rapanel-navy-200 dark:border-white/15">{{ item.forged.creator_name }}</span>
+                            </div>
+                            <div v-else-if="item.cards.length" class="flex flex-wrap gap-1 mt-1">
+                                <span v-for="card in item.cards" :key="card.id" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/25 dark:bg-rapanel-gold/15 dark:border-rapanel-gold/30">{{ card.name }}</span>
+                            </div>
+                            <!-- Qty + Precio -->
+                            <div class="flex items-center gap-2 mt-1.5">
+                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-md text-xs font-bold bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-text-light dark:text-rapanel-text-dark border border-rapanel-navy-200 dark:border-white/10">×{{ item.amount }}</span>
+                                <span class="font-bold text-sm" :style="priceStyle(item.price)">{{ formatPrice(item.price) }}</span>
+                                <span class="text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark">Z</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

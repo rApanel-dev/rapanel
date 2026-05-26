@@ -173,16 +173,18 @@ El código del panel usa siempre `DB::table('users')` (sin prefijo en el código
 
 ## Opcional: Assets del juego
 
-El panel puede mostrar iconos, ilustraciones e imágenes de cartas si los colocas en `public/data/`:
+El panel puede mostrar iconos, ilustraciones, imágenes de cartas y más si los colocas en `public/data/`:
 
 ```
 public/data/
 ├── items/
-│   ├── icons/          # Iconos de ítems   → /data/items/icons/{item_id}.png
-│   ├── images/         # Imágenes de ítems → /data/items/images/{item_id}.png
-│   └── cards/          # Arte de cartas    → /data/items/cards/{item_id}.png
-└── gameaccount/
-    └── job_icons/      # Iconos de clase/trabajo
+│   ├── item/           # Iconos de ítems        → /data/items/item/{nameid}.png
+│   ├── collection/     # Ilustraciones de ítems → /data/items/collection/{nameid}.png
+│   └── cards/          # Arte de cartas         → /data/items/cards/{nameid}.png
+├── icon_jobs/          # Iconos de clase/trabajo → /data/icon_jobs/icon_jobs_{class}.png
+├── maps/               # Vistas previas de mapas → /data/maps/{map}.png
+├── monsters/           # Sprites de monstruos    → /data/monsters/{id}.png
+└── gameaccount/        # Iconos de funciones (banco, VIP, cash points, etc.)
 ```
 
 Estas carpetas están en `.gitignore` — los archivos se gestionan de forma independiente.
@@ -198,6 +200,9 @@ El panel incluye importadores para las bases de datos YAML y LUA de rAthena. Ve 
 | Item DB (YML) | Todos los archivos `item_db_*.yml` de la carpeta de tu modo de juego — seleccionarlos todos a la vez. Pre-renewal tiene 3 archivos; renewal puede tener más. | `db/re/` o `db/pre-re/` |
 | Item DB (LUA) | `itemInfo.lua` — opcional, enriquece los nombres de display | cliente `data/luafiles514/lua files/datainfo/` |
 | Mob DB | `mob_db.yml` | `db/re/` o `db/pre-re/` |
+| Map DB — Caché | `map_cache.dat` — importa las dimensiones de los mapas | `db/map_cache.dat` |
+| Map DB — Spawns | Uno o más archivos de spawn | `db/re/` o `db/pre-re/` |
+| Map DB — Info | `mapInfo.lua` — opcional, enriquece los nombres de display de los mapas | cliente `data/luafiles514/lua files/datainfo/` |
 
 Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de monstruos MVP, Boss y Normal, y permite activar cuáles son visibles en la página pública.
 
@@ -209,8 +214,10 @@ Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de mo
 - Registrar una cuenta maestra y vincularla a cuentas rAthena existentes mediante un token de reclamación
 - Crear nuevas cuentas de juego rAthena (hasta el límite configurado)
 - Cambiar contraseña y género de la cuenta de juego
+- Autenticación de dos factores (TOTP / app autenticadora)
 - Ver personajes con clase, stats, equipamiento, inventario, carrito y almacenamiento
 - Resetear posición y apariencia del personaje
+- Interfaz responsive para móvil — instalable como PWA en Android e iOS
 
 ### Páginas públicas
 - **Noticias** — con reacciones y comentarios

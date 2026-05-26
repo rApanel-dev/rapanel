@@ -423,7 +423,8 @@ const { openItemDb } = useItemDbModal();
                     {{ __('No characters found.') }}
                 </div>
 
-                <div v-else class="overflow-x-auto">
+                <!-- Tabla: md+ -->
+                <div v-else class="hidden md:block overflow-x-auto">
                     <table class="w-full text-sm text-left">
                         <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                             <tr>
@@ -448,12 +449,7 @@ const { openItemDb } = useItemDbModal();
                                 </td>
                                 <td class="px-4 py-3 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                                     <div class="flex items-center gap-1.5">
-                                        <img
-                                            :src="`/data/icon_jobs/icon_jobs_${char.class}.png`"
-                                            @error="onImgError"
-                                            class="w-5 h-5 object-contain shrink-0"
-                                            :alt="getJobName(char.class)"
-                                        />
+                                        <img :src="`/data/icon_jobs/icon_jobs_${char.class}.png`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="getJobName(char.class)" />
                                         {{ getJobName(char.class) }}
                                     </div>
                                 </td>
@@ -474,25 +470,17 @@ const { openItemDb } = useItemDbModal();
                                         size="sm"
                                     />
                                 </td>
-                                <!-- Actions column — orden: gold, blue, purple, navy -->
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-center gap-1">
-                                        <!-- Preferences (gold) -->
-                                        <ActionButton variant="gold" size="sm" @click="openPrefModal(char)"
-                                            :title="__('Character Preferences')"
-                                            :class="getCharPref(char.char_id)?.hide_from_rankings ? 'ring-1 ring-rapanel-gold' : ''"
-                                        >
+                                        <ActionButton variant="gold" size="sm" @click="openPrefModal(char)" :title="__('Character Preferences')" :class="getCharPref(char.char_id)?.hide_from_rankings ? 'ring-1 ring-rapanel-gold' : ''">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                         </ActionButton>
-                                        <!-- Change Slot (blue) -->
                                         <ActionButton variant="blue" size="sm" @click="openSlotModal(char)" :disabled="char.online > 0" :title="__('Change Slot')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
                                         </ActionButton>
-                                        <!-- Reset Look (purple) -->
                                         <ActionButton variant="purple" size="sm" @click="openResetLookModal(char)" :disabled="char.online > 0" :title="__('Reset Look')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/></svg>
                                         </ActionButton>
-                                        <!-- Reset Position (navy) -->
                                         <ActionButton variant="navy" size="sm" @click="openResetPosModal(char)" :disabled="char.online > 0" :title="__('Reset Position')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
                                         </ActionButton>
@@ -509,6 +497,60 @@ const { openItemDb } = useItemDbModal();
                         </tfoot>
                     </table>
                 </div>
+
+                <!-- Cards: móvil -->
+                <div v-if="characters.length > 0" class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
+                    <div v-for="char in characters" :key="char.char_id"
+                         class="px-4 py-4 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                        <!-- Fila principal: nombre + dot estado -->
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span :class="char.online > 0 ? 'bg-rapanel-success' : 'bg-rapanel-text-light/25 dark:bg-white/20'" class="w-2 h-2 rounded-full shrink-0 mt-0.5"></span>
+                                    <button @click="openCharModal(char)" class="font-bold text-rapanel-blue hover:underline text-left text-sm leading-tight">
+                                        {{ char.name }}
+                                    </button>
+                                    <span class="text-[10px] font-mono text-rapanel-text-light/40 dark:text-white/25">·{{ char.char_num + 1 }}</span>
+                                </div>
+                                <!-- Job + nivel -->
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    <img :src="`/data/icon_jobs/icon_jobs_${char.class}.png`" @error="onImgError" class="w-4 h-4 object-contain shrink-0" />
+                                    <span class="text-xs text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ getJobName(char.class) }}</span>
+                                    <span class="text-rapanel-text-light/30 dark:text-white/20 text-xs">·</span>
+                                    <span class="text-xs font-bold text-rapanel-navy-900 dark:text-white">{{ char.base_level }}<span class="text-rapanel-text-light/40 dark:text-white/30 font-normal">/</span>{{ char.job_level }}</span>
+                                </div>
+                                <!-- Zeny + guild -->
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-xs font-mono text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(char.zeny) }} z</span>
+                                    <span v-if="char.guild_name" class="flex items-center gap-1 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-4 h-4 object-contain shrink-0" />
+                                        {{ char.guild_name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Botones acción 2×2 -->
+                            <div class="grid grid-cols-2 gap-1 shrink-0">
+                                <ActionButton variant="gold" size="sm" @click="openPrefModal(char)" :title="__('Character Preferences')" :class="getCharPref(char.char_id)?.hide_from_rankings ? 'ring-1 ring-rapanel-gold' : ''">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </ActionButton>
+                                <ActionButton variant="blue" size="sm" @click="openSlotModal(char)" :disabled="char.online > 0" :title="__('Change Slot')">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                                </ActionButton>
+                                <ActionButton variant="purple" size="sm" @click="openResetLookModal(char)" :disabled="char.online > 0" :title="__('Reset Look')">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/></svg>
+                                </ActionButton>
+                                <ActionButton variant="navy" size="sm" @click="openResetPosModal(char)" :disabled="char.online > 0" :title="__('Reset Position')">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                                </ActionButton>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Zeny móvil -->
+                    <div class="px-4 py-3 bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 flex items-center justify-between">
+                        <span class="text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</span>
+                        <span class="font-mono font-bold text-sm text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</span>
+                    </div>
+                </div>
             </div>
 
             <!-- ===== SECCIÓN 3: STORAGE ITEMS ===== -->
@@ -524,7 +566,8 @@ const { openItemDb } = useItemDbModal();
                     {{ __('No storage items found.') }}
                 </div>
 
-                <div v-else class="overflow-x-auto max-h-96 overflow-y-auto">
+                <!-- Tabla: md+ -->
+                <div v-else class="hidden md:block overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full text-xs text-left">
                         <thead class="sticky top-0 z-10 bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                             <tr>
@@ -571,6 +614,33 @@ const { openItemDb } = useItemDbModal();
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Cards storage: móvil -->
+                <div v-if="storageItems.length > 0" class="md:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30 max-h-96 overflow-y-auto">
+                    <div v-for="(item, idx) in storageItems" :key="idx"
+                         class="px-3 py-3 flex items-center gap-3 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors cursor-pointer"
+                         @click="openItemDb(item.nameid, item)">
+                        <div class="flex flex-col items-center gap-0.5 shrink-0 w-10">
+                            <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-9 h-9 object-contain" :alt="item.name_english" />
+                            <span class="font-mono text-[9px] text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 mt-0.5 whitespace-nowrap">ID: {{ item.nameid }}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span v-if="item.refine > 0" class="text-xs font-bold text-rapanel-danger dark:text-rapanel-gold shrink-0">+{{ item.refine }}</span>
+                                <span class="text-sm font-medium text-rapanel-navy-900 dark:text-white truncate">{{ itemLabel(item) }}</span>
+                                <span v-if="item.attribute > 0" class="text-rapanel-danger font-bold text-[10px] shrink-0">[{{ __('Broken') }}]</span>
+                            </div>
+                            <div v-if="['card0','card1','card2','card3'].some(s => getCardName(item[s]))" class="grid grid-cols-2 gap-1 mt-1">
+                                <template v-for="slot in ['card0','card1','card2','card3']" :key="slot">
+                                    <span v-if="getCardName(item[slot])"
+                                          class="text-[10px] font-medium text-rapanel-blue bg-rapanel-blue/10 border border-rapanel-blue/20 px-1.5 py-0.5 rounded truncate cursor-pointer"
+                                          @click.stop="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
+                                </template>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 shrink-0">×{{ item.amount }}</span>
+                    </div>
                 </div>
             </div>
 

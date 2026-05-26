@@ -90,7 +90,7 @@ const scrollTo = (id) => {
             <div class="relative z-10 container mx-auto py-10 px-6">
 
                 <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-white drop-shadow text-center mb-16">
-                    {{ __('Stay Update') }}
+                    {{ __('Stay Updated') }}
                 </h1>
 
                 <!-- 3-column grid — todas las columnas con h-[520px] para altura uniforme -->
@@ -182,7 +182,7 @@ const scrollTo = (id) => {
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('About Us') }}</h2>
                             <p class="text-base text-white/85 leading-relaxed">
                                 <span class="font-bold text-rapanel-blue">{{ $page.props.serverName }}</span>
-                                {{ __('is a private server of Ragnarok Online, we are a community that aims to bring back the good old times! We have many custom additions that will get you thrilled and busy! In our community you will find infinity of surprises that you will not be able to see in the rest of the servers and Staff committed in providing the best support.') }}
+                                {{ __("is a private Ragnarok Online server with a passionate community at its core. We offer a carefully crafted experience with dedicated staff and custom content, where every player matters. Whether you're a veteran adventurer or a newcomer, there's always something new to discover.") }}
                             </p>
                         </div>
 
@@ -193,7 +193,7 @@ const scrollTo = (id) => {
                         <div>
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('Community') }}</h2>
                             <p class="text-base text-white/85 leading-relaxed">
-                                {{ __('We see no reason to have dead forums, we communicate in real time using Discord. Do you have any questions, suggestions, or ideas? Feel free to ask us on our Discord channel.') }}
+                                {{ __('We communicate in real time through Discord — no dead forums, just an active community ready to help. Have questions, suggestions, or ideas? Join our channel and become part of the conversation.') }}
                             </p>
                         </div>
 

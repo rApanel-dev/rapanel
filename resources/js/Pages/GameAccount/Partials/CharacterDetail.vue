@@ -331,7 +331,8 @@ const { openItemDb } = useItemDbModal();
                                     {{ __('Other Party Members of') }} <span class="text-rapanel-blue uppercase">{{ char.party_name }}</span>
                                 </h3>
                                 <div class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
-                                    <table class="w-full text-xs text-left">
+                                    <!-- Tabla: sm+ -->
+                                    <table class="hidden sm:table w-full text-xs text-left">
                                         <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
                                                 <th class="px-3 py-2">{{ __('Character Name') }}</th>
@@ -348,11 +349,7 @@ const { openItemDb } = useItemDbModal();
                                                     <div class="flex items-center gap-2">
                                                         <div class="relative shrink-0">
                                                             <img :src="`/data/icon_jobs/icon_jobs_${m.class}.png`" @error="onImgError" class="w-5 h-5 object-contain block" :alt="getJobName(m.class)" />
-                                                            <img v-if="m.name === char.party_leader_name"
-                                                                src="/data/icon_jobs/ico_partyCrown.png"
-                                                                class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 object-contain"
-                                                                alt="Leader"
-                                                            />
+                                                            <img v-if="m.name === char.party_leader_name" src="/data/icon_jobs/ico_partycrown.png" class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 object-contain" alt="Leader" />
                                                         </div>
                                                         <span>{{ getJobName(m.class) }}</span>
                                                     </div>
@@ -365,6 +362,20 @@ const { openItemDb } = useItemDbModal();
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <!-- Cards: móvil -->
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <div v-for="m in char.party_members" :key="m.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
+                                            <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <div class="relative shrink-0">
+                                                <img :src="`/data/icon_jobs/icon_jobs_${m.class}.png`" @error="onImgError" class="w-6 h-6 object-contain" />
+                                                <img v-if="m.name === char.party_leader_name" src="/data/icon_jobs/ico_partycrown.png" class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 object-contain" alt="Leader" />
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-xs font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ m.name }}</p>
+                                                <p class="text-[10px] text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ getJobName(m.class) }} · <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ m.base_level }}/{{ m.job_level }}</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
 
@@ -378,7 +389,8 @@ const { openItemDb } = useItemDbModal();
                                     {{ char.name }} {{ __('has no friends.') }}
                                 </div>
                                 <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
-                                    <table class="w-full text-xs text-left">
+                                    <!-- Tabla: sm+ -->
+                                    <table class="hidden sm:table w-full text-xs text-left">
                                         <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
                                             <tr>
                                                 <th class="px-3 py-2">{{ __('Character Name') }}</th>
@@ -405,6 +417,17 @@ const { openItemDb } = useItemDbModal();
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <!-- Cards: móvil -->
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <div v-for="f in char.friends" :key="f.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
+                                            <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <img :src="`/data/icon_jobs/icon_jobs_${f.class}.png`" @error="onImgError" class="w-6 h-6 object-contain shrink-0" />
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-xs font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ f.name }}</p>
+                                                <p class="text-[10px] text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ getJobName(f.class) }} · <span class="font-bold text-rapanel-navy-900 dark:text-white">{{ f.base_level }}/{{ f.job_level }}</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
 
@@ -417,52 +440,79 @@ const { openItemDb } = useItemDbModal();
                                 <span class="ml-1 font-normal">({{ char.inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
-                                <table class="w-full text-xs text-left">
-                                    <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
-                                        <tr>
-                                            <th class="px-2 py-2 text-center">ID</th>
-                                            <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
-                                            <th class="px-3 py-2">{{ __('Item Name') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Amount') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Identified') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 1') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 2') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 3') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                        <tr v-for="(item, idx) in char.inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800"
-                                            :class="{ 'bg-rapanel-blue/5': item.equip > 0 }"
-                                        >
-                                            <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue"
-                                                @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
-                                            <td class="px-2 py-1.5 text-center cursor-pointer"
-                                                @click="openItemDb(item.nameid, item)">
-                                                <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
-                                            </td>
-                                            <td class="px-3 py-1.5 cursor-pointer"
-                                                @click="openItemDb(item.nameid, item)">
-                                                <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
-                                                <span class="font-medium text-rapanel-navy-900 dark:text-white hover:text-rapanel-blue dark:hover:text-rapanel-blue transition-colors">{{ itemLabel(item) }}</span>
-                                                <span v-if="item.equip > 0" class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-rapanel-blue/10 text-rapanel-blue border border-rapanel-blue/20">{{ __('Equipped') }}</span>
-                                                <span v-if="item.attribute > 0" class="ml-1 text-rapanel-danger font-bold text-[10px]">[{{ __('Broken') }}]</span>
-                                            </td>
-                                            <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
-                                            <td class="px-3 py-1.5 text-center">
-                                                <span :class="item.identify ? 'text-rapanel-success' : 'text-rapanel-danger'" class="font-bold">{{ item.identify ? __('Yes') : __('No') }}</span>
-                                            </td>
-                                            <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 italic">
-                                                <span v-if="getCardName(item[slot])"
-                                                    class="text-rapanel-blue not-italic font-medium cursor-pointer hover:underline"
-                                                    @click="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
-                                                <span v-else>{{ __('None') }}</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
+                                <!-- Tabla: sm+ -->
+                                <div class="hidden sm:block overflow-x-auto">
+                                    <table class="w-full text-xs text-left">
+                                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                            <tr>
+                                                <th class="px-2 py-2 text-center">ID</th>
+                                                <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
+                                                <th class="px-3 py-2">{{ __('Item Name') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Amount') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Identified') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Broken') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 1') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 2') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 3') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                            <tr v-for="(item, idx) in char.inventory" :key="idx"
+                                                class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
+                                                <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
+                                                <td class="px-2 py-1.5 text-center cursor-pointer" @click="openItemDb(item.nameid, item)">
+                                                    <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
+                                                </td>
+                                                <td class="px-3 py-1.5 cursor-pointer" @click="openItemDb(item.nameid, item)">
+                                                    <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
+                                                    <span class="font-medium text-rapanel-navy-900 dark:text-white hover:text-rapanel-blue transition-colors">{{ itemLabel(item) }}</span>
+                                                    <span v-if="item.equip > 0" class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20">{{ __('Equipped') }}</span>
+                                                </td>
+                                                <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
+                                                <td class="px-3 py-1.5 text-center">
+                                                    <span :class="item.identify ? 'text-rapanel-success' : 'text-rapanel-danger'" class="font-bold">{{ item.identify ? __('Yes') : __('No') }}</span>
+                                                </td>
+                                                <td class="px-3 py-1.5 text-center">
+                                                    <span v-if="item.attribute > 0" class="font-bold text-rapanel-danger">{{ __('Yes') }}</span>
+                                                    <span v-else class="text-rapanel-text-light/30 dark:text-rapanel-text-dark/30">{{ __('No') }}</span>
+                                                </td>
+                                                <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 italic">
+                                                    <span v-if="getCardName(item[slot])" class="text-rapanel-blue not-italic font-medium cursor-pointer hover:underline" @click="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
+                                                    <span v-else>{{ __('None') }}</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Cards: móvil -->
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div v-for="(item, idx) in char.inventory" :key="idx"
+                                         class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
+                                         @click="openItemDb(item.nameid, item)">
+                                        <div class="flex flex-col items-center gap-0.5 shrink-0 w-10">
+                                            <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-9 h-9 object-contain" />
+                                            <span class="font-mono text-[9px] text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 mt-0.5 whitespace-nowrap">ID: {{ item.nameid }}</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span v-if="item.refine > 0" class="text-xs font-bold text-rapanel-danger dark:text-rapanel-gold shrink-0">+{{ item.refine }}</span>
+                                                <span class="text-sm font-medium text-rapanel-navy-900 dark:text-white truncate">{{ itemLabel(item) }}</span>
+                                                <svg v-if="item.equip > 0" class="w-3.5 h-3.5 text-rapanel-success shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
+                                                </svg>
+                                                <span v-if="item.attribute > 0" class="text-rapanel-danger font-bold text-[10px] shrink-0">[{{ __('Broken') }}]</span>
+                                            </div>
+                                            <div v-if="['card0','card1','card2','card3'].some(s => getCardName(item[s]))" class="grid grid-cols-2 gap-1 mt-1">
+                                                <template v-for="slot in ['card0','card1','card2','card3']" :key="slot">
+                                                    <span v-if="getCardName(item[slot])" class="text-[10px] font-medium text-rapanel-blue bg-rapanel-blue/10 border border-rapanel-blue/20 px-1.5 py-0.5 rounded truncate">{{ getCardName(item[slot]) }}</span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs font-bold text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 shrink-0">×{{ item.amount }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </section>
 
@@ -473,50 +523,75 @@ const { openItemDb } = useItemDbModal();
                                 <span class="ml-1 font-normal">({{ char.cart_inventory?.length ?? 0 }})</span>
                             </h3>
                             <div v-if="!char.cart_inventory?.length" class="text-xs italic text-rapanel-text-light/30 dark:text-rapanel-text-dark/30 py-4 text-center">{{ __('No cart items found.') }}</div>
-                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 overflow-x-auto">
-                                <table class="w-full text-xs text-left">
-                                    <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
-                                        <tr>
-                                            <th class="px-2 py-2 text-center">ID</th>
-                                            <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
-                                            <th class="px-3 py-2">{{ __('Item Name') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Amount') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Identified') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 1') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 2') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 3') }}</th>
-                                            <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
-                                        <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
-                                            class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800"
-                                        >
-                                            <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue"
-                                                @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
-                                            <td class="px-2 py-1.5 text-center cursor-pointer"
-                                                @click="openItemDb(item.nameid, item)">
-                                                <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
-                                            </td>
-                                            <td class="px-3 py-1.5 cursor-pointer"
-                                                @click="openItemDb(item.nameid, item)">
-                                                <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
-                                                <span class="font-medium text-rapanel-navy-900 dark:text-white hover:text-rapanel-blue dark:hover:text-rapanel-blue transition-colors">{{ itemLabel(item) }}</span>
-                                                <span v-if="item.attribute > 0" class="ml-1 text-rapanel-danger font-bold text-[10px]">[{{ __('Broken') }}]</span>
-                                            </td>
-                                            <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
-                                            <td class="px-3 py-1.5 text-center">
-                                                <span :class="item.identify ? 'text-rapanel-success' : 'text-rapanel-danger'" class="font-bold">{{ item.identify ? __('Yes') : __('No') }}</span>
-                                            </td>
-                                            <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 italic">
-                                                <span v-if="getCardName(item[slot])"
-                                                    class="text-rapanel-blue not-italic font-medium cursor-pointer hover:underline"
-                                                    @click="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
-                                                <span v-else>{{ __('None') }}</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div v-else class="rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
+                                <!-- Tabla: sm+ -->
+                                <div class="hidden sm:block overflow-x-auto">
+                                    <table class="w-full text-xs text-left">
+                                        <thead class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 text-[10px] uppercase tracking-widest font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                            <tr>
+                                                <th class="px-2 py-2 text-center">ID</th>
+                                                <th class="px-2 py-2 w-8">{{ __('Icon') }}</th>
+                                                <th class="px-3 py-2">{{ __('Item Name') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Amount') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Identified') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Broken') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 1') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 2') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 3') }}</th>
+                                                <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                            <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
+                                                class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
+                                                <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
+                                                <td class="px-2 py-1.5 text-center cursor-pointer" @click="openItemDb(item.nameid, item)">
+                                                    <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-7 h-7 object-contain mx-auto hover:scale-110 transition-transform" />
+                                                </td>
+                                                <td class="px-3 py-1.5 cursor-pointer" @click="openItemDb(item.nameid, item)">
+                                                    <span v-if="item.refine > 0" class="font-bold text-rapanel-danger dark:text-rapanel-gold mr-1">+{{ item.refine }}</span>
+                                                    <span class="font-medium text-rapanel-navy-900 dark:text-white hover:text-rapanel-blue transition-colors">{{ itemLabel(item) }}</span>
+                                                </td>
+                                                <td class="px-3 py-1.5 text-center text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ item.amount }}</td>
+                                                <td class="px-3 py-1.5 text-center">
+                                                    <span :class="item.identify ? 'text-rapanel-success' : 'text-rapanel-danger'" class="font-bold">{{ item.identify ? __('Yes') : __('No') }}</span>
+                                                </td>
+                                                <td class="px-3 py-1.5 text-center">
+                                                    <span v-if="item.attribute > 0" class="font-bold text-rapanel-danger">{{ __('Yes') }}</span>
+                                                    <span v-else class="text-rapanel-text-light/30 dark:text-rapanel-text-dark/30">{{ __('No') }}</span>
+                                                </td>
+                                                <td v-for="slot in ['card0','card1','card2','card3']" :key="slot" class="px-3 py-1.5 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 italic">
+                                                    <span v-if="getCardName(item[slot])" class="text-rapanel-blue not-italic font-medium cursor-pointer hover:underline" @click="openItemDb(item[slot], { nameid: item[slot] })">{{ getCardName(item[slot]) }}</span>
+                                                    <span v-else>{{ __('None') }}</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Cards: móvil -->
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div v-for="(item, idx) in char.cart_inventory" :key="idx"
+                                         class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
+                                         @click="openItemDb(item.nameid, item)">
+                                        <div class="flex flex-col items-center gap-0.5 shrink-0 w-10">
+                                            <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-9 h-9 object-contain" />
+                                            <span class="font-mono text-[9px] text-rapanel-text-light/40 dark:text-rapanel-text-dark/30 mt-0.5 whitespace-nowrap">ID: {{ item.nameid }}</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span v-if="item.refine > 0" class="text-xs font-bold text-rapanel-danger dark:text-rapanel-gold shrink-0">+{{ item.refine }}</span>
+                                                <span class="text-sm font-medium text-rapanel-navy-900 dark:text-white truncate">{{ itemLabel(item) }}</span>
+                                                <span v-if="item.attribute > 0" class="text-rapanel-danger font-bold text-[10px] shrink-0">[{{ __('Broken') }}]</span>
+                                            </div>
+                                            <div v-if="['card0','card1','card2','card3'].some(s => getCardName(item[s]))" class="grid grid-cols-2 gap-1 mt-1">
+                                                <template v-for="slot in ['card0','card1','card2','card3']" :key="slot">
+                                                    <span v-if="getCardName(item[slot])" class="text-[10px] font-medium text-rapanel-blue bg-rapanel-blue/10 border border-rapanel-blue/20 px-1.5 py-0.5 rounded truncate">{{ getCardName(item[slot]) }}</span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs font-bold text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 shrink-0">×{{ item.amount }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </section>
 

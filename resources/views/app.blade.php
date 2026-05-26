@@ -68,7 +68,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}?v={{ $fv('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}?v={{ $fv('images/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $fv('manifest.json') }}">
-    <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg') }}?v={{ $fv('safari-pinned-tab.svg') }}" color="#3b82f6">
+    <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}?v={{ $fv('icons/safari-pinned-tab.svg') }}" color="#3b82f6">
     <meta name="msapplication-TileColor" content="#3b82f6">
     <meta name="theme-color" content="#3b82f6">
 
