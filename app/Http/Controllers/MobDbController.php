@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemDb;
 use App\Models\MobDb;
 use App\Models\SpawnEntry;
+use App\Services\DropRateCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -64,17 +65,29 @@ class MobDbController extends Controller
             ->toArray();
 
         $itemLookup = ItemDb::whereIn('aegis_name', $aegisNames)
-            ->select(['item_id', 'aegis_name', 'display_name', 'name'])
+            ->select(['item_id', 'aegis_name', 'display_name', 'name', 'type', 'slots'])
             ->get()
             ->keyBy(fn ($i) => strtolower($i->aegis_name))
             ->toArray();
 
-        $enrich = fn ($drops) => collect($drops)->map(fn ($d) => array_merge($d, [
-            'item_data' => $itemLookup[strtolower($d['item'] ?? '')] ?? null,
+        $isMvp  = (bool) $mob->is_mvp;
+        $isBoss = !$isMvp && $mob->class === 'Boss';
+
+        $enrich = fn ($drops, bool $isMvpDrop = false) => collect($drops)->map(fn ($d) => array_merge($d, [
+            'item_data'     => $itemLookup[strtolower($d['item'] ?? '')] ?? null,
+            'adjusted_rate' => isset($d['rate'])
+                ? DropRateCalculator::calculate(
+                    (int) $d['rate'],
+                    $itemLookup[strtolower($d['item'] ?? '')]['type'] ?? 'Etc',
+                    $isMvp,
+                    $isBoss,
+                    $isMvpDrop
+                )
+                : null,
         ]))->values()->toArray();
 
-        $data['drops']     = $enrich($mob->drops     ?? []);
-        $data['mvp_drops'] = $enrich($mob->mvp_drops ?? []);
+        $data['drops']     = $enrich($mob->drops     ?? [], false);
+        $data['mvp_drops'] = $enrich($mob->mvp_drops ?? [], true);
 
         $data['spawns'] = SpawnEntry::where('mob_id', $id)
             ->select(

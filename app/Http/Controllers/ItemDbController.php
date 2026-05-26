@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemDb;
 use App\Models\MobDb;
+use App\Services\DropRateCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,7 @@ class ItemDbController extends Controller
 
     public function monsters(int $itemId): JsonResponse
     {
-        $item = ItemDb::where('item_id', $itemId)->firstOrFail(['item_id', 'aegis_name']);
+        $item = ItemDb::where('item_id', $itemId)->firstOrFail(['item_id', 'aegis_name', 'type']);
 
         if (!$item->aegis_name) {
             return response()->json([]);
@@ -80,7 +81,7 @@ class ItemDbController extends Controller
             ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'class', 'element', 'race', 'drops', 'mvp_drops'])
             ->orderBy('level')
             ->get()
-            ->map(function ($mob) use ($aegis) {
+            ->map(function ($mob) use ($aegis, $item) {
                 $rate      = null;
                 $isMvpDrop = false;
 
@@ -101,17 +102,29 @@ class ItemDbController extends Controller
                     }
                 }
 
+                $isMvp  = (bool) $mob->is_mvp;
+                $isBoss = !$isMvp && $mob->class === 'Boss';
+
                 return [
-                    'id'          => $mob->id,
-                    'name'        => $mob->name,
-                    'level'       => $mob->level,
-                    'hp'          => $mob->hp,
-                    'is_mvp'      => $mob->is_mvp,
-                    'class'       => $mob->class,
-                    'element'     => $mob->element,
-                    'race'        => $mob->race,
-                    'rate'        => $rate,
-                    'is_mvp_drop' => $isMvpDrop,
+                    'id'            => $mob->id,
+                    'name'          => $mob->name,
+                    'level'         => $mob->level,
+                    'hp'            => $mob->hp,
+                    'is_mvp'        => $isMvp,
+                    'class'         => $mob->class,
+                    'element'       => $mob->element,
+                    'race'          => $mob->race,
+                    'rate'          => $rate,
+                    'adjusted_rate' => $rate !== null
+                        ? DropRateCalculator::calculate(
+                            (int) $rate,
+                            $item->type ?? 'Etc',
+                            $isMvp,
+                            $isBoss,
+                            $isMvpDrop
+                        )
+                        : null,
+                    'is_mvp_drop'   => $isMvpDrop,
                 ];
             });
 

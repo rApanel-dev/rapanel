@@ -151,8 +151,9 @@ const monstersLoading = ref(false);
 const monstersSort    = ref('desc');
 const sortedMonsters  = computed(() => {
     if (!monstersData.value?.length) return monstersData.value ?? [];
+    const val = (m) => m.adjusted_rate ?? m.rate / 100;
     return [...monstersData.value].sort((a, b) =>
-        monstersSort.value === 'desc' ? b.rate - a.rate : a.rate - b.rate
+        monstersSort.value === 'desc' ? val(b) - val(a) : val(a) - val(b)
     );
 });
 
@@ -196,6 +197,11 @@ const fmtRate = (r) => {
     if (r >= 10000) return '100%';
     const p = r / 100;
     return (Number.isInteger(p) ? p : parseFloat(p.toFixed(2))) + '%';
+};
+
+const fmtAdjusted = (r) => {
+    if (r === null || r === undefined) return null;
+    return parseFloat(r.toFixed(2)) + '%';
 };
 
 // ── Price tiers (Trade tab) ───────────────────────────────────────────
@@ -645,7 +651,10 @@ const elementBadge = (el) => {
                                                 </div>
                                             </div>
                                             <div class="text-right shrink-0">
-                                                <div :class="['text-sm font-bold tabular-nums', mob.rate >= 5000 ? 'text-rapanel-success' : mob.rate >= 500 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60']">
+                                                <div :class="['text-sm font-bold tabular-nums', (mob.adjusted_rate ?? mob.rate / 100) >= 50 ? 'text-rapanel-success' : (mob.adjusted_rate ?? mob.rate / 100) >= 5 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60']">
+                                                    {{ fmtAdjusted(mob.adjusted_rate) ?? fmtRate(mob.rate) }}
+                                                </div>
+                                                <div v-if="mob.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums">
                                                     {{ fmtRate(mob.rate) }}
                                                 </div>
                                             </div>

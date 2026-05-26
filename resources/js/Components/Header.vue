@@ -2,12 +2,21 @@
 import { Menu, MenuButton, MenuItems, MenuItem, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { Link, usePage } from '@inertiajs/vue3';
-import LocaleSelector from '@/Components/LocaleSelector.vue'; 
+import LocaleSelector from '@/Components/LocaleSelector.vue';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import { visitorMenuItems, authMenuItems } from '@/menu.js';
 import { computed, ref } from 'vue';
 
 const page = usePage();
+
+const logoSrc = computed(() => {
+    const st = page.props.siteSettings ?? {};
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+    if (isDark && st.logo_dark)   return '/storage/' + st.logo_dark;
+    if (!isDark && st.logo_light) return '/storage/' + st.logo_light;
+    if (st.logo_light)            return '/storage/' + st.logo_light;
+    return '/images/logo.png';
+});
 
 const __ = (key) => {
     return page.props.translations?.[key] || key;
@@ -49,7 +58,7 @@ const toggleMobileSubmenu = (name) => {
             <div class="flex justify-between items-center h-20 border-b border-rapanel-navy-100 dark:border-white/10">
                 
                 <Link :href="safeRoute('home')" class="shrink-0">
-                    <img class="h-9 md:h-12 w-auto max-w-[150px] md:max-w-none object-contain" src="/images/logo.png" alt="rApanel" />
+                    <img class="h-9 md:h-12 w-auto max-w-[150px] md:max-w-none object-contain" :src="logoSrc" :alt="page.props.siteSettings?.site_name ?? 'rApanel'" />
                 </Link>
 
                 <div class="hidden md:flex items-center gap-4">

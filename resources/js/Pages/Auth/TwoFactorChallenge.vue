@@ -29,7 +29,7 @@ const submit = () => {
         <meta name="robots" content="noindex, nofollow">
     </Head>
 
-    <MainLayout>
+    <MainLayout :show-bg="true">
         <div class="min-h-[calc(100vh-8.5rem)] flex items-center justify-center px-4 py-12">
             <div class="w-full max-w-md">
                 <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-xl border border-rapanel-navy-100 dark:border-rapanel-navy-800 p-8">
@@ -44,7 +44,7 @@ const submit = () => {
                         </div>
                     </div>
 
-                    <h1 class="text-2xl font-bold text-center text-rapanel-text-light dark:text-white mb-2">
+                    <h1 class="text-2xl font-display font-bold text-center text-rapanel-navy-900 dark:text-white tracking-wide mb-2">
                         {{ __('Two Factor Authentication') }}
                     </h1>
 

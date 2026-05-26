@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\News;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -40,6 +41,10 @@ class HandleInertiaRequests extends Middleware
             },
 
             'locale' => \App::getLocale(),
+
+            'siteSettings' => Cache::remember('ra_site_settings', 300, function () {
+                return SiteSetting::pluck('value', 'key')->toArray();
+            }),
 
             'serverName'      => config('services.ra.server_name', 'rApanel'),
             'discordServerId' => config('services.discord.server_id'),

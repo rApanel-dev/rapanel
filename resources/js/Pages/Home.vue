@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
 const page = usePage();
@@ -7,6 +8,8 @@ const __ = (key) => page.props.translations?.[key] || key;
 const safeRoute = (routeName, params = {}) => {
     try { return route(routeName, params); } catch { return '#'; }
 };
+
+const st = computed(() => page.props.siteSettings ?? {});
 
 const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -180,7 +183,8 @@ const scrollTo = (id) => {
                         <!-- About Us -->
                         <div>
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('About Us') }}</h2>
-                            <p class="text-base text-white/85 leading-relaxed">
+                            <div v-if="st.home_about_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="st.home_about_text" />
+                            <p v-else class="text-base text-white/85 leading-relaxed">
                                 <span class="font-bold text-rapanel-blue">{{ $page.props.serverName }}</span>
                                 {{ __("is a private Ragnarok Online server with a passionate community at its core. We offer a carefully crafted experience with dedicated staff and custom content, where every player matters. Whether you're a veteran adventurer or a newcomer, there's always something new to discover.") }}
                             </p>
@@ -192,7 +196,8 @@ const scrollTo = (id) => {
                         <!-- Community -->
                         <div>
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('Community') }}</h2>
-                            <p class="text-base text-white/85 leading-relaxed">
+                            <div v-if="st.home_community_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="st.home_community_text" />
+                            <p v-else class="text-base text-white/85 leading-relaxed">
                                 {{ __('We communicate in real time through Discord — no dead forums, just an active community ready to help. Have questions, suggestions, or ideas? Join our channel and become part of the conversation.') }}
                             </p>
                         </div>
@@ -242,7 +247,7 @@ const scrollTo = (id) => {
                             <img src="/images/exp.png" alt="EXP" class="w-full h-full object-contain" />
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-white drop-shadow">Rates 100x / 100x</h2>
+                            <h2 class="text-xl font-bold text-white drop-shadow">Rates {{ st.home_base_rate ?? '100' }}x / {{ st.home_job_rate ?? '100' }}x</h2>
                             <p class="text-base text-white/85 mt-1 leading-snug">
                                 {{ __('Average rates for you to have fun and level up your character quickly.') }}
                             </p>
@@ -254,7 +259,7 @@ const scrollTo = (id) => {
                             <img src="/images/lvl.png" alt="Level" class="w-full h-full object-contain" />
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-white drop-shadow">{{ __('Max Level') }}: 99/70</h2>
+                            <h2 class="text-xl font-bold text-white drop-shadow">{{ __('Max Level') }}: {{ st.home_max_base_level ?? '99' }}/{{ st.home_max_job_level ?? '70' }}</h2>
                             <p class="text-base text-white/85 mt-1 leading-snug">
                                 {{ __('Pre-Renewal server. Level up to 99/70 with new skills and exclusive items.') }}
                             </p>
@@ -266,7 +271,7 @@ const scrollTo = (id) => {
                             <img src="/images/epi.png" alt="Episode" class="w-full h-full object-contain" />
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-white drop-shadow">{{ __('Episode') }}: 13.3+ — El Dicastes</h2>
+                            <h2 class="text-xl font-bold text-white drop-shadow">{{ __('Episode') }}: {{ st.home_episode ?? 'Episode 13.3+' }}</h2>
                             <p class="text-base text-white/85 mt-1 leading-snug">
                                 {{ __("Explore Nidhoggr's episode with new instances and exclusive items.") }}
                             </p>

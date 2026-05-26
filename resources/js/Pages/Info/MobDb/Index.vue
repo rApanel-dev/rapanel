@@ -162,12 +162,12 @@ const { openMobDb } = useMobDbModal();
 
                 <button v-for="mob in mobs.data" :key="mob.id"
                     @click="openMobDb(mob)"
-                    class="group bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 text-left w-full">
+                    class="group bg-white dark:bg-rapanel-navy-900 rounded-2xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm overflow-hidden hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200 text-left w-full flex flex-col">
 
                     <!-- Barra de acento superior según clase -->
-                    <div :class="classBg(mob)" class="h-[3px] w-full" />
+                    <div :class="classBg(mob)" class="h-[3px] w-full shrink-0" />
 
-                    <div class="p-3 flex items-center gap-2.5">
+                    <div class="p-3 flex items-center gap-2.5 flex-1">
 
                         <!-- Imagen del mob -->
                         <div class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center overflow-hidden">

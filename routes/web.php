@@ -35,6 +35,8 @@ use App\Http\Controllers\MobDbController;
 use App\Http\Controllers\MapDbController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AdminTwoFactorVerifyController;
+use App\Http\Controllers\Admin\SiteSettingsController;
+use App\Http\Controllers\Admin\DropRatesController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -186,6 +188,23 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::delete('map-db/map-cache',                 [AdminMapDbController::class, 'destroyMapCache'])->name('map-db.destroy-map-cache');
     Route::delete('map-db/spawns',                    [AdminMapDbController::class, 'destroySpawns'])->name('map-db.destroy-spawns');
     Route::delete('map-db/{mapName}/spawns',          [AdminMapDbController::class, 'destroyMapSpawns'])->name('map-db.destroy-map-spawns')->where('mapName', '[a-zA-Z0-9_@]+');
+
+    // Drop Rates admin
+    Route::get('drop-rates',         [DropRatesController::class, 'index'])->name('drop-rates.index');
+    Route::post('drop-rates/import', [DropRatesController::class, 'import'])->name('drop-rates.import');
+    Route::post('drop-rates/update', [DropRatesController::class, 'update'])->name('drop-rates.update');
+    Route::post('drop-rates/clear',  [DropRatesController::class, 'clear'])->name('drop-rates.clear');
+
+    // Site Settings admin
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/',                       [SiteSettingsController::class, 'index'])->name('index');
+        Route::post('/general',               [SiteSettingsController::class, 'updateGeneral'])->name('general');
+        Route::post('/home',                  [SiteSettingsController::class, 'updateHome'])->name('home');
+        Route::post('/seo',                   [SiteSettingsController::class, 'updateSeo'])->name('seo');
+        Route::post('/danger/clear-logs',     [SiteSettingsController::class, 'dangerClearLogs'])->name('danger.logs');
+        Route::post('/danger/clear-cache',    [SiteSettingsController::class, 'dangerClearCache'])->name('danger.cache');
+        Route::post('/danger/clear-sessions', [SiteSettingsController::class, 'dangerClearSessions'])->name('danger.sessions');
+    });
 });
 
 // Noticias públicas

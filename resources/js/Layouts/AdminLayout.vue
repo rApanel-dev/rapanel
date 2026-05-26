@@ -21,6 +21,8 @@ import {
     BookOpenIcon,
     CpuChipIcon,
     MapPinIcon,
+    Cog6ToothIcon,
+    ChartBarIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -41,8 +43,10 @@ const navigation = [
     { name: 'Mob DB',             route: 'admin.mob-db.index',             icon: CpuChipIcon,                group: 'Content' },
     { name: 'Map DB',             route: 'admin.map-db.index',             icon: MapPinIcon,                 group: 'Content' },
     { name: 'MvP Cards',          route: 'admin.mvp-cards.index',          icon: TrophyIcon,                 group: 'Content' },
+    { name: 'Drop Rates',         route: 'admin.drop-rates.index',         icon: ChartBarIcon,               group: 'Content' },
     { name: 'Action Logs',        route: 'admin.logs.index',               icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',            route: 'admin.console.index',            icon: CommandLineIcon,            group: 'System' },
+    { name: 'Settings',           route: 'admin.settings.index',           icon: Cog6ToothIcon,              group: 'System' },
 ];
 
 const isActive = (routeName) => {

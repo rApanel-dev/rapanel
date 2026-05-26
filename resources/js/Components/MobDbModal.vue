@@ -22,6 +22,11 @@ const fmtRate = (r) => {
     return (Number.isInteger(p) ? p : parseFloat(p.toFixed(2))) + '%';
 };
 
+const fmtAdjusted = (r) => {
+    if (r === null || r === undefined) return null;
+    return parseFloat(r.toFixed(2)) + '%';
+};
+
 const classBg = (mob) => {
     if (!mob) return '';
     if (mob.is_mvp)           return 'bg-rapanel-gold';
@@ -77,14 +82,6 @@ const sortedSpawns = computed(() => {
             : a.total_amount - b.total_amount
     );
 });
-
-const fmtDelay = (ms) => {
-    if (!ms || ms <= 0) return __('Instantly');
-    if (ms < 60_000)     return `${Math.round(ms / 1_000)} ${__('sec')}`;
-    if (ms < 3_600_000)  return `${Math.round(ms / 60_000)} ${__('min')}`;
-    if (ms < 86_400_000) return `${Math.round(ms / 3_600_000)} ${__('h')}`;
-    return `${Math.round(ms / 86_400_000)} ${__('d')}`;
-};
 
 const statLabels = {
     str: 'STR', agi: 'AGI', vit: 'VIT', int: 'INT', dex: 'DEX', luk: 'LUK',
@@ -347,7 +344,7 @@ const displayStats = (stats) => {
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm text-rapanel-navy-900 dark:text-white truncate">
-                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}
+                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}<span v-if="drop.item_data?.slots > 0"> [{{ drop.item_data.slots }}]</span>
                                                 </p>
                                                 <div class="flex items-center gap-1.5 mt-0.5">
                                                     <p v-if="drop.item_data" class="text-[10px] text-rapanel-text-light/50 dark:text-white/35 font-mono">{{ drop.item }}</p>
@@ -357,10 +354,13 @@ const displayStats = (stats) => {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <span :class="[
-                                                'text-sm font-bold tabular-nums shrink-0',
-                                                drop.rate >= 5000 ? 'text-rapanel-success' : drop.rate >= 500 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
-                                            ]">{{ fmtRate(drop.rate) }}</span>
+                                            <div class="text-right shrink-0">
+                                                <span :class="[
+                                                    'text-sm font-bold tabular-nums block',
+                                                    (drop.adjusted_rate ?? drop.rate / 100) >= 50 ? 'text-rapanel-success' : (drop.adjusted_rate ?? drop.rate / 100) >= 5 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
+                                                ]">{{ fmtAdjusted(drop.adjusted_rate) ?? fmtRate(drop.rate) }}</span>
+                                                <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums">{{ fmtRate(drop.rate) }}</span>
+                                            </div>
                                         </button>
                                     </div>
                                 </div>
@@ -393,14 +393,17 @@ const displayStats = (stats) => {
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm text-rapanel-navy-900 dark:text-white truncate">
-                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}
+                                                    {{ drop.item_data?.display_name || drop.item_data?.name || drop.item }}<span v-if="drop.item_data?.slots > 0"> [{{ drop.item_data.slots }}]</span>
                                                 </p>
                                                 <p v-if="drop.item_data" class="text-[10px] text-rapanel-text-light/50 dark:text-white/35 font-mono">{{ drop.item }}</p>
                                             </div>
-                                            <span :class="[
-                                                'text-sm font-bold tabular-nums shrink-0',
-                                                drop.rate >= 5000 ? 'text-rapanel-success' : drop.rate >= 500 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
-                                            ]">{{ fmtRate(drop.rate) }}</span>
+                                            <div class="text-right shrink-0">
+                                                <span :class="[
+                                                    'text-sm font-bold tabular-nums block',
+                                                    (drop.adjusted_rate ?? drop.rate / 100) >= 50 ? 'text-rapanel-success' : (drop.adjusted_rate ?? drop.rate / 100) >= 5 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
+                                                ]">{{ fmtAdjusted(drop.adjusted_rate) ?? fmtRate(drop.rate) }}</span>
+                                                <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums">{{ fmtRate(drop.rate) }}</span>
+                                            </div>
                                         </button>
                                     </div>
                                 </div>
