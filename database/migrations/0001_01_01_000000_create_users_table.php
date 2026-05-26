@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('last_ip', 45)->nullable();
             $table->timestamp('last_login')->nullable();
             $table->string('country')->default('CL');
+            $table->string('locale', 5)->nullable();
             $table->date('birthdate')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -26,6 +27,7 @@ return new class extends Migration
             // Campos de seguridad (2FA)
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
             
             // Economía Global de la Cuenta Maestra
             $table->integer('donation_points')->default(0);

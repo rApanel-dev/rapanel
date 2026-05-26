@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('map_sizes', function (Blueprint $table) {
             $table->string('map_name', 32)->primary();
+            $table->string('display_name', 128)->nullable();
+            $table->string('background_bmp', 64)->nullable();
             $table->unsignedSmallInteger('width')->default(0);
             $table->unsignedSmallInteger('height')->default(0);
             $table->timestamps();

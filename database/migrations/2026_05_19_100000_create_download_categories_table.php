@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('icon')->nullable(); // emoji or short label
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
         });
     }
