@@ -8,18 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // ATENCIÓN: Usamos la conexión 'mysql_main' para que NO use el prefijo 'ra_' 
-        // y modifique la tabla 'login' real del emulador.
         Schema::connection('mysql_main')->table('login', function (Blueprint $table) {
-            
-            // Agregamos la columna master_id. 
-            // Es "nullable" (permite nulos) porque tus cuentas antiguas de rAthena 
-            // aún no tendrán un dueño maestro asignado hasta que las vinculen en el panel.
-            $table->unsignedBigInteger('master_id')->nullable()->after('account_id');
-            $table->timestamp('created_at')->nullable()->after('master_id');
-            
-            // Creamos un índice para que buscar qué cuentas le pertenecen a un usuario sea rapidísimo
-            $table->index('master_id');
+            if (!Schema::connection('mysql_main')->hasColumn('login', 'master_id')) {
+                $table->unsignedBigInteger('master_id')->nullable()->after('account_id');
+                $table->index('master_id');
+            }
+            if (!Schema::connection('mysql_main')->hasColumn('login', 'created_at')) {
+                $table->timestamp('created_at')->nullable()->after('master_id');
+            }
         });
     }
 
