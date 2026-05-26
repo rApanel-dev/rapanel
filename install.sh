@@ -5,8 +5,6 @@
 # Optimizado para Ubuntu 24.04 LTS
 # =========================================================================
 
-set -e
-
 # Colores
 Red='\033[0;31m'
 Green='\033[0;32m'
@@ -38,7 +36,7 @@ update_system() {
 
 install_php() {
     if ! dpkg -l | grep -q "$php_version"; then
-        echo -e "${Cyan}Instalando PHP 8.3 y extensiones...${White}"
+        echo -e "${Cyan}Instalando PHP 8.4 y extensiones...${White}"
         apt install software-properties-common -y
 
         max_retries=3
@@ -171,7 +169,7 @@ stopwaitsecs=3660
 EOF
     supervisorctl reread
     supervisorctl update
-    supervisorctl start rapanel-worker:*
+    supervisorctl start rapanel-worker:* || true
 }
 
 add_cron_job() {
@@ -193,17 +191,21 @@ collect_config() {
 
     # Nombre del servidor
     read -rp "[2/7] Nombre del servidor RO (ej: Mi Servidor RO): " server_name
-    [ -z "$server_name" ] && server_name="Mi Servidor RO"
+    server_name="${server_name:-Mi Servidor RO}"
 
     # Modo de juego
-    echo -e "[3/7] Modo de juego:"
+    echo "[3/7] Modo de juego:"
     echo "      1. renewal (por defecto)"
     echo "      2. pre-renewal"
     read -rp "      Selecciona [1-2]: " game_mode_sel
-    [ "$game_mode_sel" = "2" ] && game_mode="pre-renewal" || game_mode="renewal"
+    if [ "$game_mode_sel" = "2" ]; then
+        game_mode="pre-renewal"
+    else
+        game_mode="renewal"
+    fi
 
     # Idioma
-    echo -e "[4/7] Idioma por defecto:"
+    echo "[4/7] Idioma por defecto:"
     echo "      1. es — Español (por defecto)"
     echo "      2. en — English"
     echo "      3. pt — Português"
@@ -220,9 +222,9 @@ collect_config() {
     echo ""
     echo "--- BASE DE DATOS rAthena (main) ---"
     read -rp "[5/7] Host BD (default: 127.0.0.1): " db_host
-    [ -z "$db_host" ] && db_host="127.0.0.1"
+    db_host="${db_host:-127.0.0.1}"
     read -rp "      Puerto BD (default: 3306): " db_port
-    [ -z "$db_port" ] && db_port="3306"
+    db_port="${db_port:-3306}"
     read -rp "      Nombre de la BD: " db_database
     read -rp "      Usuario BD: " db_username
     read -srp "      Contraseña BD: " db_password
@@ -234,9 +236,9 @@ collect_config() {
     read -rp "[6/7] ¿Usar la misma BD para logs? (s/n, default: s): " same_logs
     if [[ "$same_logs" == "n" || "$same_logs" == "N" ]]; then
         read -rp "      Host logs (default: $db_host): " log_db_host
-        [ -z "$log_db_host" ] && log_db_host="$db_host"
+        log_db_host="${log_db_host:-$db_host}"
         read -rp "      Puerto logs (default: $db_port): " log_db_port
-        [ -z "$log_db_port" ] && log_db_port="$db_port"
+        log_db_port="${log_db_port:-$db_port}"
         read -rp "      Nombre BD logs: " log_db_database
         read -rp "      Usuario logs: " log_db_username
         read -srp "      Contraseña logs: " log_db_password
@@ -252,7 +254,7 @@ collect_config() {
     # IP del servidor rAthena (para estado online)
     echo ""
     read -rp "[7/7] IP del servidor rAthena para estado online (default: 127.0.0.1): " ra_server_ip
-    [ -z "$ra_server_ip" ] && ra_server_ip="127.0.0.1"
+    ra_server_ip="${ra_server_ip:-127.0.0.1}"
 }
 
 show_success() {
@@ -264,15 +266,39 @@ show_success() {
     echo " URL del panel:  http://$domain_name"
     echo " Servidor:       $server_name"
     echo " Modo de juego:  $game_mode"
+    echo " Idioma:         $app_locale"
     echo ""
-    echo -e "${Yellow} PRÓXIMO PASO — Crear el primer administrador:${White}"
-    echo " 1. Regístrate en el panel: http://$domain_name/register"
-    echo " 2. Ejecuta en la BD de rAthena:"
+    echo -e "${Yellow} PASO 1 — Crear el primer administrador:${White}"
+    echo "   1. Regístrate en: http://$domain_name/register"
+    echo "   2. Ejecuta en MySQL:"
     echo ""
-    echo "    UPDATE ra_users SET role = 'admin' WHERE email = 'tu@email.com';"
+    echo "      UPDATE ra_users SET role = 'admin' WHERE email = 'tu@email.com';"
     echo ""
-    echo " Puertos rAthena: asegúrate de que $ra_server_ip:6900/6121/5121"
-    echo " sean accesibles desde este servidor para el estado online."
+    echo -e "${Yellow} PASO 2 — Completar configuración en .env:${White}"
+    echo "   Edita: $install_dir/.env"
+    echo ""
+    echo "   • DB_WEB_DATABASE / DB_WEB_USERNAME / DB_WEB_PASSWORD"
+    echo "     → Base de datos web de rAthena (si es diferente a la main)"
+    echo ""
+    echo "   • RA_LOGIN_PORT (def: 6900) / RA_CHAR_PORT (def: 6121)"
+    echo "     RA_MAP_PORT (def: 5121) / RA_WEB_PORT (def: 8080)"
+    echo "     → Puertos de los servidores rAthena para el estado online"
+    echo ""
+    echo "   • DISCORD_SERVER_ID / DISCORD_BOT_TOKEN / DISCORD_INVITE_URL"
+    echo "     → Widget de Discord en la página de inicio"
+    echo ""
+    echo "   • MAIL_MAILER / MAIL_HOST / MAIL_PORT / MAIL_USERNAME / MAIL_PASSWORD"
+    echo "     → Correo para verificación de cuenta y recuperación de contraseña"
+    echo ""
+    echo "   • RA_2FA_ENABLED / RA_2FA_FORCE_ADMINS"
+    echo "     → Autenticación de dos factores"
+    echo ""
+    echo "   • RA_VIP_ENABLED / RA_BANK_ENABLED / RA_CASHPOINTS_ENABLED"
+    echo "     → Funcionalidades opcionales del panel"
+    echo ""
+    echo "   Tras editar .env ejecuta:"
+    echo "   php artisan config:clear && php artisan cache:clear"
+    echo ""
     echo -e "${Green}=========================================================${White}"
 }
 
@@ -344,7 +370,7 @@ EOF
         show_success
     else
         echo -e "${Red}ERROR: $install_dir ya existe y no está vacío.${White}"
-        echo "Para actualizar usa: sudo ./update.sh"
+        echo "Para actualizar usa: sudo bash $install_dir/update.sh"
         exit 1
     fi
 }
@@ -399,7 +425,7 @@ EOF
         show_success
     else
         echo -e "${Red}ERROR: $install_dir ya existe y no está vacío.${White}"
-        echo "Para actualizar usa: sudo ./update.sh"
+        echo "Para actualizar usa: sudo bash $install_dir/update.sh"
         exit 1
     fi
 }
