@@ -160,7 +160,12 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::put('/game-accounts/{accountId}',               [GameAccountAdminController::class, 'update'])->name('game-accounts.update');
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
-    Route::get('/console',       [ConsoleController::class,        'index'])->name('console.index');
+    Route::get('/console',                          [ConsoleController::class, 'index'])->name('console.index');
+    Route::post('/console/token',                   [ConsoleController::class, 'token'])->name('console.token')->middleware('throttle:15,1');
+    Route::get('/console/server/status',            [ConsoleController::class, 'serverStatus'])->name('console.server.status');
+    Route::post('/console/server/{name}/start',     [ConsoleController::class, 'serverStart'])->name('console.server.start')->middleware('throttle:5,1');
+    Route::post('/console/server/{name}/stop',      [ConsoleController::class, 'serverStop'])->name('console.server.stop')->middleware('throttle:5,1');
+    Route::post('/console/server/{name}/restart',   [ConsoleController::class, 'serverRestart'])->name('console.server.restart')->middleware('throttle:5,1');
     Route::resource('news', AdminNewsController::class)->except(['show']);
     Route::delete('news-comments/{newsComment}', [AdminNewsCommentController::class, 'destroy'])->name('news-comments.destroy');
     Route::resource('downloads', AdminDownloadController::class)->except(['show']);

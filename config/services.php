@@ -54,6 +54,11 @@ return [
         'bank_enabled'       => env('RA_BANK_ENABLED', false),
         'cashpoints_enabled' => env('RA_CASHPOINTS_ENABLED', false),
         'log_path'           => env('RA_LOG_PATH', null),
+        'ws_port'            => env('RA_WS_PORT', 3001),
+        'ws_secret'          => env('RA_WS_SECRET'),
+        // Overrides opcionales — si no se definen, se derivan de RA_LOGIN_IP + RA_WS_PORT
+        'ws_internal_url'    => env('RA_WS_INTERNAL_URL'),
+        'ws_public_url'      => env('RA_WS_PUBLIC_URL'),
         'require_email_verify' => env('RA_REQUIRE_EMAIL_VERIFY', false),
         '2fa_enabled'          => env('RA_2FA_ENABLED', false),
         '2fa_force_admins'     => env('RA_2FA_FORCE_ADMINS', false),
