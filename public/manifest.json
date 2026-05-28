@@ -8,8 +8,8 @@
   "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "any",
   "lang": "en",
-  "background_color": "#1a2b4d",
-  "theme_color": "#3b82f6",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "categories": ["games", "utilities"],
   "icons": [
     {

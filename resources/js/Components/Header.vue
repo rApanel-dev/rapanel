@@ -52,6 +52,25 @@ const toggleMobileSubmenu = (name) => {
 </script>
 
 <template>
+
+    <!-- ═══ BOTÓN PLAY NOW — cuelga desde el top del navegador ═══ -->
+    <a v-if="$page.props.roBrowserUrl"
+       :href="$page.props.roBrowserUrl"
+       target="_blank" rel="noopener"
+       class="ro-top-play-btn">
+
+        <div class="ro-top-play-shimmer" aria-hidden="true"></div>
+
+        <div class="relative z-10 flex items-center gap-2.5">
+            <svg class="w-3.5 h-3.5 text-yellow-900 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+            </svg>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] sm:tracking-[0.45em] text-yellow-900 whitespace-nowrap">
+                {{ __('Play Now') }}
+            </span>
+        </div>
+    </a>
+
     <Disclosure as="nav" class="bg-white dark:bg-rapanel-navy-900 shadow-sm dark:shadow-2xl transition-colors duration-200" v-slot="{ open }">
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,14 +189,6 @@ const toggleMobileSubmenu = (name) => {
                         </template>
                     </div>
 
-                    <!-- Play Now button (desktop) -->
-                    <a v-if="$page.props.roBrowserUrl"
-                        :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-rapanel-gold hover:opacity-90 transition text-rapanel-navy-900 text-xs font-black uppercase tracking-wider shadow shrink-0">
-                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                        {{ __('Play Now') }}
-                    </a>
-
                     <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold ml-4 shrink-0">
                         <div class="flex items-center gap-2">
                             <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
@@ -231,14 +242,6 @@ const toggleMobileSubmenu = (name) => {
                     </template>
 
                     <div class="mt-6 pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
-                        <!-- Play Now button (mobile) -->
-                        <a v-if="$page.props.roBrowserUrl"
-                            :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
-                            class="flex items-center justify-center gap-2 w-full px-4 py-3 mb-3 rounded-lg bg-rapanel-gold hover:opacity-90 transition text-rapanel-navy-900 text-sm font-black uppercase tracking-wider shadow">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                            {{ __('Play Now') }}
-                        </a>
-
                         <div v-if="!$page.props.auth.user" class="grid grid-cols-2 gap-3">
                             <Link :href="safeRoute('login')" class="flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-text-light dark:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
                                 {{ __('Login') }}
@@ -294,3 +297,87 @@ const toggleMobileSubmenu = (name) => {
         </transition>
     </Disclosure>
 </template>
+
+<style scoped>
+/* ─── Botón Play Now fijo en el top del viewport ─── */
+.ro-top-play-btn {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 24px 15px;
+    border-radius: 0 0 20px 20px;
+    background: linear-gradient(
+        180deg,
+        #a16207 0%,
+        #ca8a04 15%,
+        #eab308 35%,
+        #fde047 52%,
+        #facc15 75%,
+        #ca8a04 100%
+    );
+    text-decoration: none;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow:
+        0 4px 18px rgba(253, 224, 71, 0.65),
+        0 10px 36px rgba(202, 138, 4, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    /* Empieza oculto arriba; la animación lo trae hacia abajo */
+    transform: translateX(-50%) translateY(-100%);
+    animation: roTopBtnIn 0.72s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform;
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ro-top-play-btn:hover {
+    filter: brightness(1.1) saturate(1.12);
+    box-shadow:
+        0 6px 28px rgba(253, 224, 71, 0.85),
+        0 14px 50px rgba(202, 138, 4, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Borde inferior más oscuro — refuerza el efecto de profundidad */
+.ro-top-play-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    height: 2px;
+    border-radius: 0 0 2px 2px;
+    background: linear-gradient(90deg, transparent, rgba(120, 53, 15, 0.55), transparent);
+    pointer-events: none;
+}
+
+/* Capa shimmer — barre de izquierda a derecha cada ~4 s */
+.ro-top-play-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        110deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.48) 50%,
+        transparent 80%
+    );
+    transform: translateX(-200%) skewX(-15deg);
+    animation: roShimmerSweep 4s ease-in-out infinite;
+    animation-delay: 0.9s;
+    pointer-events: none;
+}
+
+@keyframes roTopBtnIn {
+    from { transform: translateX(-50%) translateY(-100%); }
+    to   { transform: translateX(-50%) translateY(0);    }
+}
+
+@keyframes roShimmerSweep {
+    0%   { transform: translateX(-200%) skewX(-15deg); }
+    42%  { transform: translateX(350%)  skewX(-15deg); }
+    100% { transform: translateX(350%)  skewX(-15deg); }
+}
+</style>
