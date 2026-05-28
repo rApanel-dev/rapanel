@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link, useForm, router } from '@inertiajs/vue3';
+import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { ArrowLeftIcon, PhotoIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import RichTextEditor from '@/Components/RichTextEditor.vue';
@@ -8,6 +8,13 @@ import RichTextEditor from '@/Components/RichTextEditor.vue';
 const props = defineProps({ news: Object });
 
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
+
+const page = usePage();
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
 
 const imagePreview = ref(props.news.featured_image_url || null);
 
@@ -36,7 +43,7 @@ const submit = () => {
 };
 
 const confirmDelete = () => {
-    if (confirm('Delete this news item permanently?')) {
+    if (confirm(__('Delete this news item permanently?'))) {
         router.delete(safeRoute('admin.news.destroy', { news: props.news.id }));
     }
 };
@@ -54,14 +61,14 @@ const confirmDelete = () => {
                         <ArrowLeftIcon class="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">Edit News</h1>
-                        <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">Admin › News › Edit</p>
+                        <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">{{ __('Edit News') }}</h1>
+                        <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">{{ __('Admin › News › Edit') }}</p>
                     </div>
                 </div>
                 <button @click="confirmDelete"
                         class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-rapanel-danger border border-rapanel-danger/30 hover:bg-rapanel-danger/10 transition">
                     <TrashIcon class="w-4 h-4" />
-                    Delete
+                    {{ __('Delete') }}
                 </button>
             </div>
 
@@ -70,26 +77,26 @@ const confirmDelete = () => {
                 <!-- Category + Image row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">News Category</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">{{ __('News Category') }}</label>
                         <select v-model="form.type"
                                 class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10
                                        text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
-                            <option style="background:#1e2d4a;color:#E2E8F0" :value="1">News</option>
-                            <option style="background:#1e2d4a;color:#E2E8F0" :value="2">Event</option>
-                            <option style="background:#1e2d4a;color:#E2E8F0" :value="3">Notice</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="1">{{ __('News') }}</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="2">{{ __('Event') }}</option>
+                            <option style="background:#1e2d4a;color:#E2E8F0" :value="3">{{ __('Notice') }}</option>
                         </select>
                     </div>
 
                     <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
-                            Featured Image <span class="normal-case font-normal">(Optional)</span>
+                            {{ __('Featured Image') }} <span class="normal-case font-normal">{{ __('(Optional)') }}</span>
                         </label>
                         <label class="relative flex flex-col items-center justify-center h-28 rounded-lg border-2 border-dashed
                                       border-rapanel-navy-100 dark:border-white/20 hover:border-rapanel-blue/50 transition cursor-pointer overflow-hidden">
                             <img v-if="imagePreview" :src="imagePreview" class="absolute inset-0 w-full h-full object-cover" />
                             <div v-else class="flex flex-col items-center gap-1 text-rapanel-text-light/40 dark:text-white/30">
                                 <PhotoIcon class="w-8 h-8" />
-                                <span class="text-xs">Upload to replace</span>
+                                <span class="text-xs">{{ __('Upload to replace') }}</span>
                             </div>
                             <input type="file" class="sr-only" accept="image/*" @change="onImageChange" />
                         </label>
@@ -98,7 +105,7 @@ const confirmDelete = () => {
 
                 <!-- Title -->
                 <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">Title</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">{{ __('Title') }}</label>
                     <input v-model="form.title" type="text"
                            class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10
                                   text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
@@ -107,7 +114,7 @@ const confirmDelete = () => {
 
                 <!-- Body -->
                 <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">Content</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">{{ __('Content') }}</label>
                     <RichTextEditor v-model="form.body" />
                     <p v-if="form.errors.body" class="mt-1.5 text-xs text-rapanel-danger">{{ form.errors.body }}</p>
                 </div>
@@ -122,7 +129,7 @@ const confirmDelete = () => {
                             <span :class="['absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200',
                                            form[field] ? 'translate-x-5' : 'translate-x-0']" />
                         </button>
-                        <span class="text-sm font-medium text-rapanel-text-light dark:text-white">{{ label }}</span>
+                        <span class="text-sm font-medium text-rapanel-text-light dark:text-white">{{ __(label) }}</span>
                     </label>
                 </div>
 
@@ -131,11 +138,11 @@ const confirmDelete = () => {
                     <Link :href="safeRoute('admin.news.index')"
                           class="px-4 py-2 rounded-lg text-sm font-medium text-rapanel-text-light/70 dark:text-white/60
                                  hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
-                        Cancel
+                        {{ __('Cancel') }}
                     </Link>
                     <button type="submit" :disabled="form.processing"
                             class="px-5 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-semibold hover:opacity-90 transition shadow disabled:opacity-60">
-                        {{ form.processing ? 'Saving…' : 'Save Changes' }}
+                        {{ form.processing ? __('Saving…') : __('Save Changes') }}
                     </button>
                 </div>
             </form>

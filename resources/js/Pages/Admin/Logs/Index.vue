@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -10,6 +10,13 @@ const props = defineProps({
     categories: Array,
     filters:    Object,
 });
+
+const page = usePage();
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
 
 const search   = ref(props.filters?.search   ?? '');
 const category = ref(props.filters?.category ?? '');
@@ -91,19 +98,19 @@ const metaDetails = (log) => {
     <AdminLayout>
         <div class="space-y-5">
 
-            <PageHeader title="Action Logs" :description="`${logs.total} total entries`" />
+            <PageHeader :title="__('Action Logs')" :description="`${logs.total} ${__('total entries')}`" />
 
             <!-- Filters -->
             <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="relative flex-1">
                     <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
-                    <input v-model="search" type="text" placeholder="Search by user, action, or category…"
+                    <input v-model="search" type="text" :placeholder="__('Search by user, action, or category…')"
                         class="w-full pl-9 pr-3 py-2 text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg text-rapanel-text-light dark:text-white placeholder-rapanel-text-light/30 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 focus:border-rapanel-blue/50 transition-colors" />
                 </div>
 
                 <select v-model="category"
                     class="text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue">
-                    <option value="">All categories</option>
+                    <option value="">{{ __('All categories') }}</option>
                     <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
                 </select>
             </div>
@@ -114,17 +121,17 @@ const metaDetails = (log) => {
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap">Date</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Admin</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">Category</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Action</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Details</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">IP</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap">{{ __('Date') }}</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Admin') }}</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">{{ __('Category') }}</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Action') }}</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Details') }}</th>
+                                <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">{{ __('IP') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
                             <tr v-if="!logs.data?.length">
-                                <td colspan="6" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">No logs found.</td>
+                                <td colspan="6" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">{{ __('No logs found.') }}</td>
                             </tr>
                             <tr v-for="log in logs.data" :key="log.id"
                                 class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition align-top">
@@ -135,7 +142,7 @@ const metaDetails = (log) => {
                                     <span v-if="log.user" class="font-semibold text-rapanel-navy-900 dark:text-white text-sm">
                                         {{ log.user.name }}
                                     </span>
-                                    <span v-else class="text-rapanel-text-light/50 dark:text-white/40 text-xs">Deleted user</span>
+                                    <span v-else class="text-rapanel-text-light/50 dark:text-white/40 text-xs">{{ __('Deleted user') }}</span>
                                 </td>
                                 <td class="px-4 py-3 text-xs text-rapanel-text-light/60 dark:text-white/50 hidden md:table-cell whitespace-nowrap">
                                     {{ log.category }}

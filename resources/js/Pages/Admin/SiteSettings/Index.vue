@@ -230,7 +230,7 @@ const executeDanger = () => {
 
             <!-- Discord -->
             <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-4">
-                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">Discord</h2>
+                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Discord') }}</h2>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -362,7 +362,7 @@ const executeDanger = () => {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Favicon -->
                     <div>
-                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">Favicon</label>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Favicon') }}</label>
                         <div class="flex items-center gap-3 mb-2">
                             <div v-if="faviconPreview" class="h-10 w-10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-lg flex items-center justify-center border border-rapanel-navy-100 dark:border-white/10">
                                 <img :src="faviconPreview" class="h-7 w-7 object-contain" alt="Favicon" />
@@ -373,7 +373,7 @@ const executeDanger = () => {
                         </div>
                         <input type="file" accept=".png,.jpg,.jpeg,.ico,.svg" @change="onFavicon"
                             class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">PNG/ICO, max 512KB</p>
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('PNG/ICO, max 512KB') }}</p>
                         <p v-if="seoForm.errors.favicon" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.favicon }}</p>
                     </div>
 
@@ -388,7 +388,7 @@ const executeDanger = () => {
                         </div>
                         <input type="file" accept="image/*" @change="onOgImage"
                             class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">1200×630px recomendado, max 2MB</p>
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('1200×630px recommended, max 2MB') }}</p>
                         <p v-if="seoForm.errors.seo_og_image" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_og_image }}</p>
                     </div>
                 </div>

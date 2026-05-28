@@ -29,6 +29,11 @@ import LocaleSelector from '@/Components/LocaleSelector.vue';
 
 const page = usePage();
 const sidebarOpen = ref(false);
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
 const flash = computed(() => page.props.flash ?? {});
 
 const navigation = [
@@ -36,14 +41,14 @@ const navigation = [
     { name: 'Master Accounts',    route: 'admin.users.index',              icon: UserCircleIcon,             group: 'Accounts' },
     { name: 'Game Accounts',      route: 'admin.game-accounts.index',      icon: ComputerDesktopIcon,        group: 'Accounts' },
     { name: 'Characters',         route: 'admin.characters.index',         icon: UserGroupIcon,              group: 'Accounts' },
-    { name: 'News',               route: 'admin.news.index',               icon: NewspaperIcon,              group: 'Content' },
-    { name: 'Downloads',          route: 'admin.downloads.index',          icon: ArrowDownTrayIcon,          group: 'Content' },
-    { name: 'Download Categories',route: 'admin.download-categories.index',icon: TagIcon,                    group: 'Content' },
-    { name: 'Item DB',            route: 'admin.item-db.index',            icon: BookOpenIcon,               group: 'Content' },
-    { name: 'Mob DB',             route: 'admin.mob-db.index',             icon: CpuChipIcon,                group: 'Content' },
-    { name: 'Map DB',             route: 'admin.map-db.index',             icon: MapPinIcon,                 group: 'Content' },
-    { name: 'MvP Cards',          route: 'admin.mvp-cards.index',          icon: TrophyIcon,                 group: 'Content' },
-    { name: 'Drop Rates',         route: 'admin.drop-rates.index',         icon: ChartBarIcon,               group: 'Content' },
+    { name: 'News',               route: 'admin.news.index',               icon: NewspaperIcon,              group: 'Website' },
+    { name: 'Downloads',          route: 'admin.downloads.index',          icon: ArrowDownTrayIcon,          group: 'Website' },
+    { name: 'Download Categories',route: 'admin.download-categories.index',icon: TagIcon,                    group: 'Website' },
+    { name: 'Item DB',            route: 'admin.item-db.index',            icon: BookOpenIcon,               group: 'Emulator Data' },
+    { name: 'Mob DB',             route: 'admin.mob-db.index',             icon: CpuChipIcon,                group: 'Emulator Data' },
+    { name: 'Map DB',             route: 'admin.map-db.index',             icon: MapPinIcon,                 group: 'Emulator Data' },
+    { name: 'Drop Rates',         route: 'admin.drop-rates.index',         icon: ChartBarIcon,               group: 'Emulator Data' },
+    { name: 'MvP Cards',          route: 'admin.mvp-cards.index',          icon: TrophyIcon,                 group: 'Emulator Data' },
     { name: 'Action Logs',        route: 'admin.logs.index',               icon: ClipboardDocumentListIcon,  group: 'System' },
     { name: 'Console',            route: 'admin.console.index',            icon: CommandLineIcon,            group: 'System' },
     { name: 'Settings',           route: 'admin.settings.index',           icon: Cog6ToothIcon,              group: 'System' },
@@ -153,14 +158,14 @@ const doLogout = () => router.post(route('logout'));
                             ]">
                                 <component :is="item.icon" class="w-4 h-4 shrink-0" />
                             </div>
-                            <span class="truncate">{{ item.name }}</span>
+                            <span class="truncate">{{ __(item.name) }}</span>
                         </Link>
                     </template>
 
                     <!-- Grouped items -->
-                    <template v-for="groupName in ['Accounts', 'Content', 'System']" :key="groupName">
+                    <template v-for="groupName in ['Accounts', 'Website', 'Emulator Data', 'System']" :key="groupName">
                         <div class="mt-5 mb-1.5 px-3 flex items-center gap-2">
-                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-rapanel-gold">{{ groupName }}</span>
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-rapanel-gold">{{ __(groupName) }}</span>
                             <div class="flex-1 h-px bg-white/[0.045]"></div>
                         </div>
                         <div class="space-y-0.5">
@@ -179,7 +184,7 @@ const doLogout = () => router.post(route('logout'));
                                     ]">
                                         <component :is="item.icon" class="w-4 h-4 shrink-0" />
                                     </div>
-                                    <span class="truncate">{{ item.name }}</span>
+                                    <span class="truncate">{{ __(item.name) }}</span>
                                 </Link>
                             </template>
                         </div>

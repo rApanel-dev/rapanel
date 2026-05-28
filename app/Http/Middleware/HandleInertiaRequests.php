@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             }),
 
             'serverName'      => config('services.ra.server_name', 'rApanel'),
+            'roBrowserUrl'    => config('services.ra.robrowser_url', ''),
             'discordServerId' => config('services.discord.server_id'),
             'twoFactorEnabled'     => config('services.ra.2fa_enabled', false),
             'twoFactorForceAdmins' => config('services.ra.2fa_force_admins', false),

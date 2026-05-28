@@ -170,6 +170,14 @@ const toggleMobileSubmenu = (name) => {
                         </template>
                     </div>
 
+                    <!-- Play Now button (desktop) -->
+                    <a v-if="$page.props.roBrowserUrl"
+                        :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
+                        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-rapanel-gold hover:opacity-90 transition text-rapanel-navy-900 text-xs font-black uppercase tracking-wider shadow shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                        {{ __('Play Now') }}
+                    </a>
+
                     <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold ml-4 shrink-0">
                         <div class="flex items-center gap-2">
                             <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
@@ -223,6 +231,14 @@ const toggleMobileSubmenu = (name) => {
                     </template>
 
                     <div class="mt-6 pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
+                        <!-- Play Now button (mobile) -->
+                        <a v-if="$page.props.roBrowserUrl"
+                            :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
+                            class="flex items-center justify-center gap-2 w-full px-4 py-3 mb-3 rounded-lg bg-rapanel-gold hover:opacity-90 transition text-rapanel-navy-900 text-sm font-black uppercase tracking-wider shadow">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                            {{ __('Play Now') }}
+                        </a>
+
                         <div v-if="!$page.props.auth.user" class="grid grid-cols-2 gap-3">
                             <Link :href="safeRoute('login')" class="flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-text-light dark:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
                                 {{ __('Login') }}

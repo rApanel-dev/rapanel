@@ -1,12 +1,20 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { router }  from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import {
     ArrowPathIcon, PlayIcon, StopIcon, CommandLineIcon,
     SignalIcon, SignalSlashIcon,
 } from '@heroicons/vue/24/outline';
 import { useConsoleSocket } from '@/Composables/useConsoleSocket.js';
+
+// ─── i18n ─────────────────────────────────────────────────────────────────────
+const page = usePage();
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 const props = defineProps({
@@ -155,13 +163,13 @@ onUnmounted(() => {
 
             <!-- Header -->
             <div>
-                <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">Console</h1>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-white/50 mt-1">rAthena server monitoring</p>
+                <h1 class="text-2xl font-bold text-rapanel-text-light dark:text-white">{{ __('Console') }}</h1>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-white/50 mt-1">{{ __('rAthena server monitoring') }}</p>
             </div>
 
             <!-- Tab switcher -->
             <div class="flex gap-1 bg-rapanel-navy-100 dark:bg-rapanel-navy-800 rounded-lg p-1 w-fit">
-                <button v-for="tab in [{ key: 'live', label: 'Live Console' }, { key: 'logs', label: 'Game Logs' }]"
+                <button v-for="tab in [{ key: 'live', label: __('Live Console') }, { key: 'logs', label: __('Game Logs') }]"
                     :key="tab.key"
                     @click="activeTab = tab.key"
                     :class="[
@@ -184,7 +192,7 @@ onUnmounted(() => {
                         <CommandLineIcon class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                         <div>
                             <p class="font-semibold text-amber-700 dark:text-amber-400 text-sm">
-                                Live console not configured
+                                {{ __('Live console not configured') }}
                             </p>
                             <p class="text-sm text-amber-600 dark:text-amber-500 mt-1">
                                 Deploy <code class="font-mono">ws-server/</code> on your rAthena host and add to <code class="font-mono">.env</code>:
@@ -232,11 +240,11 @@ RA_WS_SECRET=your_secret_here</pre>
                                 <div v-if="consoles[activeServer].connected.value"
                                     class="flex items-center gap-1 text-xs text-green-400">
                                     <SignalIcon class="w-3.5 h-3.5" />
-                                    <span>WebSocket</span>
+                                    <span>{{ __('WebSocket') }}</span>
                                 </div>
                                 <div v-else class="flex items-center gap-1 text-xs text-slate-400">
                                     <SignalSlashIcon class="w-3.5 h-3.5" />
-                                    <span>Connecting…</span>
+                                    <span>{{ __('Connecting…') }}</span>
                                 </div>
                             </div>
 
@@ -246,26 +254,26 @@ RA_WS_SECRET=your_secret_here</pre>
                                     :disabled="['running','starting'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
                                     class="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                     <PlayIcon class="w-3.5 h-3.5" />
-                                    Start
+                                    {{ __('Start') }}
                                 </button>
                                 <button @click="serverAction(activeServer, 'stop')"
                                     :disabled="['stopped','stopping'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
                                     class="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                     <StopIcon class="w-3.5 h-3.5" />
-                                    Stop
+                                    {{ __('Stop') }}
                                 </button>
                                 <button @click="serverAction(activeServer, 'restart')"
                                     :disabled="consoles[activeServer].status.value === 'stopped' || controlling[activeServer]"
                                     class="flex items-center gap-1.5 px-3 py-1.5 bg-rapanel-blue hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                     <ArrowPathIcon class="w-3.5 h-3.5" :class="{ 'animate-spin': controlling[activeServer] === 'restart' }" />
-                                    Restart
+                                    {{ __('Restart') }}
                                 </button>
                                 <button @click="autoScroll = !autoScroll"
                                     :class="autoScroll
                                         ? 'bg-rapanel-navy-700 text-white border-rapanel-navy-600'
                                         : 'bg-transparent text-rapanel-text-light/50 dark:text-white/40 border-rapanel-navy-100 dark:border-white/10'"
                                     class="px-3 py-1.5 text-xs font-semibold rounded-lg border transition">
-                                    Auto-scroll
+                                    {{ __('Auto-scroll') }}
                                 </button>
                             </div>
                         </div>
@@ -282,7 +290,7 @@ RA_WS_SECRET=your_secret_here</pre>
                                 </div>
                                 <span class="text-xs text-white/40 font-mono ml-2 capitalize">{{ activeServer }}-server</span>
                                 <span class="ml-auto text-xs text-white/30 font-mono">
-                                    {{ consoles[activeServer].lines.value.length }} lines
+                                    {{ consoles[activeServer].lines.value.length }} {{ __('Lines') }}
                                 </span>
                             </div>
                             <!-- Output -->
@@ -290,7 +298,7 @@ RA_WS_SECRET=your_secret_here</pre>
                                 class="flex-1 overflow-y-auto p-4 font-mono text-xs leading-relaxed">
                                 <div v-if="!consoles[activeServer].lines.value.length"
                                     class="text-slate-600 italic select-none">
-                                    No output yet…
+                                    {{ __('No output yet…') }}
                                 </div>
                                 <div v-for="(line, i) in consoles[activeServer].lines.value"
                                     :key="i"
@@ -309,18 +317,18 @@ RA_WS_SECRET=your_secret_here</pre>
                 <!-- Controls -->
                 <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                     <div class="flex-1">
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 mb-1">Log File</label>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 mb-1">{{ __('Log File') }}</label>
                         <select v-model="selectedLog" @change="onLogChange"
                             :disabled="!availableLogs?.length"
                             class="w-full text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue disabled:opacity-50">
-                            <option v-if="!availableLogs?.length" value="">No log files found</option>
+                            <option v-if="!availableLogs?.length" value="">{{ __('No log files found') }}</option>
                             <option v-for="log in availableLogs" :key="log.key" :value="log.key">
                                 {{ log.label }} ({{ log.file }})
                             </option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 mb-1">Lines</label>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 mb-1">{{ __('Lines') }}</label>
                         <select v-model="logLines" @change="onLinesChange"
                             class="text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue">
                             <option :value="50">50</option>
@@ -333,22 +341,22 @@ RA_WS_SECRET=your_secret_here</pre>
                         <button @click="refresh()"
                             class="flex items-center gap-1.5 px-4 py-2 bg-rapanel-blue text-white text-sm font-semibold rounded-lg hover:opacity-90 transition">
                             <ArrowPathIcon class="w-4 h-4" />
-                            Refresh
+                            {{ __('Refresh') }}
                         </button>
                         <button @click="toggleAutoRefresh"
                             :class="autoRefresh ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'"
                             class="flex items-center gap-1.5 px-4 py-2 text-white text-sm font-semibold rounded-lg transition">
                             <PlayIcon v-if="!autoRefresh" class="w-4 h-4" />
                             <StopIcon v-else class="w-4 h-4" />
-                            {{ autoRefresh ? 'Stop' : 'Auto' }}
+                            {{ autoRefresh ? __('Stop') : __('Auto') }}
                         </button>
                     </div>
                     <div class="text-[10px] text-rapanel-text-light/50 dark:text-white/40 whitespace-nowrap sm:ml-auto">
                         <div v-if="autoRefresh" class="flex items-center gap-1 text-green-500">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            Live · {{ formatTime(lastRefresh) }}
+                            {{ __('Live') }} · {{ formatTime(lastRefresh) }}
                         </div>
-                        <div v-else>Last: {{ formatTime(lastRefresh) }}</div>
+                        <div v-else>{{ __('Last') }}: {{ formatTime(lastRefresh) }}</div>
                     </div>
                 </div>
 
@@ -358,10 +366,10 @@ RA_WS_SECRET=your_secret_here</pre>
                     <div class="flex items-start gap-3">
                         <CommandLineIcon class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                         <div>
-                            <p class="font-semibold text-amber-700 dark:text-amber-400 text-sm">Log file unavailable</p>
+                            <p class="font-semibold text-amber-700 dark:text-amber-400 text-sm">{{ __('Log file unavailable') }}</p>
                             <p class="text-sm text-amber-600 dark:text-amber-500 mt-1">{{ error }}</p>
                             <div class="mt-3 text-xs text-amber-500 dark:text-amber-400/70 font-mono bg-amber-100 dark:bg-amber-900/30 rounded p-2">
-                                Add to .env: <span class="font-bold">RA_LOG_PATH=/path/to/rathena/log</span>
+                                {{ __('Add to .env:') }} <span class="font-bold">RA_LOG_PATH=/path/to/rathena/log</span>
                             </div>
                         </div>
                     </div>
@@ -377,11 +385,11 @@ RA_WS_SECRET=your_secret_here</pre>
                         </div>
                         <span class="text-xs text-white/40 font-mono ml-2">
                             {{ availableLogs?.find(l => l.key === selectedLog)?.file ?? selectedLog + '.log' }}
-                            · last {{ logLines }} lines
+                            · {{ __('last :n lines', { n: logLines }) }}
                         </span>
                         <span v-if="autoRefresh" class="ml-auto flex items-center gap-1 text-[10px] text-green-400">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                            LIVE
+                            {{ __('LIVE') }}
                         </span>
                     </div>
                     <div class="flex-1 overflow-y-auto p-4 max-h-[60vh]">
@@ -389,7 +397,7 @@ RA_WS_SECRET=your_secret_here</pre>
                             class="text-xs text-green-300 font-mono leading-relaxed whitespace-pre-wrap break-all">{{ content }}</pre>
                         <div v-else
                             class="flex items-center justify-center h-32 text-rapanel-text-light/50 dark:text-white/40 text-sm">
-                            No content available.
+                            {{ __('No content available.') }}
                         </div>
                     </div>
                 </div>

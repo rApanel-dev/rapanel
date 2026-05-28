@@ -86,6 +86,31 @@ const openClaimModal = () => {
 
             <FlashMessages :success="flashSuccess" :error="flashError" />
 
+            <!-- Play Now banner -->
+            <a v-if="$page.props.roBrowserUrl"
+                :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
+                class="group flex items-center justify-between gap-4 bg-gradient-to-r from-rapanel-navy-800 to-rapanel-navy-900 dark:from-rapanel-navy-800 dark:to-[#0a1120] border border-rapanel-gold/30 hover:border-rapanel-gold/60 rounded-xl px-6 py-5 shadow-xl transition-all duration-200 hover:shadow-rapanel-gold/10 hover:shadow-2xl">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rapanel-gold/15 border border-rapanel-gold/30 flex items-center justify-center shrink-0 group-hover:bg-rapanel-gold/25 transition">
+                        <svg class="w-6 h-6 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-white font-bold text-base leading-tight">{{ __('Play Now in your Browser') }}</p>
+                        <p class="text-white/50 text-xs mt-0.5">{{ __('No download required — play directly from this page') }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <div v-if="$page.props.serverStatus?.online" class="hidden sm:flex items-center gap-1.5 text-rapanel-success text-xs font-bold uppercase tracking-wider">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
+                        {{ __('Online') }}
+                    </div>
+                    <span class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-rapanel-gold text-rapanel-navy-900 text-sm font-black uppercase tracking-wider group-hover:opacity-90 transition shadow">
+                        {{ __('Play Now') }}
+                        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                    </span>
+                </div>
+            </a>
+
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">

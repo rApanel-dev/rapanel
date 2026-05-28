@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { MagnifyingGlassIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -22,6 +22,13 @@ const search  = ref(props.filters?.search ?? '');
 const role    = ref(props.filters?.role ?? '');
 const status  = ref(props.filters?.status ?? '');
 
+const page = usePage();
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
+
 const safeRoute = (name, params) => { try { return route(name, params); } catch { return '#'; } };
 
 const dt = (v) => v ? v.replace('T', ' ').replace(/\.\d+Z?$/, '') : '—';;
@@ -41,13 +48,13 @@ watch([search, role, status], applyFilters);
 
 // ── Role toggle ─────────────────────────────────────────────────────────
 const updateRole = (user, newRole) => {
-    if (!confirm(`Change ${user.name}'s role to ${newRole}?`)) return;
+    if (!confirm(__("Change :name's role to :role?", { name: user.name, role: newRole }))) return;
     router.put(safeRoute('admin.users.role', user.id), { role: newRole }, { preserveScroll: true });
 };
 
 // ── Status toggle ────────────────────────────────────────────────────────
 const updateStatus = (user, newStatus) => {
-    const msg = newStatus ? `Activate ${user.name}?` : `Ban ${user.name}?`;
+    const msg = newStatus ? __('Activate :name?', { name: user.name }) : __('Ban :name?', { name: user.name });
     if (!confirm(msg)) return;
     router.put(safeRoute('admin.users.status', user.id), { status: newStatus }, { preserveScroll: true });
 };
@@ -91,7 +98,7 @@ const submitEdit = () => {
 
 // ── Clear MFA ────────────────────────────────────────────────────────────
 const clearMfa = (user) => {
-    if (!confirm(`Clear MFA for ${user.name}?`)) return;
+    if (!confirm(__('Clear MFA for :name?', { name: user.name }))) return;
     router.delete(safeRoute('admin.users.clear-mfa', user.id), { preserveScroll: true });
 };
 
@@ -101,9 +108,9 @@ const clearMfa = (user) => {
     <AdminLayout>
         <div class="space-y-5">
 
-            <PageHeader title="Master Accounts">
+            <PageHeader :title="__('Master Accounts')">
                 <template #description>
-                    <span class="font-bold text-rapanel-blue">{{ users.total }}</span> total master accounts created
+                    <span class="font-bold text-rapanel-blue">{{ users.total }}</span> {{ __('total master accounts created') }}
                 </template>
             </PageHeader>
 
@@ -111,20 +118,20 @@ const clearMfa = (user) => {
             <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="relative flex-1">
                     <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
-                    <input v-model="search" type="text" placeholder="Name, email, ID, IP, country, birthdate…"
+                    <input v-model="search" type="text" :placeholder="__('Name, email, ID, IP, country, birthdate…')"
                         class="w-full pl-9 pr-3 py-2 text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg text-rapanel-text-light dark:text-white placeholder-rapanel-text-light/30 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 focus:border-rapanel-blue/50 transition-colors" />
                 </div>
                 <select v-model="role"
                     class="text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 transition-colors">
-                    <option value="">All roles</option>
-                    <option value="User">User</option>
-                    <option value="Admin">Admin</option>
+                    <option value="">{{ __('All roles') }}</option>
+                    <option value="User">{{ __('User') }}</option>
+                    <option value="Admin">{{ __('Admin') }}</option>
                 </select>
                 <select v-model="status"
                     class="text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 transition-colors">
-                    <option value="">All statuses</option>
-                    <option value="1">Active</option>
-                    <option value="0">Banned</option>
+                    <option value="">{{ __('All statuses') }}</option>
+                    <option value="1">{{ __('Active') }}</option>
+                    <option value="0">{{ __('Banned') }}</option>
                 </select>
             </div>
 
@@ -132,23 +139,23 @@ const clearMfa = (user) => {
                 <thead>
                     <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
                         <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">ID</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Name</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">Email</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Role</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Status</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Country</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">Birthdate</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">Last Login</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">Last IP</th>
-                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Donate</th>
-                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Votes</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">Joined</th>
-                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">Actions</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Name') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">{{ __('Email') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Role') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Status') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Country') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">{{ __('Birthdate') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">{{ __('Last Login') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden xl:table-cell">{{ __('Last IP') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Donate') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Votes') }}</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Joined') }}</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
                     <tr v-if="!users.data?.length">
-                        <td colspan="13" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">No users found.</td>
+                        <td colspan="13" class="px-4 py-8 text-center text-rapanel-text-light/50 dark:text-white/40">{{ __('No users found.') }}</td>
                     </tr>
                     <tr v-for="user in users.data" :key="user.id"
                         class="hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
@@ -162,10 +169,10 @@ const clearMfa = (user) => {
                             <span v-if="user.role === 'Admin'"
                                 class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rapanel-gold/15 border border-rapanel-gold/40 text-rapanel-gold text-[10px] font-black uppercase tracking-wider">
                                 <ShieldCheckIcon class="w-3 h-3" />
-                                Admin
+                                {{ __('Admin') }}
                             </span>
                             <span v-else class="text-sm text-rapanel-text-light/60 dark:text-white/50">
-                                User
+                                {{ __('User') }}
                             </span>
                         </td>
 
@@ -173,7 +180,7 @@ const clearMfa = (user) => {
                         <td class="px-4 py-3">
                             <StatusBadge
                                 :variant="user.status ? 'success' : 'danger'"
-                                :label="user.status ? 'Active' : 'Banned'"
+                                :label="user.status ? __('Active') : __('Banned')"
                                 size="sm"
                             />
                         </td>
@@ -196,17 +203,17 @@ const clearMfa = (user) => {
                         <td class="px-4 py-3">
                             <div class="flex items-center justify-end gap-1">
                                 <!-- 1. View -->
-                                <ActionButton variant="blue" size="icon" title="View dashboard"
+                                <ActionButton variant="blue" size="icon" :title="__('View dashboard')"
                                     @click="router.visit(safeRoute('dashboard') + '?as=' + user.id)">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 </ActionButton>
                                 <!-- 2. Edit -->
-                                <ActionButton variant="navy" size="icon" title="Edit user" @click="openEdit(user)">
+                                <ActionButton variant="navy" size="icon" :title="__('Edit user')" @click="openEdit(user)">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                                 </ActionButton>
                                 <!-- 3. Promote / Demote -->
                                 <ActionButton variant="gold" size="icon"
-                                    :title="user.role === 'Admin' ? 'Demote to User' : 'Promote to Admin'"
+                                    :title="user.role === 'Admin' ? __('Demote to User') : __('Promote to Admin')"
                                     @click="updateRole(user, user.role === 'Admin' ? 'User' : 'Admin')">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
                                 </ActionButton>
@@ -214,7 +221,7 @@ const clearMfa = (user) => {
                                 <ActionButton
                                     :variant="user.status ? 'danger' : 'success'"
                                     size="icon"
-                                    :title="user.status ? 'Ban user' : 'Activate user'"
+                                    :title="user.status ? __('Ban user') : __('Activate user')"
                                     @click="updateStatus(user, user.status ? 0 : 1)">
                                     <svg v-if="user.status" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                                     <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -236,7 +243,7 @@ const clearMfa = (user) => {
                 <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
                 <div class="px-6 pt-5 pb-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                     <h2 class="text-lg font-display font-bold tracking-wide text-rapanel-navy-900 dark:text-white">
-                        Edit User — <span class="text-rapanel-blue">{{ editTarget?.name }}</span>
+                        {{ __('Edit User') }} — <span class="text-rapanel-blue">{{ editTarget?.name }}</span>
                     </h2>
                     <p class="text-xs text-rapanel-text-light/40 dark:text-white/30 mt-0.5">ID: {{ editTarget?.id }}</p>
                 </div>
@@ -246,25 +253,25 @@ const clearMfa = (user) => {
 
                 <!-- § 1: Identity -->
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">Identity</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">{{ __('Identity') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <InputLabel value="Name" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Name')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.name" type="text" required autofocus class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.name" />
                         </div>
                         <div>
-                            <InputLabel value="Email" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Email')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.email" type="email" required class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.email" />
                         </div>
                         <div>
-                            <InputLabel value="Country (2-letter code)" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Country (2-letter code)')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.country" type="text" maxlength="2" placeholder="CL" class="mt-1 block w-full dark:bg-rapanel-navy-900 uppercase" />
                             <InputError class="mt-1" :message="editForm.errors.country" />
                         </div>
                         <div>
-                            <InputLabel value="Birthdate" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Birthdate')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.birthdate" type="date" class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.birthdate" />
                         </div>
@@ -273,15 +280,15 @@ const clearMfa = (user) => {
 
                 <!-- § 2: Points -->
                 <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">Points</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">{{ __('Points') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <InputLabel value="Donation Points" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Donation Points')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.donation_points" type="number" min="0" class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.donation_points" />
                         </div>
                         <div>
-                            <InputLabel value="Vote Points" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Vote Points')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.vote_points" type="number" min="0" class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.vote_points" />
                         </div>
@@ -290,21 +297,21 @@ const clearMfa = (user) => {
 
                 <!-- § 3: Permissions -->
                 <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">Permissions</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">{{ __('Permissions') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <InputLabel value="Role" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Role')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <select v-model="editForm.role" class="mt-1 block w-full text-sm bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 transition-colors">
-                                <option value="User">User</option>
-                                <option value="Admin">Admin</option>
+                                <option value="User">{{ __('User') }}</option>
+                                <option value="Admin">{{ __('Admin') }}</option>
                             </select>
                             <InputError class="mt-1" :message="editForm.errors.role" />
                         </div>
                         <div>
-                            <InputLabel value="Status" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Status')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <select v-model="editForm.status" class="mt-1 block w-full text-sm bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 transition-colors">
-                                <option :value="1">Active</option>
-                                <option :value="0">Banned</option>
+                                <option :value="1">{{ __('Active') }}</option>
+                                <option :value="0">{{ __('Banned') }}</option>
                             </select>
                             <InputError class="mt-1" :message="editForm.errors.status" />
                         </div>
@@ -313,29 +320,29 @@ const clearMfa = (user) => {
 
                 <!-- § 4: Security / MFA -->
                 <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">Security</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">{{ __('Security') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- MFA status + clear -->
                         <div class="flex flex-col gap-1.5">
-                            <span class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark">Two-Factor Auth (MFA)</span>
+                            <span class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Two-Factor Auth (MFA)') }}</span>
                             <div class="flex items-center gap-3 mt-1">
                                 <span :class="editTarget?.has_two_factor
                                     ? 'bg-rapanel-success/10 text-rapanel-success border-rapanel-success/30'
                                     : 'bg-white/5 text-rapanel-text-light/40 dark:text-white/30 border-white/10',
                                     'text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border'">
-                                    {{ editTarget?.has_two_factor ? 'Active' : 'Not set' }}
+                                    {{ editTarget?.has_two_factor ? __('Active') : __('Not set') }}
                                 </span>
                                 <button v-if="editTarget?.has_two_factor" type="button"
                                     @click="clearMfa(editTarget)"
                                     class="text-xs font-semibold text-rapanel-danger hover:underline">
-                                    Clear MFA
+                                    {{ __('Clear MFA') }}
                                 </button>
                             </div>
                         </div>
                         <!-- Email verified -->
                         <div>
-                            <InputLabel value="Email Verified At" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
-                            <input :value="dt(editTarget?.email_verified_at) || 'Not verified'" disabled
+                            <InputLabel :value="__('Email Verified At')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <input :value="dt(editTarget?.email_verified_at) || __('Not verified')" disabled
                                 class="mt-1 block w-full text-sm px-3 py-2 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.03] border border-rapanel-navy-100 dark:border-white/[0.06] text-rapanel-text-light/50 dark:text-white/30 cursor-not-allowed" />
                         </div>
                     </div>
@@ -343,13 +350,13 @@ const clearMfa = (user) => {
 
                 <!-- § 5: System info (read-only) -->
                 <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">System Info <span class="normal-case font-normal tracking-normal text-rapanel-text-light/30 dark:text-white/20">(read-only)</span></p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-3">{{ __('System Info') }} <span class="normal-case font-normal tracking-normal text-rapanel-text-light/30 dark:text-white/20">(read-only)</span></p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div v-for="field in [
-                            { label: 'Last IP',        value: editTarget?.last_ip },
-                            { label: 'Last Login',     value: dt(editTarget?.last_login) },
-                            { label: 'Created At',     value: dt(editTarget?.created_at) },
-                            { label: 'Updated At',     value: dt(editTarget?.updated_at) },
+                            { label: __('Last IP'),        value: editTarget?.last_ip },
+                            { label: __('Last Login'),     value: dt(editTarget?.last_login) },
+                            { label: __('Created At'),     value: dt(editTarget?.created_at) },
+                            { label: __('Updated At'),     value: dt(editTarget?.updated_at) },
                             { label: 'Remember Token', value: editTarget?.remember_token },
                             { label: 'API Token',      value: editTarget?.api_token },
                         ]" :key="field.label">
@@ -362,16 +369,16 @@ const clearMfa = (user) => {
 
                 <!-- § 6: Password reset -->
                 <div class="border-t border-rapanel-navy-100 dark:border-white/[0.06] pt-5">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-1">Reset Password</p>
-                    <p class="text-xs text-rapanel-text-light/40 dark:text-white/25 mb-3">Leave blank to keep current password.</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-white/30 mb-1">{{ __('Reset Password') }}</p>
+                    <p class="text-xs text-rapanel-text-light/40 dark:text-white/25 mb-3">{{ __('Leave blank to keep current password.') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <InputLabel value="New Password" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('New Password')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.password" type="password" autocomplete="new-password" class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                             <InputError class="mt-1" :message="editForm.errors.password" />
                         </div>
                         <div>
-                            <InputLabel value="Confirm Password" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            <InputLabel :value="__('Confirm Password')" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <TextInput v-model="editForm.password_confirmation" type="password" autocomplete="new-password" class="mt-1 block w-full dark:bg-rapanel-navy-900" />
                         </div>
                     </div>
@@ -379,10 +386,10 @@ const clearMfa = (user) => {
 
                 <!-- Footer -->
                 <div class="flex justify-end gap-3 pt-2 border-t border-rapanel-navy-100 dark:border-white/[0.06]">
-                    <SecondaryButton type="button" @click="closeEdit">Cancel</SecondaryButton>
+                    <SecondaryButton type="button" @click="closeEdit">{{ __('Cancel') }}</SecondaryButton>
                     <button type="submit" :disabled="editForm.processing"
                         class="px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
-                        {{ editForm.processing ? 'Saving…' : 'Save Changes' }}
+                        {{ editForm.processing ? __('Saving…') : __('Save Changes') }}
                     </button>
                 </div>
             </form>

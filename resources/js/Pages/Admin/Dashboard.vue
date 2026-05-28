@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import WorldMap from '@/Components/Admin/WorldMap.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import {
     UsersIcon,
     ComputerDesktopIcon,
@@ -16,6 +16,13 @@ const props = defineProps({
     mapSeries:    Object,
     topCountries: Array,
 });
+
+const page = usePage();
+const __ = (key, rep = {}) => {
+    let t = page.props.translations?.[key] || key;
+    Object.entries(rep).forEach(([k, v]) => { t = t.replace(`:${k}`, v); });
+    return t;
+};
 
 const safeRoute = (name) => { try { return route(name); } catch { return '#'; } };
 
@@ -43,42 +50,42 @@ const barWidth = (count) => {
     <AdminLayout>
         <div class="space-y-6">
 
-            <PageHeader title="Admin Dashboard" description="Server overview and player distribution" />
+            <PageHeader :title="__('Admin Dashboard')" :description="__('Server overview and player distribution')" />
 
             <!-- Stats grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-                <StatsCard label="Master Accounts" :value="stats.total_users" accent="blue">
+                <StatsCard :label="__('Master Accounts')" :value="stats.total_users" accent="blue">
                     <template #icon><UsersIcon class="w-5 h-5 text-rapanel-blue" /></template>
                     <template #footer>
                         <div class="flex gap-3 text-xs">
-                            <span class="text-rapanel-success font-semibold">{{ stats.active_users }} active</span>
-                            <span class="text-rapanel-danger font-semibold">{{ stats.banned_users }} banned</span>
+                            <span class="text-rapanel-success font-semibold">{{ stats.active_users }} {{ __('active') }}</span>
+                            <span class="text-rapanel-danger font-semibold">{{ stats.banned_users }} {{ __('banned') }}</span>
                         </div>
                     </template>
                 </StatsCard>
 
-                <StatsCard label="Admins" :value="stats.admin_users" accent="gold">
+                <StatsCard :label="__('Admins')" :value="stats.admin_users" accent="gold">
                     <template #icon><ShieldExclamationIcon class="w-5 h-5 text-rapanel-gold" /></template>
                     <template #footer>
-                        <div class="text-xs text-rapanel-text-light/40 dark:text-white/35">Panel administrators</div>
+                        <div class="text-xs text-rapanel-text-light/40 dark:text-white/35">{{ __('Panel administrators') }}</div>
                     </template>
                 </StatsCard>
 
-                <StatsCard label="Game Accounts" :value="stats.total_game_accounts" accent="purple">
+                <StatsCard :label="__('Game Accounts')" :value="stats.total_game_accounts" accent="purple">
                     <template #icon><ComputerDesktopIcon class="w-5 h-5 text-rapanel-purple" /></template>
                     <template #footer>
-                        <div class="text-xs text-rapanel-success font-semibold">{{ stats.active_game_accounts }} active</div>
+                        <div class="text-xs text-rapanel-success font-semibold">{{ stats.active_game_accounts }} {{ __('active') }}</div>
                     </template>
                 </StatsCard>
 
-                <StatsCard label="Players Online" :value="$page.props.serverStatus.players" accent="green">
+                <StatsCard :label="__('Players Online')" :value="$page.props.serverStatus.players" accent="green">
                     <template #icon><WifiIcon class="w-5 h-5 text-rapanel-success" /></template>
                     <template #footer>
                         <div :class="$page.props.serverStatus.online ? 'text-rapanel-success' : 'text-rapanel-danger'"
                             class="text-xs font-semibold flex items-center gap-1.5">
                             <span :class="[$page.props.serverStatus.online ? 'bg-rapanel-success animate-pulse' : 'bg-rapanel-danger', 'w-1.5 h-1.5 rounded-full shrink-0']"></span>
-                            {{ $page.props.serverStatus.online ? 'Server Online' : 'Server Offline' }}
+                            {{ $page.props.serverStatus.online ? __('Server Online') : __('Server Offline') }}
                         </div>
                     </template>
                 </StatsCard>
@@ -92,8 +99,8 @@ const barWidth = (count) => {
                 <div class="lg:col-span-2 bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col">
                     <div class="flex items-center justify-between px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] shrink-0 bg-rapanel-navy-50 dark:bg-white/[0.025]">
                         <div>
-                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">Player Distribution</h2>
-                            <p class="text-[10px] text-rapanel-text-light/30 dark:text-white/22 mt-0.5">Based on registered country</p>
+                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Player Distribution') }}</h2>
+                            <p class="text-[10px] text-rapanel-text-light/30 dark:text-white/22 mt-0.5">{{ __('Based on registered country') }}</p>
                         </div>
                         <span class="text-[10px] font-semibold text-rapanel-text-light/35 dark:text-white/25">
                             {{ stats.total_users }} users · {{ topCountries?.length ?? 0 }} countries
@@ -110,11 +117,11 @@ const barWidth = (count) => {
                     <!-- Top Countries -->
                     <div class="flex-1 bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] bg-rapanel-navy-50 dark:bg-white/[0.025]">
-                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">Top Countries</h2>
+                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Top Countries') }}</h2>
                         </div>
                         <div class="px-5 py-4 space-y-3">
                             <div v-if="!topCountries?.length" class="text-sm text-rapanel-text-light/40 dark:text-white/35">
-                                No country data available.
+                                {{ __('No country data available.') }}
                             </div>
                             <div v-for="(country, i) in topCountries" :key="country.code" class="space-y-1.5">
                                 <div class="flex items-center justify-between">
@@ -138,21 +145,21 @@ const barWidth = (count) => {
                     <!-- Log Activity -->
                     <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] bg-rapanel-navy-50 dark:bg-white/[0.025]">
-                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">Log Activity</h2>
+                            <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Log Activity') }}</h2>
                         </div>
                         <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.05]">
                             <div class="px-5 py-3.5 flex items-center justify-between">
-                                <span class="text-sm text-rapanel-text-light/60 dark:text-white/45">Actions today</span>
+                                <span class="text-sm text-rapanel-text-light/60 dark:text-white/45">{{ __('Actions today') }}</span>
                                 <span class="text-xl font-black text-rapanel-text-light dark:text-white tabular-nums">{{ stats.logs_today }}</span>
                             </div>
                             <div class="px-5 py-3.5 flex items-center justify-between">
-                                <span class="text-sm text-rapanel-text-light/60 dark:text-white/45">Total logs</span>
+                                <span class="text-sm text-rapanel-text-light/60 dark:text-white/45">{{ __('Total logs') }}</span>
                                 <span class="text-xl font-black text-rapanel-text-light dark:text-white tabular-nums">{{ stats.logs_total }}</span>
                             </div>
                             <div class="px-5 py-3">
                                 <Link :href="safeRoute('admin.logs.index')"
                                     class="w-full flex items-center justify-center text-xs font-bold text-rapanel-blue hover:text-rapanel-blue/80 transition-colors">
-                                    View all action logs →
+                                    {{ __('View all action logs →') }}
                                 </Link>
                             </div>
                         </div>
