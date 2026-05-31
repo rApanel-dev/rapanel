@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { playNowMobile } from '@/Composables/usePlayNow.js';
 import { Head, usePage, useForm, Link } from '@inertiajs/vue3';
 import Header from '@/Components/Header.vue';
 import Modal from '@/Components/Modal.vue';
@@ -89,7 +90,8 @@ const openClaimModal = () => {
             <!-- Play Now banner -->
             <a v-if="$page.props.roBrowserUrl"
                 :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
-                class="group flex items-center justify-between gap-4 bg-gradient-to-r from-rapanel-navy-800 to-rapanel-navy-900 dark:from-rapanel-navy-800 dark:to-[#0a1120] border border-rapanel-gold/30 hover:border-rapanel-gold/60 rounded-xl px-6 py-5 shadow-xl transition-all duration-200 hover:shadow-rapanel-gold/10 hover:shadow-2xl">
+                class="group flex items-center justify-between gap-4 bg-gradient-to-r from-rapanel-navy-800 to-rapanel-navy-900 dark:from-rapanel-navy-800 dark:to-[#0a1120] border border-rapanel-gold/30 hover:border-rapanel-gold/60 rounded-xl px-6 py-5 shadow-xl transition-all duration-200 hover:shadow-rapanel-gold/10 hover:shadow-2xl"
+                @click="(e) => playNowMobile(e, $page.props.roBrowserUrl)">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-rapanel-gold/15 border border-rapanel-gold/30 flex items-center justify-center shrink-0 group-hover:bg-rapanel-gold/25 transition">
                         <svg class="w-6 h-6 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>

@@ -6,6 +6,7 @@ import LocaleSelector from '@/Components/LocaleSelector.vue';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import { visitorMenuItems, authMenuItems } from '@/menu.js';
 import { computed, ref } from 'vue';
+import { playNowMobile, closeGame, gameOverlayUrl } from '@/Composables/usePlayNow.js';
 
 const page = usePage();
 
@@ -41,14 +42,19 @@ const isUrl = (routeName) => {
 // LÓGICA MÁGICA: Une los menús si hay sesión iniciada
 const currentMenuItems = computed(() => {
     return page.props.auth.user
-        ? [...visitorMenuItems, ...authMenuItems] // Une el menú público y el privado
-        : visitorMenuItems;                       // Solo muestra el público
+        ? [...visitorMenuItems, ...authMenuItems]
+        : visitorMenuItems;
 });
 
 const openMobileSubmenus = ref({});
 const toggleMobileSubmenu = (name) => {
     openMobileSubmenus.value[name] = !openMobileSubmenus.value[name];
 };
+
+// ── Play Now mobile fullscreen overlay ──────────────────────────────────────
+function playNow(event) {
+    playNowMobile(event, page.props.roBrowserUrl);
+}
 </script>
 
 <template>
@@ -57,7 +63,8 @@ const toggleMobileSubmenu = (name) => {
     <a v-if="$page.props.roBrowserUrl"
        :href="$page.props.roBrowserUrl"
        target="_blank" rel="noopener"
-       class="ro-top-play-btn">
+       class="ro-top-play-btn"
+       @click="playNow">
 
         <div class="ro-top-play-shimmer" aria-hidden="true"></div>
 
@@ -71,6 +78,22 @@ const toggleMobileSubmenu = (name) => {
         </div>
     </a>
 
+    <!-- ═══ OVERLAY FULLSCREEN DEL JUEGO (solo móvil) ═══ -->
+    <Teleport to="body">
+        <div v-if="gameOverlayUrl" class="ro-game-overlay">
+            <iframe
+                :src="gameOverlayUrl"
+                class="ro-game-iframe"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen
+                allow="fullscreen; screen-wake-lock"
+            />
+            <button class="ro-game-close" @click="closeGame" aria-label="Cerrar juego">✕</button>
+        </div>
+    </Teleport>
+
+    <div class="ro-nav-wrapper">
     <Disclosure as="nav" class="bg-white dark:bg-rapanel-navy-900 shadow-sm dark:shadow-2xl transition-colors duration-200" v-slot="{ open }">
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -296,13 +319,26 @@ const toggleMobileSubmenu = (name) => {
             </DisclosurePanel>
         </transition>
     </Disclosure>
+    </div>
 </template>
 
 <style scoped>
+/* ─── Wrapper del nav: cubre al botón durante su animación de entrada en mobile ─── */
+.ro-nav-wrapper {
+    position: relative;
+    z-index: 10000;
+}
+@media (min-width: 768px) {
+    .ro-nav-wrapper {
+        position: static;
+        z-index: auto;
+    }
+}
+
 /* ─── Botón Play Now fijo en el top del viewport ─── */
 .ro-top-play-btn {
     position: fixed;
-    top: 0;
+    top: 5rem; /* mobile: debajo del header (h-20 = 80px) */
     left: 50%;
     z-index: 9999;
     display: flex;
@@ -331,6 +367,12 @@ const toggleMobileSubmenu = (name) => {
     animation: roTopBtnIn 0.72s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     will-change: transform;
     transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 768px) {
+    .ro-top-play-btn {
+        top: 0; /* desktop: cuelga del top del viewport */
+    }
 }
 
 .ro-top-play-btn:hover {
@@ -379,5 +421,39 @@ const toggleMobileSubmenu = (name) => {
     0%   { transform: translateX(-200%) skewX(-15deg); }
     42%  { transform: translateX(350%)  skewX(-15deg); }
     100% { transform: translateX(350%)  skewX(-15deg); }
+}
+
+/* ─── Overlay fullscreen del juego (móvil) ─── */
+.ro-game-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: #000;
+}
+
+.ro-game-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+.ro-game-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000000;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
 }
 </style>
