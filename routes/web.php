@@ -37,6 +37,9 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AdminTwoFactorVerifyController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\DropRatesController;
+use App\Http\Controllers\WikiController;
+use App\Http\Controllers\Admin\WikiSectionController;
+use App\Http\Controllers\Admin\WikiArticleController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -60,7 +63,8 @@ Route::get('/donations', fn() => Inertia::render('ComingSoon', ['title' => 'Dona
 
 // Rutas de Información
 Route::prefix('info')->name('info.')->group(function() {
-    Route::get('/wiki', fn() => Inertia::render('ComingSoon', ['title' => 'Wiki']))->name('wiki');
+    Route::get('/wiki', [WikiController::class, 'index'])->name('wiki');
+    Route::get('/wiki/{section:slug}/{article:slug}', [WikiController::class, 'show'])->name('wiki.show');
     Route::get('/who-sell', [WhoSellController::class, 'index'])->name('who-sell');
     Route::get('/who-sell/shop/{vendingId}', [WhoSellController::class, 'show'])->name('who-sell.shop');
     Route::get('/mvp-card', [MvpCardController::class, 'index'])->name('mvp-card');
@@ -199,6 +203,12 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::post('drop-rates/import', [DropRatesController::class, 'import'])->name('drop-rates.import');
     Route::post('drop-rates/update', [DropRatesController::class, 'update'])->name('drop-rates.update');
     Route::post('drop-rates/clear',  [DropRatesController::class, 'clear'])->name('drop-rates.clear');
+
+    // Wiki admin
+    Route::prefix('wiki')->name('wiki.')->group(function () {
+        Route::resource('sections', WikiSectionController::class)->except(['show']);
+        Route::resource('articles', WikiArticleController::class)->except(['show']);
+    });
 
     // Site Settings admin
     Route::prefix('settings')->name('settings.')->group(function () {

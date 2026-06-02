@@ -23,6 +23,8 @@ import {
     MapPinIcon,
     Cog6ToothIcon,
     ChartBarIcon,
+    DocumentTextIcon,
+    Squares2X2Icon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -42,6 +44,8 @@ const navigation = [
     { name: 'Game Accounts',      route: 'admin.game-accounts.index',      icon: ComputerDesktopIcon,        group: 'Accounts' },
     { name: 'Characters',         route: 'admin.characters.index',         icon: UserGroupIcon,              group: 'Accounts' },
     { name: 'News',               route: 'admin.news.index',               icon: NewspaperIcon,              group: 'Website' },
+    { name: 'Wiki Sections',      route: 'admin.wiki.sections.index',      icon: Squares2X2Icon,             group: 'Website' },
+    { name: 'Wiki Articles',      route: 'admin.wiki.articles.index',      icon: DocumentTextIcon,           group: 'Website' },
     { name: 'Downloads',          route: 'admin.downloads.index',          icon: ArrowDownTrayIcon,          group: 'Website' },
     { name: 'Download Categories',route: 'admin.download-categories.index',icon: TagIcon,                    group: 'Website' },
     { name: 'Item DB',            route: 'admin.item-db.index',            icon: BookOpenIcon,               group: 'Emulator Data' },
