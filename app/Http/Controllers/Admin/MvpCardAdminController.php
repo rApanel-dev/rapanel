@@ -190,8 +190,10 @@ class MvpCardAdminController extends Controller
         $masterIds  = collect($rows)->pluck('master_id')->filter()->unique()->values()->all();
         $panelUsers = [];
         if (!empty($masterIds)) {
-            $in    = implode(',', array_map('intval', $masterIds));
-            $users = DB::select("SELECT id, name FROM ra_users WHERE id IN ({$in})");
+            $users = DB::connection('mysql')->table('users')
+                        ->select('id', 'name')
+                        ->whereIn('id', $masterIds)
+                        ->get();
             foreach ($users as $u) {
                 $panelUsers[(int) $u->id] = $u->name;
             }

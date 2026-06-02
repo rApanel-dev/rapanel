@@ -32,6 +32,8 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 CLAUDE.md
+FORUM_EN.md
+FORUM_ES.md
 /.agents
 /.claude
 skills-lock.json

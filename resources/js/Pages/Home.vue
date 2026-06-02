@@ -2,6 +2,9 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import { useSafeHtml } from '@/Composables/useSafeHtml.js';
+
+const { sanitizeNews } = useSafeHtml();
 
 const page = usePage();
 const __ = (key) => page.props.translations?.[key] || key;
@@ -183,7 +186,7 @@ const scrollTo = (id) => {
                         <!-- About Us -->
                         <div>
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('About Us') }}</h2>
-                            <div v-if="st.home_about_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="st.home_about_text" />
+                            <div v-if="st.home_about_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="sanitizeNews(st.home_about_text)" />
                             <p v-else class="text-base text-white/85 leading-relaxed">
                                 <span class="font-bold text-rapanel-blue">{{ $page.props.serverName }}</span>
                                 {{ __("is a private Ragnarok Online server with a passionate community at its core. We offer a carefully crafted experience with dedicated staff and custom content, where every player matters. Whether you're a veteran adventurer or a newcomer, there's always something new to discover.") }}
@@ -196,7 +199,7 @@ const scrollTo = (id) => {
                         <!-- Community -->
                         <div>
                             <h2 class="text-xl uppercase font-bold text-white mb-4">{{ __('Community') }}</h2>
-                            <div v-if="st.home_community_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="st.home_community_text" />
+                            <div v-if="st.home_community_text" class="text-base text-white/85 leading-relaxed prose prose-invert max-w-none" v-html="sanitizeNews(st.home_community_text)" />
                             <p v-else class="text-base text-white/85 leading-relaxed">
                                 {{ __('We communicate in real time through Discord — no dead forums, just an active community ready to help. Have questions, suggestions, or ideas? Join our channel and become part of the conversation.') }}
                             </p>

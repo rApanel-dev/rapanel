@@ -357,8 +357,6 @@ const clearMfa = (user) => {
                             { label: __('Last Login'),     value: dt(editTarget?.last_login) },
                             { label: __('Created At'),     value: dt(editTarget?.created_at) },
                             { label: __('Updated At'),     value: dt(editTarget?.updated_at) },
-                            { label: 'Remember Token', value: editTarget?.remember_token },
-                            { label: 'API Token',      value: editTarget?.api_token },
                         ]" :key="field.label">
                             <InputLabel :value="field.label" class="text-xs font-bold uppercase text-rapanel-text-light dark:text-rapanel-text-dark" />
                             <input :value="field.value ?? '—'" disabled

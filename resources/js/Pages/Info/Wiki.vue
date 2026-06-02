@@ -2,6 +2,9 @@
 import { ref, watch, computed, onMounted } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import { useSafeHtml } from '@/Composables/useSafeHtml.js';
+
+const { sanitizeNews } = useSafeHtml();
 
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
 
@@ -255,7 +258,7 @@ const pageTitle = computed(() =>
                                     prose-img:rounded-xl prose-img:shadow-md
                                     prose-blockquote:border-rapanel-blue/40 prose-blockquote:text-rapanel-text-light/70 dark:prose-blockquote:text-white/55
                                     prose-hr:border-rapanel-navy-100 dark:prose-hr:border-white/[0.07]"
-                             v-html="currentArticle.content" />
+                             v-html="sanitizeNews(currentArticle.content)" />
 
                         <!-- Prev / Next -->
                         <div class="mt-12 pt-5 border-t border-rapanel-navy-100 dark:border-white/[0.07] grid grid-cols-2 gap-4">

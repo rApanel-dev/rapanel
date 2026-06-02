@@ -152,6 +152,13 @@ RA_CASHPOINTS_ENABLED=false
 
 # Ruta al log del servidor rAthena (consola en el admin)
 RA_LOG_PATH=
+
+# Consola en vivo del admin — ws-server (requerido para la pestaña Live Console)
+RA_WS_PORT=3001                 # puerto donde escucha el ws-server (por defecto 3001)
+RA_WS_SECRET=                   # secreto compartido entre rapanel y el ws-server
+# Sobrescribir las URLs auto-detectadas solo cuando sea necesario:
+# RA_WS_INTERNAL_URL=http://127.0.0.1:3001   # Laravel → ws-server (server-side, siempre http://)
+# RA_WS_PUBLIC_URL=ws://ip:3001              # browser → ws-server (ws:// para HTTP, wss://dominio/ws-proxy para HTTPS)
 ```
 
 ---
@@ -183,7 +190,7 @@ public/data/
 │   └── cards/          # Arte de cartas         → /data/items/cards/{nameid}.png
 ├── icon_jobs/          # Iconos de clase/trabajo → /data/icon_jobs/icon_jobs_{class}.png
 ├── maps/               # Vistas previas de mapas → /data/maps/{map}.png
-├── monsters/           # Sprites de monstruos    → /data/monsters/{id}.png
+├── monsters/           # Sprites de monstruos    → /data/monsters/{id}.gif
 └── gameaccount/        # Iconos de funciones (banco, VIP, cash points, etc.)
 ```
 
@@ -225,12 +232,14 @@ Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de mo
 - **Who Sell** — búsqueda en el mercado de vendings
 - **Item DB** — base de datos de ítems con modal de detalle completo
 - **MVP Cards** — cartas activas en el servidor con cantidades y propiedades
+- **Wiki** — base de conocimiento estilo docs, organizada en secciones y artículos
 
 ### Panel de administración
 - Gestionar cuentas maestras y de juego (baneo, grupo, VIP)
 - Moderar noticias, comentarios y descargas
 - Importar Item DB y Mob DB desde archivos YAML/LUA de rAthena
 - Configurar visibilidad de MVP Cards por carta
+- Gestionar secciones y artículos de la Wiki (CRUD)
 - Ver logs de acciones y consola del servidor en vivo
 
 ---

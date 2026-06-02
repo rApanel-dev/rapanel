@@ -43,7 +43,7 @@ class UserController extends Controller
 
         // Expose fields hidden by default — safe in admin-only context
         $users->getCollection()->transform(function ($user) {
-            return $user->makeVisible(['api_token', 'remember_token', 'email_verified_at'])
+            return $user->makeVisible(['email_verified_at'])
                         ->append([])
                         ->setAttribute('has_two_factor', !empty($user->getRawOriginal('two_factor_secret')));
         });

@@ -116,22 +116,22 @@ Route::middleware(['auth', 'require2fa'])->group(function () {
     Route::post('/game-accounts', [GameAccountController::class, 'store'])->name('game-accounts.store');
 
     // Actualizar contraseña cuenta de juego
-    Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->middleware('throttle:5,5')->name('game-accounts.password.update');
+    Route::put('/game-accounts/{account_id}/password', [GameAccountController::class, 'changePassword'])->middleware('throttle:5,5')->name('game-accounts.password.update')->whereNumber('account_id');
 
     // Logs cuentas de juego
-    Route::get('/game-accounts/{account_id}/logs', [GameAccountController::class, 'logs'])->name('game-accounts.logs');
+    Route::get('/game-accounts/{account_id}/logs', [GameAccountController::class, 'logs'])->name('game-accounts.logs')->whereNumber('account_id');
 
     // Eliminar cuenta de juego
-    Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->middleware('throttle:5,10')->name('game-accounts.destroy');
+    Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->middleware('throttle:5,10')->name('game-accounts.destroy')->whereNumber('account_id');
 
     // Ruta para generar/obtener el token de reclamación (debe ir ANTES del wildcard)
     Route::get('/game-accounts/claim-token', [DashboardController::class, 'getClaimToken'])->name('game-accounts.claim.token');
 
     // Detalle de cuenta de juego
-    Route::get('/game-accounts/{account_id}', [GameAccountController::class, 'show'])->name('game-accounts.show');
+    Route::get('/game-accounts/{account_id}', [GameAccountController::class, 'show'])->name('game-accounts.show')->whereNumber('account_id');
 
     // Cambio de género de cuenta de juego
-    Route::put('/game-accounts/{account_id}/gender', [GameAccountController::class, 'changeGender'])->middleware('throttle:5,5')->name('game-accounts.gender');
+    Route::put('/game-accounts/{account_id}/gender', [GameAccountController::class, 'changeGender'])->middleware('throttle:5,5')->name('game-accounts.gender')->whereNumber('account_id');
 
     // Acciones de personaje
     Route::put('/characters/{char_id}/reset-position', [CharacterController::class, 'resetPosition'])->name('characters.reset-position');
