@@ -6,6 +6,7 @@ use App\Models\News;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Inertia\Middleware;
 
@@ -28,9 +29,25 @@ class HandleInertiaRequests extends Middleware
             
             // Estado del servidor con Cache de 60 segundos
             'serverStatus' => Cache::remember('ra_server_status', 60, function () {
+                $ra = config('services.ra');
+                $login = $this->checkPort($ra['login_ip'], (int) $ra['login_port']);
+                $char  = $this->checkPort($ra['char_ip'],  (int) $ra['char_port']);
+                $map   = $this->checkPort($ra['map_ip'],   (int) $ra['map_port']);
+                $web   = $this->checkPort($ra['web_ip'],   (int) $ra['web_port']);
+                $ws    = $this->checkPort($ra['login_ip'], (int) $ra['ws_port']);
+                $peak = DB::table('onlinepeak')
+                    ->orderByDesc('users')
+                    ->value('users') ?? 0;
+
                 return [
-                    'online' => $this->checkRAthenaStatus(),
+                    'online'  => $login,
                     'players' => $this->getOnlinePlayersCount(),
+                    'peak'    => (int) $peak,
+                    'login'   => $login,
+                    'char'    => $char,
+                    'map'     => $map,
+                    'web'     => $web,
+                    'ws'      => $ws,
                 ];
             }),
 
@@ -91,21 +108,11 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 
-    /**
-     * Valida la conexión a los puertos de rAthena usando el .env
-     */
-    private function checkRAthenaStatus(): bool
+    private function checkPort(string $ip, int $port): bool
     {
-        $ip   = config('services.ra.login_ip', '127.0.0.1');
-        $port = config('services.ra.login_port', 6900);
-
-        $connection = @fsockopen($ip, $port, $errno, $errstr, 1);
-
-        if ($connection) {
-            fclose($connection);
-            return true;
-        }
-
+        $ip = ($ip === '0.0.0.0') ? '127.0.0.1' : $ip;
+        $conn = @fsockopen($ip, $port, $errno, $errstr, 0.5);
+        if ($conn) { fclose($conn); return true; }
         return false;
     }
 

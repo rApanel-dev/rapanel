@@ -1,6 +1,6 @@
 <template>
     <img
-        src="/images/bg-main-rapanel.svg"
+        src="/images/bg-main.svg"
         class="fixed inset-0 w-full h-full object-cover object-bottom -z-10 dark:filter dark:brightness-50 pointer-events-none select-none"
         aria-hidden="true"
         alt=""

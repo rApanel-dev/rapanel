@@ -49,11 +49,18 @@ Route::get('/robots.txt', function () {
 });
 
 Route::get('/', function () {
-    return Inertia::render('Home', [        
-        'canLogin' => Route::has('login'),
+    return Inertia::render('HomeAlt', [
+        'canLogin'    => Route::has('login'),
         'canRegister' => Route::has('register'),
     ]);
 })->name('home');
+
+Route::get('/home-classic', function () {
+    return Inertia::render('Home', [
+        'canLogin'    => Route::has('login'),
+        'canRegister' => Route::has('register'),
+    ]);
+})->name('home.classic');
 
 // Downloads públicas
 Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads');
