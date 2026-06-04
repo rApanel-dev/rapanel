@@ -34,7 +34,7 @@ const sizeClasses = {
         :type="type"
         :disabled="disabled"
         :title="title"
-        class="inline-flex items-center gap-1.5 rounded-lg font-bold border transition-all"
+        class="font-display inline-flex items-center gap-1.5 rounded-lg font-bold border transition-all"
         :class="[
             variantClasses[variant] ?? variantClasses.blue,
             sizeClasses[size] ?? sizeClasses.md,

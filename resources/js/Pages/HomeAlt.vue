@@ -70,22 +70,27 @@ const initCanvas = () => {
         r: Math.random() * 1.4 + 0.2,
         alpha: Math.random() * 0.7 + 0.15,
         speed: Math.random() * 0.00015 + 0.00005,
-        color: Math.random() > 0.9 ? '#F1C40F'
-             : Math.random() > 0.75 ? '#4A90E2'
-             : '#ffffff',
+        colorDark:  Math.random() > 0.9 ? '#F1C40F'  : Math.random() > 0.75 ? '#4A90E2'  : '#ffffff',
+        colorLight: Math.random() > 0.9 ? '#b45309'  : Math.random() > 0.75 ? '#1d4ed8'  : '#334155',
         twinkle: Math.random() * Math.PI * 2,
         twinkleSpeed: Math.random() * 0.02 + 0.005,
     }))
 
-    // A few larger nebula blobs
-    const nebulas = [
+    const nebulasDark = [
         { x: 0.15, y: 0.3,  r: 180, c: 'rgba(74,144,226,0.06)' },
         { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.05)' },
         { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.04)'  },
     ]
+    const nebulasLight = [
+        { x: 0.15, y: 0.3,  r: 180, c: 'rgba(74,144,226,0.18)' },
+        { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.14)' },
+        { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.12)'  },
+    ]
 
     const draw = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const dark = document.documentElement.classList.contains('dark')
+        const nebulas = dark ? nebulasDark : nebulasLight
 
         // nebulas
         nebulas.forEach(n => {
@@ -104,13 +109,14 @@ const initCanvas = () => {
         // stars
         stars.forEach(s => {
             s.twinkle += s.twinkleSpeed
-            const alpha = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle))
+            const baseAlpha = dark ? s.alpha : Math.min(s.alpha * 1.4, 1)
+            const alpha = baseAlpha * (0.6 + 0.4 * Math.sin(s.twinkle))
             s.y -= s.speed
             if (s.y < 0) { s.y = 1; s.x = Math.random() }
 
             ctx.beginPath()
             ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2)
-            ctx.fillStyle = s.color
+            ctx.fillStyle = dark ? s.colorDark : s.colorLight
             ctx.globalAlpha = alpha
             ctx.fill()
         })
@@ -241,10 +247,24 @@ const doBurst = e => {
 }
 
 // ── Feature cards data ────────────────────────────────────────────────────────
+const infoBlocks = computed(() => {
+    try {
+        const raw = st.value.home_info_blocks
+        if (raw) return JSON.parse(raw)
+    } catch {}
+    return [
+        { id: 'rates',   show: true, icon_type: 'icon', image: null },
+        { id: 'level',   show: true, icon_type: 'icon', image: null },
+        { id: 'mode',    show: true, icon_type: 'icon', image: null },
+        { id: 'episode', show: true, icon_type: 'icon', image: null },
+        { id: 'intl',    show: true, icon_type: 'icon', image: null },
+    ]
+})
+
 const highlightCards = computed(() => {
     try {
         const raw = st.value.home_highlight_cards
-        if (raw) return JSON.parse(raw)
+        if (raw) return JSON.parse(raw).filter(c => c.show !== false)
     } catch {}
     return [
         { image: '', title: 'New Battlegrounds', desc: 'New Battleground modes designed to improve GvG and competitive gameplay, not found on other servers.', url: '#' },
@@ -327,7 +347,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="st.server_name || 'rApanel'" />
+    <Head  :title="__('Home')" />
 
     <MainLayout>
         <div class="ha-root">
@@ -335,11 +355,18 @@ onUnmounted(() => {
             <!-- ══════════ HERO ══════════ -->
             <section ref="heroRef" class="ha-hero relative flex items-center justify-center overflow-hidden">
 
-                <!-- Imagen de fondo -->
-                <img src="/images/bg-main.svg" aria-hidden="true"
+                <!-- Fondo: video > imagen custom > SVG por defecto -->
+                <video v-if="st.home_hero_bg_video"
+                       autoplay muted loop playsinline aria-hidden="true"
+                       class="absolute inset-0 w-full h-full object-cover pointer-events-none select-none">
+                    <source :src="'/storage/' + st.home_hero_bg_video" type="video/mp4" />
+                </video>
+                <img v-else
+                     :src="st.home_hero_bg_image ? '/storage/' + st.home_hero_bg_image : '/images/bg-main.svg'"
+                     aria-hidden="true"
                      class="absolute inset-0 w-full h-full object-cover pointer-events-none select-none" />
-                <!-- Overlay oscuro sobre la imagen -->
-                <div class="absolute inset-0 pointer-events-none" style="background:#0f172acc" />
+                <!-- Overlay sobre la imagen -->
+                <div class="absolute inset-0 pointer-events-none ha-hero-overlay" />
 
                 <!-- Starfield canvas -->
                 <canvas ref="canvasRef" class="absolute inset-0 w-full h-full" />
@@ -351,8 +378,7 @@ onUnmounted(() => {
 
                 <!-- Central glow -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                            w-[700px] h-[700px] rounded-full pointer-events-none"
-                     style="background: radial-gradient(circle, rgba(74,144,226,0.12) 0%, transparent 70%)" />
+                            w-[700px] h-[700px] rounded-full pointer-events-none ha-central-glow" />
 
                 <!-- Personaje (fade-out con scroll, frame cycling) -->
                 <div class="ha-char-wrap absolute bottom-0 right-0 hidden sm:block"
@@ -371,14 +397,14 @@ onUnmounted(() => {
                     <!-- Title -->
                     <h1 class="ha-title opacity-0 font-display font-bold leading-none mb-5
                                text-5xl sm:text-7xl md:text-8xl">
-                        <span class="block text-white">{{ __('Welcome to') }}</span>
+                        <span class="block text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Welcome to') }}</span>
                         <span class="block ha-gradient-text">
-                            {{ st.server_name || 'rApanel' }}
+                            {{ st.site_name || 'rApanel' }}
                         </span>
                     </h1>
 
                     <!-- Subtitle -->
-                    <p class="ha-subtitle opacity-0 text-slate-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+                    <p class="ha-subtitle opacity-0 text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
                         {{ st.home_hero_subtitle || __('A classic Ragnarok Online experience, reimagined for a new era.') }}
                     </p>
 
@@ -387,7 +413,11 @@ onUnmounted(() => {
                         <Link :href="safeRoute('register')" class="ha-btn-primary font-display text-base md:text-lg font-bold uppercase tracking-widest px-9 py-4 rounded-xl">
                             {{ __('Register Now') }}
                         </Link>
-                        <button @click="$el.closest('section').nextElementSibling?.scrollIntoView({ behavior: 'smooth' })"
+                        <a v-if="st.home_learn_more_url" :href="st.home_learn_more_url"
+                           class="ha-btn-ghost font-display text-base md:text-lg font-bold uppercase tracking-widest px-9 py-4 rounded-xl">
+                            {{ __('Learn More') }}
+                        </a>
+                        <button v-else @click="$el.closest('section').nextElementSibling?.scrollIntoView({ behavior: 'smooth' })"
                                 class="ha-btn-ghost font-display text-base md:text-lg font-bold uppercase tracking-widest px-9 py-4 rounded-xl">
                             {{ __('Learn More') }}
                         </button>
@@ -395,8 +425,8 @@ onUnmounted(() => {
 
                     <!-- Scroll arrow -->
                     <div class="mt-16 flex flex-col items-center gap-1 ha-bounce">
-                        <span class="text-xs text-slate-600 tracking-[0.25em] uppercase">{{ __('Scroll') }}</span>
-                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span class="text-xs text-gray-400 dark:text-gray-500 tracking-[0.25em] uppercase">{{ __('Scroll') }}</span>
+                        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
@@ -404,7 +434,7 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ STATS BAR ══════════ -->
-            <section ref="statsRef" class="ha-stats-bar border-y border-white/5 py-10">
+            <section v-if="st.home_show_stats !== '0'" ref="statsRef" class="ha-stats-bar border-y border-black/5 dark:border-white/5 py-10">
                 <div class="max-w-6xl mx-auto px-6">
                     <div class="flex flex-wrap justify-center gap-x-10 gap-y-6">
 
@@ -419,7 +449,7 @@ onUnmounted(() => {
                                      :class="srv[s.key] ? 'text-[#2ECC71]' : 'text-red-500'">
                                     {{ srv[s.key] ? __('ONLINE') : __('OFFLINE') }}
                                 </div>
-                                <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">{{ __(s.label) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __(s.label) }}</div>
                             </div>
                         </template>
 
@@ -430,7 +460,7 @@ onUnmounted(() => {
                                  :class="srv.ws ? 'text-[#2ECC71]' : 'text-red-500'">
                                 {{ srv.ws ? __('ONLINE') : __('OFFLINE') }}
                             </div>
-                            <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">{{ __('roBrowser Server') }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __('roBrowser Server') }}</div>
                         </div>
 
                         <!-- Peak Players (al final) -->
@@ -438,7 +468,7 @@ onUnmounted(() => {
                             <div class="font-display text-3xl font-bold text-[#4A90E2]">
                                 <span :data-count="srv.peak ?? 0">{{ srv.peak ?? 0 }}</span>
                             </div>
-                            <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">{{ __('Peak Players') }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __('Peak Players') }}</div>
                         </div>
 
                     </div>
@@ -446,96 +476,106 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ SERVER INFO ══════════ -->
-            <section ref="infoRef" class="py-24 px-6" style="background: #080e1a">
+            <section v-if="st.home_show_info !== '0'" ref="infoRef" class="py-24 px-6 ha-info-section">
                 <div class="max-w-6xl mx-auto">
 
                     <div class="text-center mb-16">
                         <p class="text-[#F1C40F] text-xs uppercase tracking-[0.3em] font-semibold mb-4">{{ __('The World Awaits') }}</p>
-                        <h2 class="font-display text-4xl md:text-6xl font-bold text-white">{{ __('Server Information') }}</h2>
+                        <h2 class="font-display text-4xl md:text-6xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Information') }}</h2>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="flex flex-wrap gap-4">
 
                         <!-- EXP Rate -->
-                        <div class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0">
+                        <div v-if="infoBlocks[0]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(74,144,226,0.15)">
-                                <svg class="w-5 h-5 text-[#4A90E2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <img v-if="infoBlocks[0]?.image" :src="'/storage/' + infoBlocks[0].image" class="w-9 h-9 object-contain" />
+                                <span v-else-if="infoBlocks[0]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#4A90E2]" v-html="infoBlocks[0].svg_code" />
+                                <svg v-else class="w-5 h-5 text-[#4A90E2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-display text-xl font-bold text-white">
-                                    <span data-count-info="100">{{ st.exp_rate || 100 }}</span>x /
-                                    <span data-count-info="100">{{ st.job_rate || 100 }}</span>x /
-                                    <span data-count-info="100">{{ st.drop_rate || 100 }}</span>x
+                                <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">
+                                    <span data-count-info="100">{{ st.home_base_rate || 100 }}</span>x /
+                                    <span data-count-info="100">{{ st.home_job_rate || 100 }}</span>x /
+                                    <span data-count-info="100">{{ st.home_drop_rate || 100 }}</span>x
                                 </div>
-                                <div class="text-slate-500 text-xs uppercase tracking-widest mt-1">{{ __('Base / Job / Drop') }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Base / Job / Drop') }}</div>
                             </div>
                         </div>
 
                         <!-- Max Level -->
-                        <div class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0">
+                        <div v-if="infoBlocks[1]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(241,196,15,0.12)">
-                                <svg class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <img v-if="infoBlocks[1]?.image" :src="'/storage/' + infoBlocks[1].image" class="w-9 h-9 object-contain" />
+                                <span v-else-if="infoBlocks[1]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#F1C40F]" v-html="infoBlocks[1].svg_code" />
+                                <svg v-else class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-display text-xl font-bold text-white">
-                                    <span data-count-info="99">{{ st.max_base_level || 99 }}</span> /
-                                    <span data-count-info="70">{{ st.max_job_level || 70 }}</span>
+                                <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">
+                                    <span data-count-info="99">{{ st.home_max_base_level || 99 }}</span> /
+                                    <span data-count-info="70">{{ st.home_max_job_level || 70 }}</span>
                                 </div>
-                                <div class="text-slate-500 text-xs uppercase tracking-widest mt-1">{{ __('Max Base / Job') }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Max Base / Job') }}</div>
                             </div>
                         </div>
 
                         <!-- Game Mode -->
-                        <div class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0">
+                        <div v-if="infoBlocks[2]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(46,204,113,0.12)">
-                                <svg class="w-5 h-5 text-[#2ECC71]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <img v-if="infoBlocks[2]?.image" :src="'/storage/' + infoBlocks[2].image" class="w-9 h-9 object-contain" />
+                                <span v-else-if="infoBlocks[2]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#2ECC71]" v-html="infoBlocks[2].svg_code" />
+                                <svg v-else class="w-5 h-5 text-[#2ECC71]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-display text-xl font-bold text-white capitalize">{{ st.game_mode || 'Pre-Renewal' }}</div>
-                                <div class="text-slate-500 text-xs uppercase tracking-widest mt-1">{{ __('Game Mode') }}</div>
+                                <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark capitalize">{{ st.home_game_mode || 'Pre-Renewal' }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Game Mode') }}</div>
                             </div>
                         </div>
 
                         <!-- Episode -->
-                        <div class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0">
+                        <div v-if="infoBlocks[3]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(241,196,15,0.12)">
-                                <svg class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <img v-if="infoBlocks[3]?.image" :src="'/storage/' + infoBlocks[3].image" class="w-9 h-9 object-contain" />
+                                <span v-else-if="infoBlocks[3]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#F1C40F]" v-html="infoBlocks[3].svg_code" />
+                                <svg v-else class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-display text-xl font-bold text-white">{{ st.episode || '13.3+ — El Dicastes' }}</div>
-                                <div class="text-slate-500 text-xs uppercase tracking-widest mt-1">{{ __('Episode') }}</div>
+                                <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ st.home_episode || '13.3+ — El Dicastes' }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Episode') }}</div>
                             </div>
                         </div>
 
                         <!-- International -->
-                        <div class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0">
+                        <div v-if="infoBlocks[4]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(168,85,247,0.12)">
-                                <svg class="w-5 h-5 text-[#a855f7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <img v-if="infoBlocks[4]?.image" :src="'/storage/' + infoBlocks[4].image" class="w-9 h-9 object-contain" />
+                                <span v-else-if="infoBlocks[4]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#a855f7]" v-html="infoBlocks[4].svg_code" />
+                                <svg v-else class="w-5 h-5 text-[#a855f7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-display text-xl font-bold text-white">{{ __('International') }}</div>
-                                <div class="text-slate-500 text-xs uppercase tracking-widest mt-1">EN · ES · PT · FR</div>
+                                <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('International') }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ st.home_intl_text || 'EN · ES · PT · FR' }}</div>
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Tarjetas highlight personalizables -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
-                        <div v-for="(card, i) in highlightCards" :key="i" class="ha-hcard">
+                    <div class="flex flex-wrap gap-5 mt-12">
+                        <div v-for="(card, i) in highlightCards" :key="i" class="ha-hcard flex-1 min-w-[220px]">
                             <!-- Imagen -->
                             <div class="ha-hcard-img">
-                                <img v-if="card.image" :src="card.image" :alt="card.title"
+                                <img v-if="card.image" :src="card.image.startsWith('http') || card.image.startsWith('/') ? card.image : '/storage/' + card.image" :alt="card.title"
                                      class="w-full h-full object-cover" />
                                 <div v-else class="w-full h-full ha-hcard-placeholder"
                                      :style="`--ci: ${i}`"></div>
@@ -552,9 +592,9 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ NEWS MARQUEE ══════════ -->
-            <section v-if="news.length" class="py-16 border-y border-white/5 overflow-hidden">
+            <section v-if="news.length && st.home_show_news !== '0'" class="py-16 border-y border-black/5 dark:border-white/5 overflow-hidden">
                 <div class="text-center mb-10">
-                    <h2 class="font-display text-3xl font-bold text-white">{{ __('Latest News') }}</h2>
+                    <h2 class="font-display text-3xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Latest News') }}</h2>
                 </div>
                 <div class="ha-marquee-wrap">
                     <div class="ha-marquee-track">
@@ -567,12 +607,12 @@ onUnmounted(() => {
                                           style="background: rgba(74,144,226,0.2); color: #4A90E2">
                                         {{ item.type_label }}
                                     </span>
-                                    <span class="text-xs text-slate-600">{{ item.created_at }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ item.created_at }}</span>
                                 </div>
-                                <h4 class="font-display text-lg font-bold text-white leading-snug line-clamp-2 group-hover:text-[#4A90E2] transition-colors">
+                                <h4 class="font-display text-lg font-bold text-rapanel-text-light dark:text-rapanel-text-dark leading-snug line-clamp-2 group-hover:text-[#4A90E2] transition-colors">
                                     {{ item.title }}
                                 </h4>
-                                <p class="text-slate-500 text-xs mt-2 line-clamp-2">{{ item.excerpt }}</p>
+                                <p class="text-gray-600 dark:text-gray-400 text-xs mt-2 line-clamp-2">{{ item.excerpt }}</p>
                             </Link>
                         </template>
                     </div>
@@ -580,12 +620,12 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ FEATURES ══════════ -->
-            <section ref="featuresRef" class="py-24 md:py-32 px-6">
+            <section v-if="st.home_show_features !== '0'" ref="featuresRef" class="py-24 md:py-32 px-6">
                 <div class="max-w-6xl mx-auto">
 
                     <div class="text-center mb-16">
                         <p class="text-[#4A90E2] text-xs uppercase tracking-[0.3em] font-semibold mb-4">{{ __('Everything in one place') }}</p>
-                        <h2 class="font-display text-4xl md:text-6xl font-bold text-white">{{ __('Panel Features') }}</h2>
+                        <h2 class="font-display text-4xl md:text-6xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Panel Features') }}</h2>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -599,8 +639,8 @@ onUnmounted(() => {
                                 <span class="w-5 h-5" :style="`color: ${f.color}`" v-html="f.icon" />
                             </div>
 
-                            <h3 class="font-display text-xl font-bold text-white mb-2">{{ __(f.title) }}</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed">{{ __(f.desc) }}</p>
+                            <h3 class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __(f.title) }}</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{{ __(f.desc) }}</p>
 
                             <!-- Top-edge glow line -->
                             <div class="absolute top-0 left-6 right-6 h-px"
@@ -611,18 +651,18 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ CTA ══════════ -->
-            <section ref="ctaRef" class="py-32 px-6 relative overflow-hidden">
+            <section v-if="st.home_show_cta !== '0'" ref="ctaRef" class="py-32 px-6 relative overflow-hidden">
                 <div class="ha-mesh-bg absolute inset-0 pointer-events-none" />
 
                 <div class="cta-inner opacity-0 relative z-10 text-center max-w-3xl mx-auto">
 
                     <h2 class="font-display font-bold leading-none mb-6
                                text-5xl sm:text-6xl md:text-8xl">
-                        <span class="block text-white">{{ __('Start Your') }}</span>
+                        <span class="block text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Start Your') }}</span>
                         <span class="block ha-gradient-text">{{ __('Adventure') }}</span>
                     </h2>
 
-                    <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
+                    <p class="text-gray-600 dark:text-gray-300 text-lg mb-10 max-w-xl mx-auto">
                         {{ __('Join our community and experience Ragnarok Online the way it was meant to be played.') }}
                     </p>
 
@@ -647,11 +687,39 @@ onUnmounted(() => {
 <style scoped>
 /* ── Root ───────────────────────────────────────────────────── */
 .ha-root {
-    background: #0f172a;
-    color: #fff;
+    background: #f8fafc;
+    color: #1d283a;
     font-family: 'Figtree', sans-serif;
 }
+.dark .ha-root {
+    background: #0f172a;
+    color: #E2E8F0;
+}
 .font-display { font-family: 'Rajdhani', sans-serif; }
+
+/* ── Hero overlay ───────────────────────────────────────────── */
+.ha-hero-overlay {
+    background: linear-gradient(135deg, rgba(239,246,255,0.70) 0%, rgba(238,242,255,0.65) 50%, rgba(245,243,255,0.62) 100%);
+}
+.dark .ha-hero-overlay {
+    background: rgba(15, 23, 42, 0.8);
+}
+
+/* ── Central glow ───────────────────────────────────────────── */
+.ha-central-glow {
+    background: radial-gradient(circle, rgba(74,144,226,0.18) 0%, transparent 70%);
+}
+.dark .ha-central-glow {
+    background: radial-gradient(circle, rgba(74,144,226,0.12) 0%, transparent 70%);
+}
+
+/* ── Info section ───────────────────────────────────────────── */
+.ha-info-section {
+    background: #e8eef6;
+}
+.dark .ha-info-section {
+    background: #080e1a;
+}
 
 /* ── Gradient text ──────────────────────────────────────────── */
 .ha-gradient-text {
@@ -664,11 +732,16 @@ onUnmounted(() => {
 /* ── Grid glow ──────────────────────────────────────────────── */
 .ha-grid-glow {
     background-image:
-        linear-gradient(rgba(74,144,226,0.45) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,144,226,0.45) 1px, transparent 1px);
+        linear-gradient(rgba(74,144,226,0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,144,226,0.6) 1px, transparent 1px);
     background-size: 64px 64px;
     -webkit-mask-image: radial-gradient(circle 96px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 100%);
     mask-image: radial-gradient(circle 96px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 100%);
+}
+.dark .ha-grid-glow {
+    background-image:
+        linear-gradient(rgba(241,196,15,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(241,196,15,0.5) 1px, transparent 1px);
 }
 
 /* ── Hero ───────────────────────────────────────────────────── */
@@ -678,9 +751,14 @@ onUnmounted(() => {
 }
 .ha-grid {
     background-image:
+        linear-gradient(rgba(74,144,226,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,144,226,0.07) 1px, transparent 1px);
+    background-size: 64px 64px;
+}
+.dark .ha-grid {
+    background-image:
         linear-gradient(rgba(74,144,226,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(74,144,226,0.04) 1px, transparent 1px);
-    background-size: 64px 64px;
 }
 
 /* ── Float ──────────────────────────────────────────────────── */
@@ -699,24 +777,35 @@ onUnmounted(() => {
 
 /* ── Glass card ─────────────────────────────────────────────── */
 .ha-glass {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(15,23,42,0.08);
     backdrop-filter: blur(14px);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
 }
+.dark .ha-glass {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.07);
+}
 .ha-glass:hover {
     border-color: rgba(74,144,226,0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 40px rgba(74,144,226,0.08);
+}
+.dark .ha-glass:hover {
     box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(74,144,226,0.08);
 }
 
 /* ── Feature card ───────────────────────────────────────────── */
 .feat-card:hover {
     border-color: var(--c, #4A90E2) !important;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.12), 0 0 30px color-mix(in srgb, var(--c) 20%, transparent);
+}
+.dark .feat-card:hover {
     box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px color-mix(in srgb, var(--c) 20%, transparent);
 }
 
 /* ── Stats bar ──────────────────────────────────────────────── */
-.ha-stats-bar { background: rgba(255,255,255,0.02); }
+.ha-stats-bar { background: rgba(0,0,0,0.03); }
+.dark .ha-stats-bar { background: rgba(255,255,255,0.02); }
 
 
 /* ── Buttons ────────────────────────────────────────────────── */
@@ -731,15 +820,24 @@ onUnmounted(() => {
     transform: translateY(-3px);
 }
 .ha-btn-ghost {
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(15,23,42,0.06);
+    color: #1d283a;
+    border: 1px solid rgba(15,23,42,0.14);
     transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
+.dark .ha-btn-ghost {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border-color: rgba(255,255,255,0.14);
+}
 .ha-btn-ghost:hover {
+    background: rgba(15,23,42,0.11);
+    border-color: rgba(15,23,42,0.28);
+    transform: translateY(-3px);
+}
+.dark .ha-btn-ghost:hover {
     background: rgba(255,255,255,0.11);
     border-color: rgba(255,255,255,0.28);
-    transform: translateY(-3px);
 }
 
 /* ── Marquee ────────────────────────────────────────────────── */
@@ -782,17 +880,24 @@ onUnmounted(() => {
 
 /* ── Highlight cards ────────────────────────────────────────── */
 .ha-hcard {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(15,23,42,0.1);
     border-radius: 16px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
+.dark .ha-hcard {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+}
 .ha-hcard:hover {
     transform: translateY(-5px);
     border-color: rgba(74,144,226,0.3);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.12), 0 0 30px rgba(74,144,226,0.08);
+}
+.dark .ha-hcard:hover {
     box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(74,144,226,0.08);
 }
 
@@ -808,6 +913,16 @@ onUnmounted(() => {
 
 /* Placeholder cuando no hay imagen */
 .ha-hcard-placeholder {
+    background:
+        radial-gradient(ellipse at 30% 40%,
+            rgba(74,144,226,calc(0.15 - var(--ci) * 0.02)) 0%,
+            transparent 65%),
+        radial-gradient(ellipse at 70% 60%,
+            rgba(168,85,247,calc(0.1 - var(--ci) * 0.01)) 0%,
+            transparent 65%),
+        linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+}
+.dark .ha-hcard-placeholder {
     background:
         radial-gradient(ellipse at 30% 40%,
             rgba(74,144,226,calc(0.25 - var(--ci) * 0.03)) 0%,
@@ -832,15 +947,17 @@ onUnmounted(() => {
     font-family: 'Rajdhani', sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #fff;
+    color: #1d283a;
     line-height: 1.2;
 }
+.dark .ha-hcard-title { color: #fff; }
 .ha-hcard-desc {
     font-size: 0.82rem;
-    color: rgba(255,255,255,0.5);
+    color: rgba(15,23,42,0.55);
     line-height: 1.6;
     flex: 1;
 }
+.dark .ha-hcard-desc { color: rgba(255,255,255,0.5); }
 .ha-hcard-btn {
     display: inline-block;
     margin-top: 4px;
@@ -859,6 +976,19 @@ onUnmounted(() => {
 .ha-hcard-btn:hover {
     box-shadow: 0 0 32px rgba(74,144,226,0.6);
     transform: translateY(-2px);
+}
+
+/* ── Char shadow (light mode: sin sombra negra tan dura) ────── */
+.ha-char-img {
+    filter: drop-shadow(-6px 0 30px rgba(74,144,226,0.35))
+            drop-shadow(0 0 50px rgba(74,144,226,0.18))
+            drop-shadow(0 20px 25px rgba(0,0,0,0.18));
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+}
+.dark .ha-char-img {
+    filter: drop-shadow(-6px 0 30px rgba(241,196,15,0.45))
+            drop-shadow(0 0 50px rgba(74,144,226,0.25))
+            drop-shadow(0 24px 30px rgba(0,0,0,0.55));
 }
 
 /* ── Personaje hero ─────────────────────────────────────────── */
@@ -882,10 +1012,6 @@ onUnmounted(() => {
 .ha-char-img {
     height: 72vh;
     animation: ha-char-enter 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-    filter: drop-shadow(-6px 0 30px rgba(241,196,15,0.45))
-            drop-shadow(0 0 50px rgba(74,144,226,0.25))
-            drop-shadow(0 24px 30px rgba(0,0,0,0.55));
-    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
 }
 .ha-char-wrap:hover .ha-char-img {
     transform: scale(1.05) translateY(-10px);
@@ -893,8 +1019,26 @@ onUnmounted(() => {
             drop-shadow(0 0 90px rgba(74,144,226,0.55))
             drop-shadow(0 30px 40px rgba(0,0,0,0.6));
 }
+.dark .ha-char-wrap:hover .ha-char-img {
+    filter: drop-shadow(-6px 0 55px rgba(241,196,15,0.75))
+            drop-shadow(0 0 90px rgba(74,144,226,0.55))
+            drop-shadow(0 30px 40px rgba(0,0,0,0.6));
+}
 @keyframes ha-char-enter {
     from { transform: translateX(70px) translateY(16px); }
     to   { transform: translateX(0)    translateY(0); }
+}
+
+/* ── SVG pegado desde heroicons/lucide ──────────────────────── */
+.ha-svg-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ha-svg-icon :deep(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    flex-shrink: 0;
 }
 </style>

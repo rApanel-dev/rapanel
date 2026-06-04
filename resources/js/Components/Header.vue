@@ -113,10 +113,10 @@ function playNow(event) {
                     
                     <div class="flex items-center gap-3 border-l border-rapanel-navy-100 dark:border-white/10 pl-4 h-8">
                         <template v-if="!$page.props.auth.user">
-                            <Link :href="safeRoute('login')" class="text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
+                            <Link :href="safeRoute('login')" class="font-display text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
                                 {{ __('Login') }}
                             </Link>
-                            <Link :href="safeRoute('register')" class="bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
+                            <Link :href="safeRoute('register')" class="font-display bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
                                 {{ __('Register') }}
                             </Link>
                         </template>
@@ -266,10 +266,10 @@ function playNow(event) {
 
                     <div class="mt-6 pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
                         <div v-if="!$page.props.auth.user" class="grid grid-cols-2 gap-3">
-                            <Link :href="safeRoute('login')" class="flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-text-light dark:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
+                            <Link :href="safeRoute('login')" class="font-display flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-text-light dark:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
                                 {{ __('Login') }}
                             </Link>
-                            <Link :href="safeRoute('register')" class="flex justify-center items-center px-4 py-3 bg-rapanel-blue rounded-md text-sm font-bold text-white hover:opacity-90 transition shadow-lg uppercase tracking-widest">
+                            <Link :href="safeRoute('register')" class="font-display flex justify-center items-center px-4 py-3 bg-rapanel-blue rounded-md text-sm font-bold text-white hover:opacity-90 transition shadow-lg uppercase tracking-widest">
                                 {{ __('Register') }}
                             </Link>
                         </div>

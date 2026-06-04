@@ -222,6 +222,10 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::get('/',                       [SiteSettingsController::class, 'index'])->name('index');
         Route::post('/general',               [SiteSettingsController::class, 'updateGeneral'])->name('general');
         Route::post('/home',                  [SiteSettingsController::class, 'updateHome'])->name('home');
+        Route::post('/home-hero',             [SiteSettingsController::class, 'updateHomeHero'])->name('home-hero');
+        Route::post('/home-sections',         [SiteSettingsController::class, 'updateHomeSections'])->name('home-sections');
+        Route::post('/home-info-blocks',      [SiteSettingsController::class, 'updateHomeInfoBlocks'])->name('home-info-blocks');
+        Route::post('/home-highlight-cards',  [SiteSettingsController::class, 'updateHomeHighlightCards'])->name('home-highlight-cards');
         Route::post('/seo',                   [SiteSettingsController::class, 'updateSeo'])->name('seo');
         Route::post('/danger/clear-logs',     [SiteSettingsController::class, 'dangerClearLogs'])->name('danger.logs');
         Route::post('/danger/clear-cache',    [SiteSettingsController::class, 'dangerClearCache'])->name('danger.cache');

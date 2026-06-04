@@ -4787,6 +4787,61 @@ function secondsToDh(d) {
     var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
     return dDisplay + hDisplay;
 }
+const ro_game_modes = [
+    { value: 'Pre-Renewal',  label: 'Pre-Renewal' },
+    { value: 'Renewal',      label: 'Renewal' },
+    { value: 'Classic',      label: 'Classic' },
+    { value: 'Zero',         label: 'Zero' },
+    { value: 'Transcendence',label: 'Transcendence' },
+    { value: 'Custom',       label: 'Custom' },
+];
+
+const ro_episodes = [
+    { value: '1 — Aldebaran',                                label: '1 — Aldebaran' },
+    { value: '1.5 — Ancestral Attack. Glast Heim, Clock Tower', label: '1.5 — Ancestral Attack. Glast Heim, Clock Tower' },
+    { value: '2 — Pets',                                     label: '2 — Pets' },
+    { value: '3 — Comodo',                                   label: '3 — Comodo' },
+    { value: '4 — War of Emperium. Turtle Island',           label: '4 — War of Emperium. Turtle Island' },
+    { value: '5 — Juno',                                     label: '5 — Juno' },
+    { value: '6 — Global Project',                           label: '6 — Global Project' },
+    { value: '6.1 — Amatsu',                                 label: '6.1 — Amatsu' },
+    { value: '6.2 — Gonryun (Kunlun)',                       label: '6.2 — Gonryun (Kunlun)' },
+    { value: '6.3 — Umbala',                                 label: '6.3 — Umbala' },
+    { value: '6.4 — Nifflheim',                              label: '6.4 — Nifflheim' },
+    { value: '6.5 — Louyang',                                label: '6.5 — Louyang' },
+    { value: '7 — Ayothaya',                                 label: '7 — Ayothaya' },
+    { value: '8 — Adoption System. Weddings. Transcendent Characters', label: '8 — Adoption System. Weddings. Transcendent Characters' },
+    { value: '9 — The Sign. Geffenia',                       label: '9 — The Sign. Geffenia' },
+    { value: '10 — The Schwarzwald Republic',                label: '10 — The Schwarzwald Republic' },
+    { value: '10.1 — Einbroch',                              label: '10.1 — Einbroch' },
+    { value: '10.2 — Lighthalzen',                           label: '10.2 — Lighthalzen' },
+    { value: '10.3 — Noghalt',                               label: '10.3 — Noghalt' },
+    { value: '10.4 — Hugel',                                 label: '10.4 — Hugel' },
+    { value: '11 — Arunafeltz',                              label: '11 — Arunafeltz' },
+    { value: '11.1 — Rachel',                                label: '11.1 — Rachel' },
+    { value: '11.2 — Veins, the Desert City of Arunafeltz', label: '11.2 — Veins, the Desert City of Arunafeltz' },
+    { value: '11.3 — Nameless Island',                       label: '11.3 — Nameless Island' },
+    { value: '12 — Satan Morroc Resurrection',               label: '12 — Satan Morroc Resurrection' },
+    { value: '13 — New World',                               label: '13 — New World' },
+    { value: '13.1 — Ash Vacuum',                            label: '13.1 — Ash Vacuum' },
+    { value: '13.2 — Encounter with the Unknown',            label: '13.2 — Encounter with the Unknown' },
+    { value: '13.3 — El Dicastes',                           label: '13.3 — El Dicastes' },
+    { value: '14.1 — Bifrost',                               label: '14.1 — Bifrost' },
+    { value: '14.2 — Eclage',                                label: '14.2 — Eclage' },
+    { value: '15.1 — Phantasmagoria',                        label: '15.1 — Phantasmagoria' },
+    { value: '15.2 — Recorded Memory',                       label: '15.2 — Recorded Memory' },
+    { value: '16.1 — Banquet for Heroes',                    label: '16.1 — Banquet for Heroes' },
+    { value: '16.2 — Terra Gloria',                          label: '16.2 — Terra Gloria' },
+    { value: 'Special — Lasagna',                            label: 'Special — Lasagna' },
+    { value: '17.1 — Illusion',                              label: '17.1 — Illusion' },
+    { value: "17.2 — Varmundt's Mansion",                    label: "17.2 — Varmundt's Mansion" },
+    { value: '18 — Direction Prayer',                        label: '18 — Direction Prayer' },
+    { value: '19 — Issgard, Land of Snowflowers',            label: '19 — Issgard, Land of Snowflowers' },
+    { value: '20 — Immortal',                                label: '20 — Immortal' },
+    { value: '21 — The Age of Heroes',                       label: '21 — The Age of Heroes' },
+    { value: 'Custom',                                       label: 'Custom' },
+];
+
 export {
     country_data,
     rank_woe_type,
@@ -4800,4 +4855,6 @@ export {
     formatDate,
     mapname2bgname,
     secondsToDh,
+    ro_game_modes,
+    ro_episodes,
 };
