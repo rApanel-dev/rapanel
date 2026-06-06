@@ -36,17 +36,20 @@ class SiteSettingsController extends Controller
             'site_name'          => 'required|string|max:100',
             'logo_light'         => 'nullable|image|max:2048',
             'logo_dark'          => 'nullable|image|max:2048',
+            'favicon'            => 'nullable|image|mimes:png,jpg,jpeg,ico,svg|max:512',
+            'seo_theme_color'    => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,8}$/',
             'discord_server_id'  => 'nullable|string|max:100',
             'discord_invite_url' => 'nullable|url|max:500',
         ]);
 
         $data = [
             'site_name'          => $request->site_name,
+            'seo_theme_color'    => $request->seo_theme_color ?? '#3b82f6',
             'discord_server_id'  => $request->discord_server_id ?? '',
             'discord_invite_url' => $request->discord_invite_url ?? '',
         ];
 
-        foreach (['logo_light', 'logo_dark'] as $field) {
+        foreach (['logo_light', 'logo_dark', 'favicon'] as $field) {
             if ($request->hasFile($field)) {
                 $old = SiteSetting::getValue($field);
                 if ($old) {
@@ -246,20 +249,19 @@ class SiteSettingsController extends Controller
     public function updateSeo(Request $request): RedirectResponse
     {
         $request->validate([
-            'seo_title'       => 'required|string|max:200',
-            'seo_description' => 'nullable|string|max:500',
-            'seo_theme_color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,8}$/',
-            'favicon'         => 'nullable|image|mimes:png,jpg,jpeg,ico,svg|max:512',
-            'seo_og_image'    => 'nullable|image|max:2048',
+            'seo_title'                => 'required|string|max:200',
+            'seo_description'          => 'nullable|string|max:500',
+            'seo_og_image'             => 'nullable|image|max:2048',
+            'google_site_verification' => 'nullable|string|max:200',
         ]);
 
         $data = [
-            'seo_title'       => $request->seo_title,
-            'seo_description' => $request->seo_description ?? '',
-            'seo_theme_color' => $request->seo_theme_color ?? '#3b82f6',
+            'seo_title'                => $request->seo_title,
+            'seo_description'          => $request->seo_description ?? '',
+            'google_site_verification' => $request->google_site_verification ?? '',
         ];
 
-        foreach (['favicon', 'seo_og_image'] as $field) {
+        foreach (['seo_og_image'] as $field) {
             if ($request->hasFile($field)) {
                 $old = SiteSetting::getValue($field);
                 if ($old) {
@@ -273,6 +275,40 @@ class SiteSettingsController extends Controller
 
         $this->clearCache();
         return back()->with('success', __('SEO settings saved.'));
+    }
+
+    public function updateSocialNetworks(Request $request): RedirectResponse
+    {
+        $networks = ['discord', 'facebook', 'instagram', 'twitter', 'youtube', 'tiktok'];
+
+        $rules = [];
+        foreach ($networks as $id) {
+            $rules["networks.{$id}.enabled"] = 'nullable|boolean';
+            $rules["networks.{$id}.url"]     = 'nullable|url|max:500';
+        }
+        $request->validate($rules);
+
+        $data = [];
+        foreach ($networks as $id) {
+            $data[] = [
+                'id'      => $id,
+                'label'   => match ($id) {
+                    'discord'   => 'Discord',
+                    'facebook'  => 'Facebook',
+                    'instagram' => 'Instagram',
+                    'twitter'   => 'Twitter / X',
+                    'youtube'   => 'YouTube',
+                    'tiktok'    => 'TikTok',
+                },
+                'enabled' => $request->boolean("networks.{$id}.enabled"),
+                'url'     => $request->input("networks.{$id}.url", ''),
+            ];
+        }
+
+        SiteSetting::setValue('social_networks', json_encode($data));
+
+        $this->clearCache();
+        return back()->with('success', __('Social networks saved.'));
     }
 
     public function dangerClearLogs(Request $request): RedirectResponse

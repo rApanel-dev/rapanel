@@ -43,6 +43,11 @@
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     @endphp
 
+    {{-- Google Search Console --}}
+    @if(!empty($st['google_site_verification']))
+    <meta name="google-site-verification" content="{{ $st['google_site_verification'] }}">
+    @endif
+
     {{-- Primary meta --}}
     <title inertia>{{ $seoTitle }}</title>
     <meta name="description" content="{{ $seoDesc }}">

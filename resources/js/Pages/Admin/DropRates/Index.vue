@@ -2,8 +2,8 @@
 import { ref, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import {
-    ChartBarIcon,
     ArrowUpTrayIcon,
     ExclamationTriangleIcon,
     TrashIcon,
@@ -169,12 +169,7 @@ const executeClear = () => {
 <template>
     <AdminLayout>
 
-        <!-- Page header -->
-        <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
-            <div class="flex items-center gap-3">
-                <ChartBarIcon class="w-6 h-6 text-rapanel-blue" />
-                <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ __('Drop Rates') }}</h1>
-            </div>
+        <PageHeader :title="__('Drop Rates')" :description="__('Configure item, MVP and card drop multipliers.')" class="mb-6">
             <div v-if="hasDropRates" class="flex items-center gap-2">
                 <button type="submit" form="drop-rates-form" :disabled="editForm.processing"
                     class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-rapanel-blue/40 text-rapanel-blue text-sm font-semibold hover:bg-rapanel-blue/10 disabled:opacity-50 transition">
@@ -186,7 +181,7 @@ const executeClear = () => {
                     {{ __('Clear All') }}
                 </button>
             </div>
-        </div>
+        </PageHeader>
 
         <!-- Import card -->
         <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 mb-6">

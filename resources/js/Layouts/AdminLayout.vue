@@ -195,18 +195,6 @@ const doLogout = () => router.post(route('logout'));
                     </template>
                 </nav>
 
-                <!-- User card -->
-                <div class="px-2.5 pb-4 pt-3 border-t border-white/[0.045]">
-                    <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-rapanel-blue/[0.055] ring-1 ring-rapanel-blue/[0.12]">
-                        <div class="w-7 h-7 rounded-full bg-rapanel-gold/[0.15] ring-1 ring-rapanel-gold/30 flex items-center justify-center shrink-0">
-                            <span class="text-[11px] font-black text-rapanel-gold">{{ userInitial }}</span>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[9px] font-black uppercase tracking-widest text-white/25 leading-none mb-0.5">Administrator</p>
-                            <p class="text-xs text-white/75 font-semibold truncate">{{ page.props.auth.user?.name }}</p>
-                        </div>
-                    </div>
-                </div>
             </aside>
 
             <!-- Main content -->

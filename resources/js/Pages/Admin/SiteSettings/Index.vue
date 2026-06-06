@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import { useForm, usePage, router } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { ro_game_modes, ro_episodes } from '@/helpers';
 import {
     Cog6ToothIcon,
@@ -35,6 +36,8 @@ const generalForm = useForm({
     site_name:          props.settings.site_name ?? '',
     logo_light:         null,
     logo_dark:          null,
+    favicon:            null,
+    seo_theme_color:    props.settings.seo_theme_color ?? '#3b82f6',
     discord_server_id:  props.settings.discord_server_id ?? '',
     discord_invite_url: props.settings.discord_invite_url ?? '',
 });
@@ -44,6 +47,9 @@ const logoLightPreview = ref(
 );
 const logoDarkPreview = ref(
     props.settings.logo_dark ? '/storage/' + props.settings.logo_dark : '/images/logo.png'
+);
+const faviconPreview = ref(
+    props.settings.favicon ? '/storage/' + props.settings.favicon : null
 );
 
 const onLogoLight = (e) => {
@@ -58,6 +64,13 @@ const onLogoDark = (e) => {
     if (!file) return;
     generalForm.logo_dark = file;
     logoDarkPreview.value = URL.createObjectURL(file);
+};
+
+const onFavicon = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    generalForm.favicon = file;
+    faviconPreview.value = URL.createObjectURL(file);
 };
 
 const submitGeneral = () => {
@@ -262,26 +275,15 @@ const submitHero = () => {
 
 // --- SEO form ---
 const seoForm = useForm({
-    seo_title:       props.settings.seo_title ?? '',
-    seo_description: props.settings.seo_description ?? '',
-    seo_theme_color: props.settings.seo_theme_color ?? '#3b82f6',
-    favicon:         null,
-    seo_og_image:    null,
+    seo_title:                props.settings.seo_title ?? '',
+    seo_description:          props.settings.seo_description ?? '',
+    google_site_verification: props.settings.google_site_verification ?? '',
+    seo_og_image:             null,
 });
 
-const faviconPreview = ref(
-    props.settings.favicon ? '/storage/' + props.settings.favicon : null
-);
 const ogImagePreview = ref(
     props.settings.seo_og_image ? '/storage/' + props.settings.seo_og_image : null
 );
-
-const onFavicon = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    seoForm.favicon = file;
-    faviconPreview.value = URL.createObjectURL(file);
-};
 
 const onOgImage = (e) => {
     const file = e.target.files[0];
@@ -292,6 +294,37 @@ const onOgImage = (e) => {
 
 const submitSeo = () => {
     seoForm.post(route('admin.settings.seo'), { forceFormData: true });
+};
+
+// --- Social networks form ---
+const socialNetworkDefs = [
+    { id: 'discord',   label: 'Discord',    svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.031.052a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>' },
+    { id: 'facebook',  label: 'Facebook',   svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>' },
+    { id: 'instagram', label: 'Instagram',  svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>' },
+    { id: 'twitter',   label: 'Twitter / X',svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
+    { id: 'youtube',   label: 'YouTube',    svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>' },
+    { id: 'tiktok',    label: 'TikTok',     svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>' },
+];
+
+const parseSocialNetworks = () => {
+    try {
+        const raw = props.settings.social_networks;
+        if (raw) return JSON.parse(raw);
+    } catch {}
+    return socialNetworkDefs.map(n => ({ id: n.id, label: n.label, enabled: false, url: '' }));
+};
+
+const socialNetworks = ref(parseSocialNetworks());
+
+const submitSocialNetworks = () => {
+    const networks = {};
+    socialNetworks.value.forEach(n => {
+        networks[n.id] = { enabled: n.enabled, url: n.url };
+    });
+    router.post(route('admin.settings.social-networks'), { networks }, {
+        preserveScroll: true,
+        onSuccess: () => {},
+    });
 };
 
 // --- Danger zone ---
@@ -337,36 +370,31 @@ const executeDanger = () => {
 
 <template>
     <AdminLayout>
-        <!-- Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <Cog6ToothIcon class="w-6 h-6 text-rapanel-blue" />
-            <h1 class="text-xl font-bold text-rapanel-navy-900 dark:text-white">{{ __('Site Settings') }}</h1>
-        </div>
-
-        <!-- Tabs -->
-        <div class="flex gap-1 mb-6 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl p-1 w-fit">
-            <button
-                v-for="tab in tabs"
-                :key="tab.key"
-                @click="activeTab = tab.key"
-                :class="[
-                    'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all',
-                    activeTab === tab.key
-                        ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
-                        : 'text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white',
-                    tab.key === 'danger' && activeTab !== 'danger' ? 'hover:text-rapanel-danger!' : '',
-                    tab.key === 'danger' && activeTab === 'danger' ? 'text-rapanel-danger!' : '',
-                ]"
-            >
-                <component :is="tab.icon" class="w-4 h-4" />
-                {{ __(tab.label) }}
-            </button>
-        </div>
+        <PageHeader :title="__('Site Settings')" :description="__('Manage your site identity, SEO, social networks and server presentation.')" class="mb-6">
+            <div class="flex gap-1 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl p-1 flex-wrap">
+                <button
+                    v-for="tab in tabs"
+                    :key="tab.key"
+                    @click="activeTab = tab.key"
+                    :class="[
+                        'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all',
+                        activeTab === tab.key
+                            ? 'bg-white dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-white shadow-sm'
+                            : 'text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white',
+                        tab.key === 'danger' && activeTab !== 'danger' ? 'hover:text-rapanel-danger!' : '',
+                        tab.key === 'danger' && activeTab === 'danger' ? 'text-rapanel-danger!' : '',
+                    ]"
+                >
+                    <component :is="tab.icon" class="w-4 h-4" />
+                    {{ __(tab.label) }}
+                </button>
+            </div>
+        </PageHeader>
 
         <!-- ========== TAB: GENERAL ========== -->
-        <form v-if="activeTab === 'general'" @submit.prevent="submitGeneral" class="space-y-6 max-w-2xl">
-            <!-- Site Identity -->
-            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
+        <form v-if="activeTab === 'general'" @submit.prevent="submitGeneral" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Site Identity: ancho completo -->
+            <div class="lg:col-span-2 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
                 <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Site Identity') }}</h2>
 
                 <div>
@@ -409,6 +437,39 @@ const executeDanger = () => {
                 </div>
             </div>
 
+            <!-- Branding -->
+            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
+                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Branding') }}</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Favicon -->
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Favicon') }}</label>
+                        <div class="h-20 w-20 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center mb-2">
+                            <img v-if="faviconPreview" :src="faviconPreview" class="h-12 w-12 object-contain" alt="Favicon" />
+                            <PhotoIcon v-else class="w-8 h-8 text-rapanel-navy-300 dark:text-rapanel-navy-600" />
+                        </div>
+                        <input type="file" accept=".png,.jpg,.jpeg,.ico,.svg" @change="onFavicon"
+                            class="block text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('PNG/ICO, max 512KB') }}</p>
+                        <p v-if="generalForm.errors.favicon" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.favicon }}</p>
+                    </div>
+
+                    <!-- Theme Color -->
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Theme Color') }}</label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" v-model="generalForm.seo_theme_color"
+                                class="h-9 w-14 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
+                            <input type="text" v-model="generalForm.seo_theme_color" maxlength="20" placeholder="#3b82f6"
+                                class="w-32 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                        </div>
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Browser tab and PWA color.') }}</p>
+                        <p v-if="generalForm.errors.seo_theme_color" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.seo_theme_color }}</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Discord -->
             <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-4">
                 <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Discord') }}</h2>
@@ -429,14 +490,16 @@ const executeDanger = () => {
                 </div>
             </div>
 
-            <button type="submit" :disabled="generalForm.processing"
-                class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
-                {{ generalForm.processing ? __('Saving...') : __('Save General Settings') }}
-            </button>
+            <div class="lg:col-span-2">
+                <button type="submit" :disabled="generalForm.processing"
+                    class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
+                    {{ generalForm.processing ? __('Saving...') : __('Save General Settings') }}
+                </button>
+            </div>
         </form>
 
         <!-- ========== TAB: HOME ========== -->
-        <div v-else-if="activeTab === 'home'" class="space-y-6 max-w-2xl">
+        <div v-else-if="activeTab === 'home'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
             <!-- Section Visibility -->
             <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6">
@@ -489,7 +552,7 @@ const executeDanger = () => {
             </div>
 
             <!-- Hero settings -->
-            <form @submit.prevent="submitHero" class="space-y-6">
+            <form @submit.prevent="submitHero" class="space-y-4">
                 <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-4">
                     <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Hero') }}</h2>
 
@@ -570,7 +633,7 @@ const executeDanger = () => {
         </div>
 
         <!-- ========== TAB: SERVER INFO ========== -->
-        <div v-else-if="activeTab === 'server-info'" class="space-y-6 max-w-2xl">
+        <div v-else-if="activeTab === 'server-info'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
             <!-- ══ Info Blocks fusionados ══ -->
             <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6">
@@ -808,65 +871,49 @@ const executeDanger = () => {
         </div>
 
         <!-- ========== TAB: SEO ========== -->
-        <form v-else-if="activeTab === 'seo'" @submit.prevent="submitSeo" class="space-y-6 max-w-2xl">
-            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
-                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('SEO & Meta') }}</h2>
+        <div v-else-if="activeTab === 'seo'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-                <div>
-                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Page Title') }} *</label>
-                    <input v-model="seoForm.seo_title" type="text" required maxlength="200"
-                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
-                    <p v-if="seoForm.errors.seo_title" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_title }}</p>
-                </div>
+            <!-- Col 1: SEO form + OG Image -->
+            <form @submit.prevent="submitSeo" class="space-y-6">
+                <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
+                    <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('SEO & Meta') }}</h2>
 
-                <div>
-                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Meta Description') }}</label>
-                    <textarea v-model="seoForm.seo_description" rows="3" maxlength="500"
-                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
-                    <p v-if="seoForm.errors.seo_description" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_description }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Theme Color') }}</label>
-                    <div class="flex items-center gap-3">
-                        <input type="color" v-model="seoForm.seo_theme_color"
-                            class="h-9 w-14 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
-                        <input type="text" v-model="seoForm.seo_theme_color" maxlength="20" placeholder="#3b82f6"
-                            class="w-32 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
-                    </div>
-                    <p v-if="seoForm.errors.seo_theme_color" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_theme_color }}</p>
-                </div>
-            </div>
-
-            <!-- Images -->
-            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
-                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Images') }}</h2>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Favicon -->
                     <div>
-                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Favicon') }}</label>
-                        <div class="flex items-center gap-3 mb-2">
-                            <div v-if="faviconPreview" class="h-10 w-10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-lg flex items-center justify-center border border-rapanel-navy-100 dark:border-white/10">
-                                <img :src="faviconPreview" class="h-7 w-7 object-contain" alt="Favicon" />
-                            </div>
-                            <div v-else class="h-10 w-10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-lg flex items-center justify-center border border-rapanel-navy-100 dark:border-white/10">
-                                <PhotoIcon class="w-5 h-5 text-rapanel-text-light dark:text-rapanel-text-dark opacity-40" />
-                            </div>
-                        </div>
-                        <input type="file" accept=".png,.jpg,.jpeg,.ico,.svg" @change="onFavicon"
-                            class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('PNG/ICO, max 512KB') }}</p>
-                        <p v-if="seoForm.errors.favicon" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.favicon }}</p>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Page Title') }} *</label>
+                        <input v-model="seoForm.seo_title" type="text" required maxlength="200"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                        <p v-if="seoForm.errors.seo_title" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_title }}</p>
                     </div>
 
-                    <!-- OG Image -->
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Meta Description') }}</label>
+                        <textarea v-model="seoForm.seo_description" rows="3" maxlength="500"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
+                        <p v-if="seoForm.errors.seo_description" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_description }}</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Google Site Verification') }}</label>
+                        <input v-model="seoForm.google_site_verification" type="text" maxlength="200"
+                            placeholder="ctg0fajt_rql-0aobauyO_3Elx352cUHCHNLHFM1Zvk"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Content value from the Google Search Console verification meta tag.') }}</p>
+                        <p v-if="seoForm.errors.google_site_verification" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.google_site_verification }}</p>
+                    </div>
+                </div>
+
+                <!-- OG Image -->
+                <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
+                    <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Open Graph Image') }}</h2>
+
                     <div>
                         <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Social Share Image (OG)') }}</label>
-                        <div class="mb-2">
-                            <img v-if="ogImagePreview" :src="ogImagePreview" class="h-16 w-full object-cover rounded-lg border border-rapanel-navy-100 dark:border-white/10" alt="OG Image" />
-                            <div v-else class="h-16 w-full bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-lg flex items-center justify-center border border-rapanel-navy-100 dark:border-white/10">
-                                <PhotoIcon class="w-6 h-6 text-rapanel-text-light dark:text-rapanel-text-dark opacity-40" />
+                        <!-- Preview ratio 1200×630 = 52.5% -->
+                        <div class="relative w-full mb-2 rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800" style="padding-bottom: 52.5%">
+                            <img v-if="ogImagePreview" :src="ogImagePreview" class="absolute inset-0 w-full h-full object-cover" alt="OG Image" />
+                            <div v-else class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                <PhotoIcon class="w-8 h-8 text-rapanel-text-light dark:text-rapanel-text-dark opacity-30" />
+                                <span class="text-xs text-rapanel-navy-400 dark:text-rapanel-text-dark opacity-50">1200 × 630 px</span>
                             </div>
                         </div>
                         <input type="file" accept="image/*" @change="onOgImage"
@@ -875,13 +922,48 @@ const executeDanger = () => {
                         <p v-if="seoForm.errors.seo_og_image" class="mt-1 text-xs text-rapanel-danger">{{ seoForm.errors.seo_og_image }}</p>
                     </div>
                 </div>
-            </div>
 
-            <button type="submit" :disabled="seoForm.processing"
-                class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
-                {{ seoForm.processing ? __('Saving...') : __('Save SEO Settings') }}
-            </button>
-        </form>
+                <button type="submit" :disabled="seoForm.processing"
+                    class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
+                    {{ seoForm.processing ? __('Saving...') : __('Save SEO Settings') }}
+                </button>
+            </form>
+
+            <!-- Col 2: Social Networks -->
+            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-4">
+                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Social Networks') }}</h2>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Enable networks and set your links. Only enabled networks with a URL will appear in the footer.') }}</p>
+
+                <div class="space-y-3">
+                    <div v-for="(net, i) in socialNetworks" :key="net.id"
+                        class="flex items-center gap-3 p-3 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800">
+
+                        <!-- Icon -->
+                        <span class="w-6 h-6 flex-shrink-0 text-rapanel-navy-400 dark:text-rapanel-text-dark" v-html="socialNetworkDefs[i].svg"></span>
+
+                        <!-- Label -->
+                        <span class="text-sm font-semibold text-rapanel-navy-900 dark:text-white w-24 flex-shrink-0">{{ net.label }}</span>
+
+                        <!-- URL -->
+                        <input v-model="net.url" type="url" :placeholder="'https://...'" :disabled="!net.enabled"
+                            class="flex-1 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-900 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue disabled:opacity-40 disabled:cursor-not-allowed transition-opacity" />
+
+                        <!-- Toggle -->
+                        <button type="button" @click="net.enabled = !net.enabled"
+                            :class="net.enabled ? 'bg-rapanel-blue' : 'bg-rapanel-navy-200 dark:bg-rapanel-navy-700'"
+                            class="relative inline-flex h-5 w-9 flex-shrink-0 rounded-full transition-colors duration-200 focus:outline-none">
+                            <span :class="net.enabled ? 'translate-x-4' : 'translate-x-0.5'"
+                                class="inline-block h-4 w-4 mt-0.5 rounded-full bg-white shadow transform transition-transform duration-200"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" @click="submitSocialNetworks"
+                    class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 text-white text-sm font-bold rounded-lg transition-colors">
+                    {{ __('Save Social Networks') }}
+                </button>
+            </div>
+        </div>
 
         <!-- ========== TAB: DANGER ZONE ========== -->
         <div v-else-if="activeTab === 'danger'" class="max-w-2xl space-y-4">

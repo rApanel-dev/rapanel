@@ -98,22 +98,20 @@ const metaDetails = (log) => {
     <AdminLayout>
         <div class="space-y-5">
 
-            <PageHeader :title="__('Action Logs')" :description="`${logs.total} ${__('total entries')}`" />
-
-            <!-- Filters -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 flex flex-col sm:flex-row gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
-                <div class="relative flex-1">
-                    <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
-                    <input v-model="search" type="text" :placeholder="__('Search by user, action, or category…')"
-                        class="w-full pl-9 pr-3 py-2 text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg text-rapanel-text-light dark:text-white placeholder-rapanel-text-light/30 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 focus:border-rapanel-blue/50 transition-colors" />
+            <PageHeader :title="__('Action Logs')" :description="`${logs.total} ${__('total entries')}`">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative">
+                        <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rapanel-text-light/40 dark:text-white/30" />
+                        <input v-model="search" type="text" :placeholder="__('Search…')"
+                            class="w-full sm:w-52 pl-9 pr-3 py-2 text-sm bg-rapanel-navy-50 dark:bg-white/[0.04] border border-rapanel-navy-100 dark:border-white/[0.08] rounded-lg text-rapanel-text-light dark:text-white placeholder-rapanel-text-light/30 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-rapanel-blue/50 focus:border-rapanel-blue/50 transition-colors" />
+                    </div>
+                    <select v-model="category"
+                        class="text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue">
+                        <option value="">{{ __('All categories') }}</option>
+                        <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+                    </select>
                 </div>
-
-                <select v-model="category"
-                    class="text-sm bg-rapanel-navy-50 dark:bg-rapanel-navy-700 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 py-2 text-rapanel-text-light dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue">
-                    <option value="">{{ __('All categories') }}</option>
-                    <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-                </select>
-            </div>
+            </PageHeader>
 
             <!-- Table -->
             <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
