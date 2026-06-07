@@ -82,6 +82,7 @@ class HandleInertiaRequests extends Middleware
                         'title'          => $n->title,
                         'type'           => $n->type,
                         'type_label'     => News::typeLabel($n->type),
+                        'type_color'     => News::typeColor($n->type),
                         'featured_image' => $n->featured_image ? asset('storage/' . $n->featured_image) : null,
                         'excerpt'        => $n->excerpt,
                         'created_at'     => $n->created_at?->diffForHumans(),

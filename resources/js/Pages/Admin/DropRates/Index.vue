@@ -213,7 +213,7 @@ const executeClear = () => {
 
                         <!-- Card header -->
                         <div class="px-4 pt-4 pb-3 border-b border-rapanel-navy-100 dark:border-white/5"
-                            :class="cat.key === 'caps' ? 'bg-rapanel-gold/5 dark:bg-rapanel-gold/5' : 'bg-rapanel-navy-50/50 dark:bg-rapanel-navy-800/30'">
+                            :class="cat.key === 'caps' ? 'bg-rapanel-gold/5 dark:bg-rapanel-gold/5' : 'bg-rapanel-navy-50/50 dark:bg-rapanel-surface/30'">
                             <p class="text-sm font-bold text-rapanel-navy-900 dark:text-white mb-1">{{ __(cat.label) }}</p>
                             <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 leading-relaxed">
                                 {{ __(cat.description) }}
@@ -229,7 +229,7 @@ const executeClear = () => {
                                 </span>
                                 <input v-model="dropRateValues[field.key]"
                                     type="number" min="0" max="100000"
-                                    class="flex-1 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-right font-mono text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                                    class="flex-1 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/[0.05] px-3 py-1.5 text-sm text-right font-mono text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
                             </div>
                         </div>
 
@@ -244,7 +244,7 @@ const executeClear = () => {
         </template>
 
         <!-- Empty state -->
-        <div v-else class="bg-rapanel-navy-50 dark:bg-rapanel-navy-800/50 rounded-xl border border-dashed border-rapanel-navy-200 dark:border-white/10 p-10 text-center">
+        <div v-else class="bg-rapanel-navy-50 dark:bg-rapanel-surface/50 rounded-xl border border-dashed border-rapanel-navy-200 dark:border-white/10 p-10 text-center">
             <ChartBarIcon class="w-10 h-10 mx-auto mb-3 text-rapanel-text-light dark:text-rapanel-text-dark opacity-30" />
             <p class="text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('No drop rates imported yet') }}</p>
             <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">
@@ -254,7 +254,7 @@ const executeClear = () => {
 
         <!-- Clear confirm modal -->
         <Teleport to="body">
-            <div v-if="confirmClear" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div v-if="confirmClear" role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                 <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 border border-rapanel-navy-100 dark:border-white/10">
                     <div class="flex items-center gap-3 mb-3">
                         <ExclamationTriangleIcon class="w-6 h-6 text-rapanel-danger shrink-0" />

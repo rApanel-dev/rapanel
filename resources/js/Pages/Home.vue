@@ -161,7 +161,7 @@ const scrollTo = (id) => {
                                             item.type === 2 ? 'bg-rapanel-gold/30 text-rapanel-gold border-rapanel-gold/40' :
                                             item.type === 3 ? 'bg-rapanel-danger/30 text-rapanel-danger border-rapanel-danger/40' :
                                             'bg-rapanel-blue/30 text-rapanel-blue border-rapanel-blue/40'
-                                        ]">{{ item.type_label }}</span>
+                                        ]">{{ __(item.type_label) }}</span>
                                     </div>
                                 </div>
 

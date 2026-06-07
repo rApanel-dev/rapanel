@@ -33,13 +33,17 @@ const submit = () => {
 
             <!-- Header -->
             <div class="flex items-center gap-4 pb-5 border-b border-rapanel-navy-100 dark:border-white/[0.055]">
-                <Link :href="safeRoute('admin.wiki.sections.index')"
+                <Link :href="safeRoute('admin.wiki.sections.index')" :aria-label="__('Back to Wiki Sections')"
                       class="p-2 rounded-lg hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.07] text-rapanel-text-light/55 dark:text-white/45 transition-colors">
-                    <ArrowLeftIcon class="w-5 h-5" />
+                    <ArrowLeftIcon class="w-5 h-5" aria-hidden="true" />
                 </Link>
                 <div>
                     <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">{{ __('Edit Wiki Section') }}</h1>
-                    <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">{{ __('Admin › Wiki Sections › Edit') }}</p>
+                    <nav class="flex items-center gap-1 text-xs mt-0.5">
+                        <Link :href="safeRoute('admin.wiki.sections.index')" class="text-rapanel-text-light/45 dark:text-white/35 hover:text-rapanel-blue dark:hover:text-rapanel-blue transition-colors">{{ __('Wiki Sections') }}</Link>
+                        <span class="text-rapanel-text-light/25 dark:text-white/20">›</span>
+                        <span class="text-rapanel-text-light/60 dark:text-white/50 max-w-[20ch] truncate">{{ props.section.title }}</span>
+                    </nav>
                 </div>
             </div>
 
@@ -48,7 +52,7 @@ const submit = () => {
                 <!-- Icon + Title row -->
                 <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-4">
 
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                             {{ __('Icon') }}
                         </label>
@@ -59,7 +63,7 @@ const submit = () => {
                         <p v-if="form.errors.icon" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.icon }}</p>
                     </div>
 
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                             {{ __('Title') }} <span class="text-rapanel-danger">*</span>
                         </label>
@@ -70,7 +74,7 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                     <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                         {{ __('Description') }} <span class="text-rapanel-text-light/30 dark:text-white/25 font-normal normal-case">{{ __('(Optional)') }}</span>
                     </label>
@@ -82,7 +86,7 @@ const submit = () => {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                             {{ __('Sort Order') }}
                         </label>
@@ -92,12 +96,12 @@ const submit = () => {
                         <p class="mt-1.5 text-xs text-rapanel-text-light/40 dark:text-white/30">{{ __('Lower number = shown first') }}</p>
                     </div>
 
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm flex items-center justify-between">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm flex items-center justify-between">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40">{{ __('Published') }}</p>
                             <p class="text-xs text-rapanel-text-light/40 dark:text-white/30 mt-1">{{ __('Visible to all visitors') }}</p>
                         </div>
-                        <button type="button" @click="form.is_published = !form.is_published"
+                        <button type="button" role="switch" :aria-checked="form.is_published" :aria-label="__('Published')" @click="form.is_published = !form.is_published"
                                 :class="form.is_published ? 'bg-rapanel-success' : 'bg-rapanel-navy-200 dark:bg-rapanel-navy-600'"
                                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
                             <span :class="form.is_published ? 'translate-x-6' : 'translate-x-1'"
@@ -106,8 +110,8 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <Link :href="safeRoute('admin.wiki.sections.index')"
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-rapanel-navy-100 dark:border-white/[0.055]">
+                    <Link :href="safeRoute('admin.wiki.sections.index')" :aria-label="__('Back to Wiki Sections')"
                           class="px-4 py-2 text-sm rounded-lg border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/70 dark:text-white/60 hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.05] transition-colors">
                         {{ __('Cancel') }}
                     </Link>

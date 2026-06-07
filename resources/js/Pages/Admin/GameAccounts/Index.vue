@@ -13,6 +13,7 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ActionButton from '@/Components/ActionButton.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
     accounts: Object,
@@ -78,6 +79,12 @@ watch([search, state, gender, accId, groupId, lastIp, linked, loginFrom, loginTo
 
 const stateLabel = (s) => ({ 0: () => __('Active'), 1: () => __('Banned'), 5: () => __('De-linked') }[s]?.() ?? `State ${s}`);
 
+// ── Confirm modal ─────────────────────────────────────────────────────
+const confirmState = ref(null);
+const askConfirm = (opts) => { confirmState.value = opts; };
+const doConfirm   = () => { confirmState.value?.action?.(); confirmState.value = null; };
+const closeConfirm = () => { confirmState.value = null; };
+
 // ── Ban modal ──────────────────────────────────────────────────────────
 const banTarget = ref(null);
 const banForm   = useForm({ type: 'permanent', days: 7, reason: '' });
@@ -93,8 +100,13 @@ const submitBan = () => {
 
 // ── Unban ──────────────────────────────────────────────────────────────
 const submitUnban = (acc) => {
-    if (!confirm(__('Unban :userid?', { userid: acc.userid }))) return;
-    router.post(safeRoute('admin.game-accounts.unban', acc.account_id), {}, { preserveScroll: true });
+    askConfirm({
+        title:        __('Unban Account'),
+        entity:       acc.userid,
+        confirmLabel: __('Unban'),
+        variant:      'default',
+        action:       () => router.post(safeRoute('admin.game-accounts.unban', acc.account_id), {}, { preserveScroll: true }),
+    });
 };
 
 // ── Group modal ────────────────────────────────────────────────────────
@@ -143,7 +155,7 @@ const submitEdit = () => {
             </PageHeader>
 
             <!-- Filters -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
 
                 <!-- Basic row -->
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -484,4 +496,15 @@ const submitEdit = () => {
             </div>
         </div>
     </Modal>
+
+    <ConfirmModal
+        :show="!!confirmState"
+        :title="confirmState?.title ?? ''"
+        :message="confirmState?.message ?? ''"
+        :entity="confirmState?.entity ?? ''"
+        :confirm-label="confirmState?.confirmLabel ?? ''"
+        :variant="confirmState?.variant ?? 'danger'"
+        @confirm="doConfirm"
+        @close="closeConfirm"
+    />
 </template>

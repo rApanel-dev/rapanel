@@ -114,6 +114,67 @@ class UserController extends Controller
         return back()->with('success', "Role updated to {$request->role}.");
     }
 
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids'    => 'required|array|min:1|max:50',
+            'ids.*'  => 'integer',
+            'action' => 'required|in:ban,activate,role_user,role_admin',
+        ]);
+
+        // Never act on the currently authenticated admin
+        $currentId = $request->user()->id;
+        $ids = array_values(array_filter(
+            array_map('intval', $request->ids),
+            fn($id) => $id !== $currentId
+        ));
+
+        if (empty($ids)) {
+            return back()->with('error', __('No accounts affected (cannot modify your own account).'));
+        }
+
+        $count = count($ids);
+
+        switch ($request->action) {
+            case 'ban':
+                User::whereIn('id', $ids)->update(['status' => 0, 'remember_token' => null]);
+                DB::connection('mysql')->table('sessions')->whereIn('user_id', $ids)->delete();
+                GameAccount::whereIn('master_id', $ids)->update(['state' => 5]);
+                $message = __(':count accounts banned.', ['count' => $count]);
+                break;
+
+            case 'activate':
+                User::whereIn('id', $ids)->update(['status' => 1]);
+                GameAccount::whereIn('master_id', $ids)->update(['state' => 0]);
+                $message = __(':count accounts activated.', ['count' => $count]);
+                break;
+
+            case 'role_user':
+                User::whereIn('id', $ids)->update(['role' => 'User']);
+                $message = __(':count accounts set to User role.', ['count' => $count]);
+                break;
+
+            case 'role_admin':
+                User::whereIn('id', $ids)->update(['role' => 'Admin']);
+                $message = __(':count accounts set to Admin role.', ['count' => $count]);
+                break;
+
+            default:
+                return back()->with('error', 'Invalid action.');
+        }
+
+        ActionLog::create([
+            'user_id'    => $request->user()->id,
+            'category'   => 'MASTER_ACCOUNT',
+            'action'     => 'bulk_' . $request->action,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => ['target_ids' => $ids, 'count' => $count],
+        ]);
+
+        return back()->with('success', $message);
+    }
+
     public function updateStatus(Request $request, User $user)
     {
         $request->validate(['status' => 'required|in:0,1']);

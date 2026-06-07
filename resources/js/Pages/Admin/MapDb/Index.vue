@@ -179,11 +179,11 @@ const sortState = (col) => {
                 [__('Maps with Spawns')]: stats.spawn_maps,
                 [__('Total Spawns')]:     stats.total_spawns,
             }" :key="label"
-                class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
+                class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
                 <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-1">{{ label }}</p>
                 <p class="text-2xl font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ Number(val).toLocaleString() }}</p>
             </div>
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
                 <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-1">{{ __('Last sync') }}</p>
                 <p class="text-sm font-medium text-rapanel-navy-900 dark:text-white truncate">{{ stats.last_sync ?? __('Never') }}</p>
             </div>
@@ -193,7 +193,7 @@ const sortState = (col) => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
             <!-- Map Cache -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
                 <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                     <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Import Map Cache') }}</h2>
@@ -339,7 +339,7 @@ const sortState = (col) => {
             </div>
 
             <!-- Spawn files -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
                 <div class="h-[3px] bg-gradient-to-r from-rapanel-purple/70 via-rapanel-purple/30 to-transparent" />
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                     <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Import Spawn Files') }}</h2>
@@ -432,7 +432,7 @@ const sortState = (col) => {
         </div>
 
         <!-- ── Imported Maps table ── -->
-        <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07] flex items-center justify-between gap-4 flex-wrap">
                 <div>
                     <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Imported Maps') }}</h2>
@@ -452,7 +452,7 @@ const sortState = (col) => {
 
             <div class="overflow-x-auto">
                 <table v-if="mapList.data.length > 0" class="w-full text-sm">
-                    <thead class="bg-rapanel-navy-100 dark:bg-rapanel-navy-800">
+                    <thead class="bg-rapanel-navy-100 dark:bg-rapanel-surface">
                         <tr>
                             <th class="px-4 py-2.5 text-left">
                                 <button @click="doSort('map_name')" class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest transition"

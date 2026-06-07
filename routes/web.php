@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
 use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
 use App\Http\Controllers\MvpCardController;
 use App\Http\Controllers\WhoSellController;
+use App\Http\Controllers\ForgotGamePasswordController;
 use App\Http\Controllers\Admin\MvpCardAdminController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsReactionController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\Admin\DropRatesController;
 use App\Http\Controllers\WikiController;
 use App\Http\Controllers\Admin\WikiSectionController;
 use App\Http\Controllers\Admin\WikiArticleController;
+use App\Http\Controllers\Admin\HealthCheckController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -131,6 +133,12 @@ Route::middleware(['auth', 'require2fa'])->group(function () {
     // Eliminar cuenta de juego
     Route::delete('/game-accounts/{account_id}', [GameAccountController::class, 'destroy'])->middleware('throttle:5,10')->name('game-accounts.destroy')->whereNumber('account_id');
 
+    // Recuperación de contraseña de cuenta de juego (debe ir ANTES del wildcard)
+    Route::get('/game-accounts/forgot-password', [ForgotGamePasswordController::class, 'create'])->name('game-password.request');
+    Route::post('/game-accounts/forgot-password', [ForgotGamePasswordController::class, 'store'])->name('game-password.send')->middleware('throttle:5,1');
+    Route::get('/game-accounts/reset-password/{token}', [ForgotGamePasswordController::class, 'reset'])->name('game-password.reset');
+    Route::post('/game-accounts/reset-password/{token}', [ForgotGamePasswordController::class, 'update'])->name('game-password.update');
+
     // Ruta para generar/obtener el token de reclamación (debe ir ANTES del wildcard)
     Route::get('/game-accounts/claim-token', [DashboardController::class, 'getClaimToken'])->name('game-accounts.claim.token');
 
@@ -164,11 +172,13 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::delete('/users/{user}/mfa',       [AdminUserController::class, 'clearMfa'])->name('users.clear-mfa');
     Route::put('/users/{user}/role',         [AdminUserController::class, 'updateRole'])->name('users.role');
     Route::put('/users/{user}/status',       [AdminUserController::class, 'updateStatus'])->name('users.status');
+    Route::post('/users/bulk',               [AdminUserController::class, 'bulkAction'])->name('users.bulk');
     Route::get('/game-accounts',                           [GameAccountAdminController::class, 'index'])->name('game-accounts.index');
     Route::post('/game-accounts/{accountId}/ban',          [GameAccountAdminController::class, 'ban'])->name('game-accounts.ban');
     Route::post('/game-accounts/{accountId}/unban',        [GameAccountAdminController::class, 'unban'])->name('game-accounts.unban');
     Route::patch('/game-accounts/{accountId}/group',       [GameAccountAdminController::class, 'setGroup'])->name('game-accounts.group');
     Route::put('/game-accounts/{accountId}',               [GameAccountAdminController::class, 'update'])->name('game-accounts.update');
+    Route::get('/health',        [HealthCheckController::class,   'index'])->name('health.index');
     Route::get('/logs',          [LogAdminController::class,      'index'])->name('logs.index');
     Route::get('/characters',    [CharacterAdminController::class, 'index'])->name('characters.index');
     Route::get('/console',                          [ConsoleController::class, 'index'])->name('console.index');
@@ -179,6 +189,7 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::post('/console/server/{name}/restart',   [ConsoleController::class, 'serverRestart'])->name('console.server.restart')->middleware('throttle:5,1');
     Route::resource('news', AdminNewsController::class)->except(['show']);
     Route::delete('news-comments/{newsComment}', [AdminNewsCommentController::class, 'destroy'])->name('news-comments.destroy');
+    Route::get('downloads/local-files', [AdminDownloadController::class, 'localFiles'])->name('downloads.local-files');
     Route::resource('downloads', AdminDownloadController::class)->except(['show']);
     Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
     Route::get('mvp-cards', [MvpCardAdminController::class, 'index'])->name('mvp-cards.index');
@@ -228,6 +239,8 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::post('/home-highlight-cards',  [SiteSettingsController::class, 'updateHomeHighlightCards'])->name('home-highlight-cards');
         Route::post('/seo',                   [SiteSettingsController::class, 'updateSeo'])->name('seo');
         Route::post('/social-networks',       [SiteSettingsController::class, 'updateSocialNetworks'])->name('social-networks');
+        Route::post('/home-features',         [SiteSettingsController::class, 'updateHomeFeatures'])->name('home-features');
+        Route::post('/home-cta',              [SiteSettingsController::class, 'updateHomeCta'])->name('home-cta');
         Route::post('/danger/clear-logs',     [SiteSettingsController::class, 'dangerClearLogs'])->name('danger.logs');
         Route::post('/danger/clear-cache',    [SiteSettingsController::class, 'dangerClearCache'])->name('danger.cache');
         Route::post('/danger/clear-sessions', [SiteSettingsController::class, 'dangerClearSessions'])->name('danger.sessions');

@@ -19,10 +19,10 @@ const filterBy = (type) => {
 };
 
 const typeBadge = (type) => {
-    if (type === 1) return 'bg-rapanel-blue/15 text-rapanel-blue border-rapanel-blue/30';
-    if (type === 2) return 'bg-rapanel-gold/15 text-rapanel-gold border-rapanel-gold/30';
-    if (type === 3) return 'bg-rapanel-danger/15 text-rapanel-danger border-rapanel-danger/30';
-    return 'bg-rapanel-blue/15 text-rapanel-blue border-rapanel-blue/30';
+    if (type === 1) return 'bg-rapanel-blue text-white';
+    if (type === 2) return 'bg-rapanel-gold text-rapanel-navy-900';
+    if (type === 3) return 'bg-rapanel-danger text-white';
+    return 'bg-rapanel-blue text-white';
 };
 
 </script>
@@ -110,8 +110,8 @@ const typeBadge = (type) => {
 
                         <!-- Type badge overlay -->
                         <div class="absolute top-2 right-2">
-                            <span :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full border backdrop-blur-sm', typeBadge(item.type)]">
-                                {{ item.type_label }}
+                            <span :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow', typeBadge(item.type)]">
+                                {{ __(item.type_label) }}
                             </span>
                         </div>
                     </div>

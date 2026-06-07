@@ -40,6 +40,16 @@ class News extends Model
         };
     }
 
+    public static function typeColor(int $type): string
+    {
+        return match ($type) {
+            1 => '#4A90E2',
+            2 => '#F1C40F',
+            3 => '#E74C3C',
+            default => '#4A90E2',
+        };
+    }
+
     public function getExcerptAttribute(): string
     {
         return Str::limit(strip_tags($this->body ?? ''), 120);

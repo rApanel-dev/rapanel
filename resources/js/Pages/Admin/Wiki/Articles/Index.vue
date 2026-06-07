@@ -1,8 +1,11 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import ActionButton from '@/Components/ActionButton.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
-import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, BookOpenIcon } from '@heroicons/vue/24/outline';
 
 const safeRoute = (name, params = {}) => { try { return route(name, params); } catch { return '#'; } };
 
@@ -20,7 +23,11 @@ const props = defineProps({
 });
 
 const sectionFilter = ref(props.filters?.section_id ?? '');
-const confirmingDelete = ref(null);
+
+const confirmState = ref(null);
+const askConfirm = (opts) => { confirmState.value = opts; };
+const doConfirm   = () => { confirmState.value?.action?.(); confirmState.value = null; };
+const closeConfirm = () => { confirmState.value = null; };
 
 watch(sectionFilter, (val) => {
     router.get(safeRoute('admin.wiki.articles.index'), { section_id: val || undefined }, {
@@ -28,9 +35,14 @@ watch(sectionFilter, (val) => {
     });
 });
 
-const destroy = (id) => {
-    router.delete(safeRoute('admin.wiki.articles.destroy', { article: id }), {
-        onSuccess: () => { confirmingDelete.value = null; },
+const confirmDelete = (id, title) => {
+    askConfirm({
+        title:        __('Delete Article'),
+        entity:       title,
+        message:      __('This action cannot be undone.'),
+        confirmLabel: __('Delete'),
+        variant:      'danger',
+        action:       () => router.delete(safeRoute('admin.wiki.articles.destroy', { article: id })),
     });
 };
 </script>
@@ -39,60 +51,66 @@ const destroy = (id) => {
     <AdminLayout>
         <div class="space-y-6">
 
-            <!-- Header -->
-            <div class="flex items-center justify-between pb-5 border-b border-rapanel-navy-100 dark:border-white/[0.055]">
-                <div>
-                    <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">{{ __('Wiki Articles') }}</h1>
-                    <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">{{ __('Admin › Wiki Articles') }}</p>
-                </div>
+            <PageHeader :title="__('Wiki Articles')" :description="`${articles.total} ${__('articles')}`">
                 <Link :href="safeRoute('admin.wiki.articles.create')"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-rapanel-blue hover:bg-rapanel-blue/85 text-white text-sm font-semibold rounded-lg transition-colors">
-                    <PlusIcon class="w-4 h-4" />
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-rapanel-blue hover:opacity-90 text-white text-sm font-bold rounded-lg transition shadow">
+                    <PlusIcon class="w-4 h-4" aria-hidden="true" />
                     {{ __('New Article') }}
                 </Link>
-            </div>
+            </PageHeader>
 
             <!-- Filter -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
                 <select v-model="sectionFilter"
-                        class="rounded-lg bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10
+                        :aria-label="__('Filter by section')"
+                        class="rounded-lg bg-white dark:bg-rapanel-surface border border-rapanel-navy-100 dark:border-white/10
                                text-rapanel-text-light dark:text-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
                     <option value="">{{ __('All Sections') }}</option>
                     <option v-for="s in sections" :key="s.id" :value="s.id">{{ s.icon }} {{ s.title }}</option>
                 </select>
-                <span class="text-sm text-rapanel-text-light/50 dark:text-white/40">
-                    {{ articles.total }} {{ __('articles') }}
-                </span>
             </div>
 
             <!-- Empty state -->
             <div v-if="!articles.data?.length"
-                 class="text-center py-20 text-rapanel-text-light/40 dark:text-white/30">
-                <span class="text-5xl">📄</span>
-                <p class="mt-4 text-sm">{{ __('No wiki articles yet.') }}</p>
+                 class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] p-14 flex flex-col items-center justify-center gap-5 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-rapanel-navy-50 dark:bg-white/[0.04] ring-1 ring-rapanel-navy-100 dark:ring-white/[0.07] flex items-center justify-center">
+                    <BookOpenIcon class="w-8 h-8 text-rapanel-text-light/30 dark:text-white/20" />
+                </div>
+                <div>
+                    <div class="text-lg font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">
+                        {{ sectionFilter ? __('No articles in this section.') : __('No wiki articles yet.') }}
+                    </div>
+                    <div class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-1.5">
+                        {{ __('Create the first article to get started.') }}
+                    </div>
+                </div>
+                <Link :href="safeRoute('admin.wiki.articles.create')"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-rapanel-blue hover:opacity-90 text-white text-sm font-semibold rounded-lg transition shadow">
+                    <PlusIcon class="w-4 h-4" aria-hidden="true" />
+                    {{ __('New Article') }}
+                </Link>
             </div>
 
             <!-- Table -->
-            <div v-else class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden shadow-sm">
+            <div v-else class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="bg-rapanel-navy-100 dark:bg-rapanel-navy-700 text-rapanel-text-light/60 dark:text-white/50 text-xs uppercase tracking-wider">
-                            <th class="text-left px-4 py-3">{{ __('Title') }}</th>
-                            <th class="text-left px-4 py-3 hidden md:table-cell">{{ __('Section') }}</th>
-                            <th class="text-left px-4 py-3 hidden lg:table-cell">{{ __('Author') }}</th>
-                            <th class="text-center px-4 py-3 w-20">{{ __('Order') }}</th>
-                            <th class="text-center px-4 py-3 w-24">{{ __('Published') }}</th>
-                            <th class="text-right px-4 py-3 w-28">{{ __('Actions') }}</th>
+                        <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40">{{ __('Title') }}</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden md:table-cell">{{ __('Section') }}</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 hidden lg:table-cell">{{ __('Author') }}</th>
+                            <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-20">{{ __('Order') }}</th>
+                            <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-24">{{ __('Published') }}</th>
+                            <th class="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/40 w-28">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.055]">
+                    <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/5">
                         <tr v-for="article in articles.data" :key="article.id"
                             class="hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.03] transition-colors">
-                            <td class="px-4 py-3">
-                                <p class="font-medium text-rapanel-text-light dark:text-white">{{ article.title }}</p>
-                            </td>
+                            <td class="px-4 py-3 font-medium text-rapanel-text-light dark:text-white max-w-xs truncate">{{ article.title }}</td>
                             <td class="px-4 py-3 hidden md:table-cell text-rapanel-text-light/60 dark:text-white/50">
                                 <span v-if="article.section_title">{{ article.section_icon }} {{ article.section_title }}</span>
+                                <span v-else class="text-rapanel-text-light/30 dark:text-white/20">—</span>
                             </td>
                             <td class="px-4 py-3 hidden lg:table-cell">
                                 <p class="text-xs text-rapanel-text-light dark:text-white/80">{{ article.created_by_name ?? '—' }}</p>
@@ -104,22 +122,22 @@ const destroy = (id) => {
                             <td class="px-4 py-3 text-center text-rapanel-text-light/50 dark:text-white/40 font-mono text-xs">{{ article.sort_order }}</td>
                             <td class="px-4 py-3 text-center">
                                 <span :class="article.is_published
-                                    ? 'bg-rapanel-success/10 text-rapanel-success'
-                                    : 'bg-rapanel-text-light/10 dark:bg-white/10 text-rapanel-text-light/50 dark:text-white/40'"
-                                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold">
+                                    ? 'bg-rapanel-success/10 text-rapanel-success border-rapanel-success/20'
+                                    : 'bg-rapanel-text-light/10 dark:bg-white/10 text-rapanel-text-light/50 dark:text-white/40 border-rapanel-navy-100 dark:border-white/10'"
+                                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border">
                                     {{ article.is_published ? __('Yes') : __('No') }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <Link :href="safeRoute('admin.wiki.articles.edit', { article: article.id })"
-                                          class="p-1.5 rounded-lg text-rapanel-blue/70 hover:text-rapanel-blue hover:bg-rapanel-blue/10 transition-colors">
-                                        <PencilSquareIcon class="w-4 h-4" />
-                                    </Link>
-                                    <button @click="confirmingDelete = article.id"
-                                            class="p-1.5 rounded-lg text-rapanel-danger/70 hover:text-rapanel-danger hover:bg-rapanel-danger/10 transition-colors">
-                                        <TrashIcon class="w-4 h-4" />
-                                    </button>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center justify-center gap-1">
+                                    <ActionButton variant="navy" size="icon" :title="__('Edit article')"
+                                        @click="router.visit(safeRoute('admin.wiki.articles.edit', { article: article.id }))">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                                    </ActionButton>
+                                    <ActionButton variant="danger" size="icon" :title="__('Delete article')"
+                                        @click="confirmDelete(article.id, article.title)">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                    </ActionButton>
                                 </div>
                             </td>
                         </tr>
@@ -128,43 +146,36 @@ const destroy = (id) => {
 
                 <!-- Pagination -->
                 <div v-if="articles.last_page > 1"
-                     class="px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/[0.055] flex items-center justify-between">
-                    <p class="text-xs text-rapanel-text-light/50 dark:text-white/40">
-                        {{ articles.from }}–{{ articles.to }} / {{ articles.total }}
-                    </p>
+                     class="px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between text-xs text-rapanel-text-light/50 dark:text-white/40">
+                    <span>{{ articles.from }}–{{ articles.to }} / {{ articles.total }}</span>
                     <div class="flex gap-1">
-                        <Link v-if="articles.prev_page_url" :href="articles.prev_page_url"
-                              class="px-3 py-1 text-xs rounded-lg bg-rapanel-navy-100 dark:bg-white/[0.07] hover:bg-rapanel-blue/10 dark:hover:bg-rapanel-blue/20 transition-colors">
-                            ‹
-                        </Link>
-                        <Link v-if="articles.next_page_url" :href="articles.next_page_url"
-                              class="px-3 py-1 text-xs rounded-lg bg-rapanel-navy-100 dark:bg-white/[0.07] hover:bg-rapanel-blue/10 dark:hover:bg-rapanel-blue/20 transition-colors">
-                            ›
-                        </Link>
+                        <Link v-for="link in articles.links" :key="link.label"
+                              :href="link.url ?? '#'"
+                              :class="[
+                                  'px-2.5 py-1 rounded transition',
+                                  link.active
+                                    ? 'bg-rapanel-blue text-white'
+                                    : 'hover:bg-rapanel-navy-100 dark:hover:bg-white/10 text-rapanel-text-light/60 dark:text-white/50',
+                                  !link.url && 'opacity-40 pointer-events-none'
+                              ]"
+                              v-html="link.label" />
                     </div>
+                </div>
+                <div v-else class="px-4 py-3 border-t border-rapanel-navy-100 dark:border-white/10 text-xs text-rapanel-text-light/50 dark:text-white/40">
+                    {{ articles.total }} {{ __('articles') }}
                 </div>
             </div>
         </div>
-
-        <!-- Confirm delete modal -->
-        <Teleport to="body">
-            <div v-if="confirmingDelete !== null"
-                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-rapanel-navy-100 dark:border-white/10">
-                    <h3 class="text-lg font-bold text-rapanel-text-light dark:text-white mb-2">{{ __('Delete Article') }}</h3>
-                    <p class="text-sm text-rapanel-text-light/60 dark:text-white/50 mb-6">{{ __('This action cannot be undone.') }}</p>
-                    <div class="flex gap-3 justify-end">
-                        <button @click="confirmingDelete = null"
-                                class="px-4 py-2 text-sm rounded-lg border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/70 dark:text-white/60 hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.05] transition-colors">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button @click="destroy(confirmingDelete)"
-                                class="px-4 py-2 text-sm rounded-lg bg-rapanel-danger hover:bg-rapanel-danger/85 text-white font-semibold transition-colors">
-                            {{ __('Delete') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
     </AdminLayout>
+
+    <ConfirmModal
+        :show="!!confirmState"
+        :title="confirmState?.title ?? ''"
+        :entity="confirmState?.entity ?? ''"
+        :message="confirmState?.message ?? ''"
+        :confirm-label="confirmState?.confirmLabel ?? ''"
+        :variant="confirmState?.variant ?? 'danger'"
+        @confirm="doConfirm"
+        @close="closeConfirm"
+    />
 </template>

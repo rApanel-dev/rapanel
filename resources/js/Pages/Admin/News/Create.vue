@@ -47,12 +47,17 @@ const submit = () => {
             <!-- Header -->
             <div class="flex items-center gap-4 pb-5 border-b border-rapanel-navy-100 dark:border-white/[0.055]">
                 <Link :href="safeRoute('admin.news.index')"
+                      :aria-label="__('Back to News')"
                       class="p-2 rounded-lg hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.07] text-rapanel-text-light/55 dark:text-white/45 transition-colors">
-                    <ArrowLeftIcon class="w-5 h-5" />
+                    <ArrowLeftIcon class="w-5 h-5" aria-hidden="true" />
                 </Link>
                 <div>
                     <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">{{ __('Create News') }}</h1>
-                    <p class="text-sm text-rapanel-text-light/50 dark:text-white/40 mt-0.5">{{ __('Admin › News › Create') }}</p>
+                    <nav class="flex items-center gap-1 text-xs mt-0.5">
+                        <Link :href="safeRoute('admin.news.index')" class="text-rapanel-text-light/45 dark:text-white/35 hover:text-rapanel-blue dark:hover:text-rapanel-blue transition-colors">{{ __('News') }}</Link>
+                        <span class="text-rapanel-text-light/25 dark:text-white/20">›</span>
+                        <span class="text-rapanel-text-light/60 dark:text-white/50">{{ __('New') }}</span>
+                    </nav>
                 </div>
             </div>
 
@@ -62,12 +67,12 @@ const submit = () => {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <!-- Category -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                             {{ __('News Category') }}
                         </label>
                         <select v-model="form.type"
-                                class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10
+                                class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.05] border border-rapanel-navy-100 dark:border-white/10
                                        text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
                             <option style="background:#1e2d4a;color:#E2E8F0" :value="1">{{ __('News') }}</option>
                             <option style="background:#1e2d4a;color:#E2E8F0" :value="2">{{ __('Event') }}</option>
@@ -77,7 +82,7 @@ const submit = () => {
                     </div>
 
                     <!-- Featured image -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                         <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">
                             {{ __('Featured Image') }} <span class="normal-case font-normal">{{ __('(Optional)') }}</span>
                         </label>
@@ -95,7 +100,7 @@ const submit = () => {
                 </div>
 
                 <!-- Title -->
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                     <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">{{ __('Title') }}</label>
                     <input v-model="form.title" type="text" :placeholder="__('News title...')"
                            class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10
@@ -104,18 +109,19 @@ const submit = () => {
                 </div>
 
                 <!-- Body -->
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm">
                     <label class="block text-xs font-bold uppercase tracking-wider text-rapanel-text-light/50 dark:text-white/40 mb-3">{{ __('Content') }}</label>
                     <RichTextEditor v-model="form.body" />
                     <p v-if="form.errors.body" class="mt-1.5 text-xs text-rapanel-danger">{{ form.errors.body }}</p>
                 </div>
 
                 <!-- Toggles -->
-                <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm flex flex-wrap gap-6">
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm flex flex-wrap gap-6">
                     <label v-for="(label, field) in { is_published: 'Published', is_pinned: 'Pinned', allow_comments: 'Allow Comments' }"
                            :key="field" class="flex items-center gap-2.5 cursor-pointer select-none">
-                        <button type="button" @click="form[field] = !form[field]"
-                                :class="['relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none',
+                        <button type="button" role="switch" :aria-checked="form[field]" :aria-label="__(label)"
+                                @click="form[field] = !form[field]"
+                                :class="['relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-rapanel-blue/50 focus-visible:ring-offset-2',
                                          form[field] ? 'bg-rapanel-blue' : 'bg-rapanel-navy-100 dark:bg-white/20']">
                             <span :class="['absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200',
                                            form[field] ? 'translate-x-5' : 'translate-x-0']" />
@@ -125,7 +131,7 @@ const submit = () => {
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-end gap-3">
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-rapanel-navy-100 dark:border-white/[0.055]">
                     <Link :href="safeRoute('admin.news.index')"
                           class="px-4 py-2 rounded-lg text-sm font-medium text-rapanel-text-light/70 dark:text-white/60
                                  hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">

@@ -53,7 +53,7 @@ const activeNetworks = computed(() => {
                     <a v-for="net in activeNetworks" :key="net.id"
                         :href="net.url" target="_blank" rel="noopener noreferrer"
                         :aria-label="net.label"
-                        class="opacity-70 hover:opacity-100 transition-opacity duration-200 text-rapanel-navy-600 dark:text-rapanel-text-dark w-7 h-7 flex-shrink-0"
+                        class="opacity-70 hover:opacity-100 transition-opacity duration-200 text-rapanel-navy-600 dark:text-rapanel-text-dark w-5 h-5 flex-shrink-0"
                         v-html="socialSvgs[net.id]">
                     </a>
                 </div>

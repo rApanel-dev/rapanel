@@ -136,29 +136,35 @@ const openClaimModal = () => {
                             <span class="text-rapanel-blue font-bold">{{ viewedUser?.name ?? $page.props.auth.user.name }}</span>.
                         </p>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <PrimaryButton 
-                            @click="!isLimitReached && openCreateModal()" 
-                            :disabled="isLimitReached"
-                            class="w-full sm:w-auto justify-center transition-all duration-300"
-                            :class="{ 
-                                'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached 
-                            }"
-                            :title="isLimitReached ? __('Maximum account limit reached') : __('Create New Game Account')"
-                        >
-                            {{ __('Create Game Account') }}
-                        </PrimaryButton>
-                        <PrimaryButton
-                            @click="!isLimitReached && openClaimModal()" 
-                            :disabled="isLimitReached"
-                            class="w-full sm:w-auto justify-center transition-all duration-300"
-                            :class="{ 
-                                'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached 
-                            }"
-                            :title="isLimitReached ? __('Maximum account limit reached') : __('Link an existing account')"
-                        >
-                            {{ __('Claim Account') }}
-                        </PrimaryButton>
+                    <div class="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <PrimaryButton
+                                @click="!isLimitReached && openCreateModal()"
+                                :disabled="isLimitReached"
+                                class="w-full sm:w-auto justify-center transition-all duration-300"
+                                :class="{
+                                    'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached
+                                }"
+                                :title="isLimitReached ? __('Maximum account limit reached') : __('Create New Game Account')"
+                            >
+                                {{ __('Create Game Account') }}
+                            </PrimaryButton>
+                            <PrimaryButton
+                                @click="!isLimitReached && openClaimModal()"
+                                :disabled="isLimitReached"
+                                class="w-full sm:w-auto justify-center transition-all duration-300"
+                                :class="{
+                                    'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached
+                                }"
+                                :title="isLimitReached ? __('Maximum account limit reached') : __('Link an existing account')"
+                            >
+                                {{ __('Claim Account') }}
+                            </PrimaryButton>
+                        </div>
+                        <Link :href="route('game-password.request')"
+                              class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 hover:opacity-100 hover:text-rapanel-blue transition-all">
+                            {{ __('Forgot game account password?') }}
+                        </Link>
                     </div>
                 </div>
 

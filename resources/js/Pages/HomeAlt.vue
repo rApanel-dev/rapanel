@@ -27,6 +27,16 @@ const charOpacity    = ref(1)
 let rafId     = null
 let charTimer = null
 
+// Paleta de colores para tarjetas (feat + info) — 6 colores en orden fijo
+const cardPalette = [
+    '#4A90E2', // rapanel-blue
+    '#F1C40F', // rapanel-gold
+    '#2ECC71', // rapanel-success
+    '#a855f7', // rapanel-purple
+    '#E74C3C', // rapanel-danger
+    '#e2e8f0', // rapanel-navy-100
+]
+
 const handleScroll = () => {
     charOpacity.value = Math.max(0, 1 - window.scrollY / 280)
 }
@@ -261,6 +271,11 @@ const infoBlocks = computed(() => {
     ]
 })
 
+// Color por bloque: usa el guardado en BD o el color de la paleta por índice
+const infoColors = computed(() =>
+    infoBlocks.value.map((b, i) => b.color || cardPalette[i])
+)
+
 const highlightCards = computed(() => {
     try {
         const raw = st.value.home_highlight_cards
@@ -274,44 +289,38 @@ const highlightCards = computed(() => {
     ]
 })
 
-const featureCards = [
-    {
-        color: '#4A90E2',
-        title: 'Dashboard',
-        desc: 'Create and manage game accounts, view characters, reset position — all from your browser.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
-    },
-    {
-        color: '#F1C40F',
-        title: 'Item DB',
-        desc: 'Full searchable item database imported from rAthena YAML + itemInfo.lua with drop sources and card slots.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>`,
-    },
-    {
-        color: '#2ECC71',
-        title: 'Wiki',
-        desc: 'Docs-style public knowledge base organized in sections and articles with a rich-text editor.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>`,
-    },
-    {
-        color: '#a855f7',
-        title: 'MvP Cards',
-        desc: 'Live MvP card browser with holder counts, item properties and illustrated card portraits.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>`,
-    },
-    {
-        color: '#4A90E2',
-        title: 'Live Console',
-        desc: 'Real-time stdout/stderr for each server process via WebSocket. Start, stop, restart with one click.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>`,
-    },
-    {
-        color: '#F1C40F',
-        title: 'Who Sell',
-        desc: 'Search the live vending market by item name or ID and find sellers in real time.',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>`,
-    },
+const defaultFeatureCards = [
+    { color: '#4A90E2', title: 'Dashboard',    desc: 'Create and manage game accounts, view characters, reset position — all from your browser.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>` },
+    { color: '#F1C40F', title: 'Item DB',      desc: 'Full searchable item database imported from rAthena YAML + itemInfo.lua with drop sources and card slots.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>` },
+    { color: '#2ECC71', title: 'Wiki',         desc: 'Docs-style public knowledge base organized in sections and articles with a rich-text editor.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>` },
+    { color: '#a855f7', title: 'MvP Cards',   desc: 'Live MvP card browser with holder counts, item properties and illustrated card portraits.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>` },
+    { color: '#4A90E2', title: 'Live Console', desc: 'Real-time stdout/stderr for each server process via WebSocket. Start, stop, restart with one click.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>` },
+    { color: '#F1C40F', title: 'Who Sell',     desc: 'Search the live vending market by item name or ID and find sellers in real time.', icon_svg: null, enabled: true, icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>` },
 ]
+
+const featureCards = computed(() => {
+    try {
+        const raw = st.value.home_feature_cards
+        if (!raw) return defaultFeatureCards
+        const saved = JSON.parse(raw)
+        return defaultFeatureCards.map((def, i) => {
+            const s = saved[i] ?? {}
+            return {
+                ...def,
+                title:     s.title     ?? def.title,
+                desc:      s.desc      ?? def.desc,
+                color:     s.color     ?? def.color,
+                svg_code:  s.svg_code  ?? null,
+                image:     s.image     ?? null,
+                icon_type: s.icon_type ?? 'icon',
+                enabled:   s.enabled   ?? true,
+                icon:      s.svg_code  || def.icon,
+            }
+        }).filter(f => f.enabled)
+    } catch {
+        return defaultFeatureCards
+    }
+})
 
 const initGridGlow = () => {
     const hero = document.querySelector('.ha-hero')
@@ -487,48 +496,48 @@ onUnmounted(() => {
                     <div class="flex flex-wrap gap-4">
 
                         <!-- EXP Rate -->
-                        <div v-if="infoBlocks[0]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(74,144,226,0.15)">
+                        <div v-if="infoBlocks[0]?.show !== false" class="info-block feat-card ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]" :style="`--c:${infoColors[0]}`">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background:${infoColors[0]}20`">
                                 <img v-if="infoBlocks[0]?.image" :src="'/storage/' + infoBlocks[0].image" class="w-9 h-9 object-contain" />
-                                <span v-else-if="infoBlocks[0]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#4A90E2]" v-html="infoBlocks[0].svg_code" />
-                                <svg v-else class="w-5 h-5 text-[#4A90E2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <span v-else-if="infoBlocks[0]?.svg_code" class="ha-svg-icon w-5 h-5" :style="`color:${infoColors[0]}`" v-html="infoBlocks[0].svg_code" />
+                                <svg v-else class="w-5 h-5" :style="`color:${infoColors[0]}`" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
                                 </svg>
                             </div>
                             <div>
                                 <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">
-                                    <span data-count-info="100">{{ st.home_base_rate || 100 }}</span>x /
-                                    <span data-count-info="100">{{ st.home_job_rate || 100 }}</span>x /
-                                    <span data-count-info="100">{{ st.home_drop_rate || 100 }}</span>x
+                                    <span :data-count-info="st.home_base_rate || 100">{{ st.home_base_rate || 100 }}</span>x /
+                                    <span :data-count-info="st.home_job_rate || 100">{{ st.home_job_rate || 100 }}</span>x /
+                                    <span :data-count-info="st.home_drop_rate || 100">{{ st.home_drop_rate || 100 }}</span>x
                                 </div>
                                 <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Base / Job / Drop') }}</div>
                             </div>
                         </div>
 
                         <!-- Max Level -->
-                        <div v-if="infoBlocks[1]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(241,196,15,0.12)">
+                        <div v-if="infoBlocks[1]?.show !== false" class="info-block feat-card ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]" :style="`--c:${infoColors[1]}`">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background:${infoColors[1]}20`">
                                 <img v-if="infoBlocks[1]?.image" :src="'/storage/' + infoBlocks[1].image" class="w-9 h-9 object-contain" />
-                                <span v-else-if="infoBlocks[1]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#F1C40F]" v-html="infoBlocks[1].svg_code" />
-                                <svg v-else class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <span v-else-if="infoBlocks[1]?.svg_code" class="ha-svg-icon w-5 h-5" :style="`color:${infoColors[1]}`" v-html="infoBlocks[1].svg_code" />
+                                <svg v-else class="w-5 h-5" :style="`color:${infoColors[1]}`" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
                                 </svg>
                             </div>
                             <div>
                                 <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">
-                                    <span data-count-info="99">{{ st.home_max_base_level || 99 }}</span> /
-                                    <span data-count-info="70">{{ st.home_max_job_level || 70 }}</span>
+                                    <span :data-count-info="st.home_max_base_level || 99">{{ st.home_max_base_level || 99 }}</span> /
+                                    <span :data-count-info="st.home_max_job_level || 70">{{ st.home_max_job_level || 70 }}</span>
                                 </div>
                                 <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Max Base / Job') }}</div>
                             </div>
                         </div>
 
                         <!-- Game Mode -->
-                        <div v-if="infoBlocks[2]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(46,204,113,0.12)">
+                        <div v-if="infoBlocks[2]?.show !== false" class="info-block feat-card ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]" :style="`--c:${infoColors[2]}`">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background:${infoColors[2]}20`">
                                 <img v-if="infoBlocks[2]?.image" :src="'/storage/' + infoBlocks[2].image" class="w-9 h-9 object-contain" />
-                                <span v-else-if="infoBlocks[2]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#2ECC71]" v-html="infoBlocks[2].svg_code" />
-                                <svg v-else class="w-5 h-5 text-[#2ECC71]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <span v-else-if="infoBlocks[2]?.svg_code" class="ha-svg-icon w-5 h-5" :style="`color:${infoColors[2]}`" v-html="infoBlocks[2].svg_code" />
+                                <svg v-else class="w-5 h-5" :style="`color:${infoColors[2]}`" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/>
                                 </svg>
                             </div>
@@ -539,11 +548,11 @@ onUnmounted(() => {
                         </div>
 
                         <!-- Episode -->
-                        <div v-if="infoBlocks[3]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(241,196,15,0.12)">
+                        <div v-if="infoBlocks[3]?.show !== false" class="info-block feat-card ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]" :style="`--c:${infoColors[3]}`">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background:${infoColors[3]}20`">
                                 <img v-if="infoBlocks[3]?.image" :src="'/storage/' + infoBlocks[3].image" class="w-9 h-9 object-contain" />
-                                <span v-else-if="infoBlocks[3]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#F1C40F]" v-html="infoBlocks[3].svg_code" />
-                                <svg v-else class="w-5 h-5 text-[#F1C40F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <span v-else-if="infoBlocks[3]?.svg_code" class="ha-svg-icon w-5 h-5" :style="`color:${infoColors[3]}`" v-html="infoBlocks[3].svg_code" />
+                                <svg v-else class="w-5 h-5" :style="`color:${infoColors[3]}`" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
                             </div>
@@ -554,11 +563,11 @@ onUnmounted(() => {
                         </div>
 
                         <!-- International -->
-                        <div v-if="infoBlocks[4]?.show !== false" class="info-block ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(168,85,247,0.12)">
+                        <div v-if="infoBlocks[4]?.show !== false" class="info-block feat-card ha-glass rounded-2xl p-4 flex flex-col items-center text-center gap-3 opacity-0 flex-1 min-w-[140px]" :style="`--c:${infoColors[4]}`">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background:${infoColors[4]}20`">
                                 <img v-if="infoBlocks[4]?.image" :src="'/storage/' + infoBlocks[4].image" class="w-9 h-9 object-contain" />
-                                <span v-else-if="infoBlocks[4]?.svg_code" class="ha-svg-icon w-5 h-5 text-[#a855f7]" v-html="infoBlocks[4].svg_code" />
-                                <svg v-else class="w-5 h-5 text-[#a855f7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <span v-else-if="infoBlocks[4]?.svg_code" class="ha-svg-icon w-5 h-5" :style="`color:${infoColors[4]}`" v-html="infoBlocks[4].svg_code" />
+                                <svg v-else class="w-5 h-5" :style="`color:${infoColors[4]}`" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>
                                 </svg>
                             </div>
@@ -601,15 +610,16 @@ onUnmounted(() => {
                         <template v-for="n in 2" :key="n">
                             <Link v-for="item in news" :key="`${n}-${item.id}`"
                                   :href="safeRoute('news.show', item.slug)"
-                                  class="ha-news-card ha-glass rounded-2xl p-5 flex-shrink-0 w-72 mx-3 block group">
+                                  class="ha-news-card ha-glass rounded-2xl p-5 flex-shrink-0 w-72 mx-3 block group"
+                                  :style="`--nc: ${item.type_color}`">
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="text-xs px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide"
-                                          style="background: rgba(74,144,226,0.2); color: #4A90E2">
-                                        {{ item.type_label }}
+                                          :style="`background: ${item.type_color}20; color: ${item.type_color}`">
+                                        {{ __(item.type_label) }}
                                     </span>
                                     <span class="text-xs text-gray-500 dark:text-gray-400">{{ item.created_at }}</span>
                                 </div>
-                                <h4 class="font-display text-lg font-bold text-rapanel-text-light dark:text-rapanel-text-dark leading-snug line-clamp-2 group-hover:text-[#4A90E2] transition-colors">
+                                <h4 class="ha-news-title font-display text-lg font-bold text-rapanel-text-light dark:text-rapanel-text-dark leading-snug line-clamp-2 transition-colors">
                                     {{ item.title }}
                                 </h4>
                                 <p class="text-gray-600 dark:text-gray-400 text-xs mt-2 line-clamp-2">{{ item.excerpt }}</p>
@@ -624,27 +634,28 @@ onUnmounted(() => {
                 <div class="max-w-6xl mx-auto">
 
                     <div class="text-center mb-16">
-                        <p class="text-[#4A90E2] text-xs uppercase tracking-[0.3em] font-semibold mb-4">{{ __('Everything in one place') }}</p>
-                        <h2 class="font-display text-4xl md:text-6xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Panel Features') }}</h2>
+                        <p class="text-[#4A90E2] text-xs uppercase tracking-[0.3em] font-semibold mb-4">{{ st.home_features_subtitle || __('Everything in one place') }}</p>
+                        <h2 class="font-display text-4xl md:text-6xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ st.home_features_title || __('Panel Features') }}</h2>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         <div v-for="(f, i) in featureCards" :key="i"
                              class="feat-card ha-glass rounded-2xl p-6 opacity-0 relative overflow-hidden cursor-default"
-                             :style="`--c: ${f.color}`">
+                             :style="`--c: ${cardPalette[i % cardPalette.length]}`">
 
                             <!-- Icon -->
                             <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                                 :style="`background: ${f.color}20`">
-                                <span class="w-5 h-5" :style="`color: ${f.color}`" v-html="f.icon" />
+                                 :style="`background: ${cardPalette[i % cardPalette.length]}20`">
+                                <img v-if="f.image" :src="'/storage/' + f.image" class="w-8 h-8 object-contain" />
+                                <span v-else class="ha-svg-icon w-5 h-5" :style="`color: ${cardPalette[i % cardPalette.length]}`" v-html="f.icon" />
                             </div>
 
-                            <h3 class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __(f.title) }}</h3>
-                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{{ __(f.desc) }}</p>
+                            <h3 class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ f.title }}</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{{ f.desc }}</p>
 
                             <!-- Top-edge glow line -->
                             <div class="absolute top-0 left-6 right-6 h-px"
-                                 :style="`background: linear-gradient(90deg, transparent, ${f.color}80, transparent)`" />
+                                 :style="`background: linear-gradient(90deg, transparent, ${cardPalette[i % cardPalette.length]}80, transparent)`" />
                         </div>
                     </div>
                 </div>
@@ -658,19 +669,19 @@ onUnmounted(() => {
 
                     <h2 class="font-display font-bold leading-none mb-6
                                text-5xl sm:text-6xl md:text-8xl">
-                        <span class="block text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Start Your') }}</span>
-                        <span class="block ha-gradient-text">{{ __('Adventure') }}</span>
+                        <span class="block text-rapanel-text-light dark:text-rapanel-text-dark">{{ st.home_cta_line1 || __('Start Your') }}</span>
+                        <span class="block ha-gradient-text">{{ st.home_cta_line2 || __('Adventure') }}</span>
                     </h2>
 
                     <p class="text-gray-600 dark:text-gray-300 text-lg mb-10 max-w-xl mx-auto">
-                        {{ __('Join our community and experience Ragnarok Online the way it was meant to be played.') }}
+                        {{ st.home_cta_subtitle || __('Join our community and experience Ragnarok Online the way it was meant to be played.') }}
                     </p>
 
                     <div class="relative inline-block">
-                        <Link ref="ctaBtnRef" :href="safeRoute('register')"
+                        <Link ref="ctaBtnRef" :href="st.home_cta_btn_url || safeRoute('register')"
                               @click="doBurst"
                               class="ha-btn-primary font-display text-xl font-bold uppercase tracking-widest px-14 py-5 rounded-2xl inline-block">
-                            {{ __('Register Free') }}
+                            {{ st.home_cta_btn_text || __('Register Free') }}
                         </Link>
                         <!-- burst particles -->
                         <span v-for="p in burstParticles" :key="p.id"
@@ -696,6 +707,7 @@ onUnmounted(() => {
     color: #E2E8F0;
 }
 .font-display { font-family: 'Rajdhani', sans-serif; }
+
 
 /* ── Hero overlay ───────────────────────────────────────────── */
 .ha-hero-overlay {
@@ -853,6 +865,7 @@ onUnmounted(() => {
     to   { transform: translateX(-50%); }
 }
 .ha-news-card { transition: border-color 0.3s ease; }
+.ha-news-card:hover .ha-news-title { color: var(--nc, #4A90E2); }
 
 /* ── Mesh CTA bg ────────────────────────────────────────────── */
 .ha-mesh-bg {

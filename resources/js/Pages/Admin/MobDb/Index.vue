@@ -64,7 +64,7 @@ const submitClear = () => {
                 ['Boss']:           stats.boss,
                 [__('Normal')]:     stats.normal,
             }" :key="label"
-                class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
+                class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4 shadow-sm">
                 <p class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-1">{{ label }}</p>
                 <p class="text-2xl font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ Number(val).toLocaleString() }}</p>
             </div>
@@ -73,7 +73,7 @@ const submitClear = () => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- ── Import Form ── -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
                 <div class="h-[3px] bg-gradient-to-r from-rapanel-blue/70 via-rapanel-blue/30 to-transparent" />
                 <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                     <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Import Mobs') }}</h2>
@@ -157,7 +157,7 @@ const submitClear = () => {
 
                 <!-- Result (tras import) -->
                 <div v-if="flash.imported !== undefined"
-                    class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+                    class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
                     <div class="h-[3px] bg-rapanel-success" />
                     <div class="px-6 py-5">
                         <p class="text-sm font-bold text-rapanel-navy-900 dark:text-white mb-4">{{ __('Import complete') }}</p>
@@ -176,7 +176,7 @@ const submitClear = () => {
                 </div>
 
                 <!-- Info / Last sync -->
-                <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm p-5 space-y-3">
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm p-5 space-y-3">
                     <p class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Last sync') }}</p>
                     <p class="text-sm font-medium text-rapanel-navy-900 dark:text-white">
                         {{ stats.last_sync ?? __('Never') }}

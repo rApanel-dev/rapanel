@@ -39,6 +39,11 @@ export default {
                 'rapanel-danger':  { DEFAULT: '#E74C3C', dark: '#7f1d1d' }, // MVP Red
                 'rapanel-gold':    { DEFAULT: '#F1C40F', dark: '#78350f' }, // Emperium Gold
                 'rapanel-purple':  { DEFAULT: '#a855f7', dark: '#581c87' }, // Mystic Purple (VIP / Gender)
+
+                // Dark mode surface tokens (replaces hardcoded hex values)
+                'rapanel-surface':      '#0f1829', // dark card/panel background
+                'rapanel-surface-deep': '#0b1120', // dark sidebar/topbar background
+                'rapanel-base-dark':    '#080d14', // dark page base background
             },
         },
     },

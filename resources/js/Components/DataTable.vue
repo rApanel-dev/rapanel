@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.28)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.55)] overflow-hidden">
+    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.28)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.55)] overflow-hidden">
         <div v-if="title || $slots.header" class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] bg-rapanel-navy-50 dark:bg-white/[0.04]">
             <slot name="header">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ title }}</h3>

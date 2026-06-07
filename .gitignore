@@ -22,6 +22,10 @@
 /public/data/monsters/*.gif
 /public/data/maps/*.png
 !**/.gitkeep
+/public/downloads/patch/*
+!/public/downloads/patch/.gitkeep
+/storage/app/public/downloads/client/*
+!/storage/app/public/downloads/client/.gitkeep
 /public/hot
 /public/storage
 /storage/*.key
@@ -38,3 +42,5 @@ CODIGO_ORIGINAL.md
 /.agents
 /.claude
 skills-lock.json
+PRODUCT.md
+/.impeccable

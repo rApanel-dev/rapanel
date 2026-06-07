@@ -193,7 +193,8 @@ class SiteSettingsController extends Controller
                 $image = null;
             }
 
-            $blocks[] = ['id' => $id, 'show' => $show, 'icon_type' => $iconType, 'image' => $image, 'svg_code' => $svgCode];
+            $color    = $request->input("blocks.{$i}.color", $existing['color'] ?? null);
+            $blocks[] = ['id' => $id, 'show' => $show, 'icon_type' => $iconType, 'image' => $image, 'svg_code' => $svgCode, 'color' => $color];
         }
 
         SiteSetting::setValue('home_info_blocks', json_encode($blocks));
@@ -309,6 +310,97 @@ class SiteSettingsController extends Controller
 
         $this->clearCache();
         return back()->with('success', __('Social networks saved.'));
+    }
+
+    public function updateHomeFeatures(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'features_title'    => 'nullable|string|max:200',
+            'features_subtitle' => 'nullable|string|max:200',
+        ]);
+
+        SiteSetting::setMany([
+            'home_features_title'    => $request->features_title    ?? '',
+            'home_features_subtitle' => $request->features_subtitle ?? '',
+        ]);
+
+        $defaults = [
+            ['color' => '#4A90E2', 'title' => 'Dashboard',    'desc' => 'Create and manage game accounts, view characters, reset position — all from your browser.'],
+            ['color' => '#F1C40F', 'title' => 'Item DB',      'desc' => 'Full searchable item database imported from rAthena YAML + itemInfo.lua with drop sources and card slots.'],
+            ['color' => '#2ECC71', 'title' => 'Wiki',         'desc' => 'Docs-style public knowledge base organized in sections and articles with a rich-text editor.'],
+            ['color' => '#a855f7', 'title' => 'MvP Cards',   'desc' => 'Live MvP card browser with holder counts, item properties and illustrated card portraits.'],
+            ['color' => '#4A90E2', 'title' => 'Live Console', 'desc' => 'Real-time stdout/stderr for each server process via WebSocket. Start, stop, restart with one click.'],
+            ['color' => '#F1C40F', 'title' => 'Who Sell',     'desc' => 'Search the live vending market by item name or ID and find sellers in real time.'],
+        ];
+
+        $current = json_decode(SiteSetting::getValue('home_feature_cards') ?? '[]', true);
+        $cards   = [];
+
+        for ($i = 0; $i < 6; $i++) {
+            $existing  = $current[$i] ?? [];
+            $iconType  = $request->input("cards.{$i}.icon_type", $existing['icon_type'] ?? 'icon');
+            $enabled   = $request->boolean("cards.{$i}.enabled", $existing['enabled'] ?? true);
+            $image     = $existing['image'] ?? null;
+
+            // Volver al ícono por defecto borra la imagen guardada
+            if ($iconType === 'icon') {
+                if ($image) Storage::disk('public')->delete($image);
+                $image = null;
+            }
+
+            // Nueva imagen sube el archivo
+            if ($request->hasFile("cards.{$i}.image")) {
+                if ($image) Storage::disk('public')->delete($image);
+                $image    = $request->file("cards.{$i}.image")->store('settings/features', 'public');
+                $iconType = 'image';
+            }
+
+            $svgCode = $request->input("cards.{$i}.svg_code", $existing['svg_code'] ?? null) ?: null;
+            // Si se sube imagen, descarta svg_code
+            if ($request->hasFile("cards.{$i}.image")) $svgCode = null;
+            // Si se pega svg_code nuevo, descarta la imagen
+            if ($svgCode && $svgCode !== ($existing['svg_code'] ?? null)) {
+                if ($image) Storage::disk('public')->delete($image);
+                $image = null;
+            }
+
+            $cards[] = [
+                'title'     => $request->input("cards.{$i}.title",  $existing['title']  ?? $defaults[$i]['title']),
+                'desc'      => $request->input("cards.{$i}.desc",   $existing['desc']   ?? $defaults[$i]['desc']),
+                'color'     => $request->input("cards.{$i}.color",  $existing['color']  ?? $defaults[$i]['color']),
+                'svg_code'  => $svgCode,
+                'image'     => $image,
+                'icon_type' => $iconType,
+                'enabled'   => $enabled,
+            ];
+        }
+
+        SiteSetting::setValue('home_feature_cards', json_encode($cards));
+
+        $this->clearCache();
+        return back()->with('success', __('Panel Features settings saved.'));
+    }
+
+    public function updateHomeCta(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'cta_line1'   => 'nullable|string|max:100',
+            'cta_line2'   => 'nullable|string|max:100',
+            'cta_subtitle'=> 'nullable|string|max:300',
+            'cta_btn_text'=> 'nullable|string|max:60',
+            'cta_btn_url' => 'nullable|string|max:500',
+        ]);
+
+        SiteSetting::setMany([
+            'home_cta_line1'    => $request->cta_line1    ?? '',
+            'home_cta_line2'    => $request->cta_line2    ?? '',
+            'home_cta_subtitle' => $request->cta_subtitle ?? '',
+            'home_cta_btn_text' => $request->cta_btn_text ?? '',
+            'home_cta_btn_url'  => $request->cta_btn_url  ?? '',
+        ]);
+
+        $this->clearCache();
+        return back()->with('success', __('Call to Action settings saved.'));
     }
 
     public function dangerClearLogs(Request $request): RedirectResponse

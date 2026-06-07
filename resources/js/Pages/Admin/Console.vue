@@ -138,7 +138,7 @@ RA_WS_SECRET=your_secret_here</pre>
                 <div class="grid gap-3 items-stretch" style="grid-template-columns: 55fr 45fr">
 
                     <!-- Left: server selector tabs -->
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <button v-for="name in SERVERS" :key="name"
                             @click="activeServer = name"
                             :class="[
@@ -156,7 +156,7 @@ RA_WS_SECRET=your_secret_here</pre>
                     </div>
 
                     <!-- Right: controls bar -->
-                    <div class="bg-white dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 px-4 flex items-center gap-3 flex-wrap">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 px-4 flex items-center gap-3 flex-wrap">
                         <!-- Status + connection -->
                         <div class="flex items-center gap-3">
                             <div class="flex items-center gap-2">

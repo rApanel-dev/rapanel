@@ -168,6 +168,27 @@ class DownloadController extends Controller
             ->with('success', __('Download updated successfully.'));
     }
 
+    public function localFiles(): \Illuminate\Http\JsonResponse
+    {
+        $disk  = Storage::disk('public');
+        $dir   = 'downloads/client';
+        $files = [];
+
+        if ($disk->exists($dir)) {
+            foreach ($disk->files($dir) as $path) {
+                $name = basename($path);
+                if ($name === '.gitkeep') continue;
+                $files[] = [
+                    'name' => $name,
+                    'size' => $disk->size($path),
+                    'url'  => '/storage/' . $path,
+                ];
+            }
+        }
+
+        return response()->json($files);
+    }
+
     public function destroy(Download $download): RedirectResponse
     {
         if ($download->image_path) {

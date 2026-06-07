@@ -406,15 +406,15 @@ const formatDelay = (ms) => {
                     <!-- Legend -->
                     <div class="mt-3 flex flex-wrap gap-3 text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark">
                         <div class="flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded border-2 border-rapanel-gold bg-[#0b1120]" />
+                            <div class="w-4 h-4 rounded border-2 border-rapanel-gold bg-rapanel-surface-deep" />
                             <span>MVP</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded border-2 border-orange-500 bg-[#0b1120]" />
+                            <div class="w-4 h-4 rounded border-2 border-orange-500 bg-rapanel-surface-deep" />
                             <span>Boss</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded border-2 border-rapanel-blue bg-[#0b1120]" />
+                            <div class="w-4 h-4 rounded border-2 border-rapanel-blue bg-rapanel-surface-deep" />
                             <span>{{ __('Normal') }}</span>
                         </div>
                         <div class="flex items-center gap-1.5">
@@ -426,7 +426,7 @@ const formatDelay = (ms) => {
 
                 <!-- ── Mob list sidebar ── -->
                 <div v-if="allMobsGrouped.length > 0" class="lg:flex-1 shrink-0">
-                    <div class="bg-white dark:bg-[#0f1829] rounded-2xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden sticky top-4">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-2xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden sticky top-4">
                         <div class="px-4 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                             <h3 class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/60 dark:text-white/40">
                                 {{ __('Monsters') }}

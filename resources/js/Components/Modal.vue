@@ -14,6 +14,14 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    ariaLabelledby: {
+        type: String,
+        default: undefined,
+    },
+    ariaLabel: {
+        type: String,
+        default: undefined,
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -79,6 +87,8 @@ const maxWidthClass = computed(() => {
 <template>
     <dialog
         class="z-50 m-0 min-h-full min-w-full overflow-y-auto bg-transparent backdrop:bg-transparent"
+        :aria-labelledby="ariaLabelledby"
+        :aria-label="ariaLabel"
         ref="dialog"
     >
         <div

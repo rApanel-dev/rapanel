@@ -53,7 +53,7 @@ const barWidth = (count) => {
             <PageHeader :title="__('Admin Dashboard')" :description="__('Server overview and player distribution')" />
 
             <!-- Stats grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
 
                 <StatsCard :label="__('Master Accounts')" :value="stats.total_users" accent="blue">
                     <template #icon><UsersIcon class="w-5 h-5 text-rapanel-blue" /></template>
@@ -96,7 +96,7 @@ const barWidth = (count) => {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                 <!-- Map -->
-                <div class="lg:col-span-2 bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col">
+                <div class="lg:col-span-2 bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col">
                     <div class="flex items-center justify-between px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] shrink-0 bg-rapanel-navy-50 dark:bg-white/[0.025]">
                         <div>
                             <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Player Distribution') }}</h2>
@@ -115,7 +115,7 @@ const barWidth = (count) => {
                 <div class="flex flex-col gap-4">
 
                     <!-- Top Countries -->
-                    <div class="flex-1 bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+                    <div class="flex-1 bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] bg-rapanel-navy-50 dark:bg-white/[0.025]">
                             <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Top Countries') }}</h2>
                         </div>
@@ -143,7 +143,7 @@ const barWidth = (count) => {
                     </div>
 
                     <!-- Log Activity -->
-                    <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.25)] dark:shadow-[0_4px_32px_rgba(0,0,0,0.5)] overflow-hidden">
                         <div class="px-5 py-3 border-b border-rapanel-navy-100 dark:border-white/[0.07] bg-rapanel-navy-50 dark:bg-white/[0.025]">
                             <h2 class="text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-white/35">{{ __('Log Activity') }}</h2>
                         </div>

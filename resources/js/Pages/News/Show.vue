@@ -97,7 +97,7 @@ const deleteComment = (commentId) => {
                     <!-- Type badge + meta -->
                     <div class="flex flex-wrap items-center gap-3">
                         <span :class="['text-xs font-bold uppercase px-2.5 py-1 rounded-full border tracking-wide', typeBadge(news.type)]">
-                            {{ news.type_label }}
+                            {{ __(news.type_label) }}
                         </span>
                         <span class="text-sm text-rapanel-text-light/50 dark:text-white/35">{{ news.created_at }}</span>
                         <span class="text-xs text-rapanel-text-light/35 dark:text-white/25 hidden sm:inline">({{ news.created_ago }})</span>
@@ -338,7 +338,7 @@ const deleteComment = (commentId) => {
                                         <span class="text-[10px] text-rapanel-text-light/40 dark:text-white/30">{{ item.created_at }}</span>
                                         <span class="w-0.5 h-0.5 rounded-full bg-rapanel-text-light/20 dark:bg-white/20" />
                                         <span :class="['text-[9px] font-bold uppercase px-1 py-0.5 rounded border', sideTypeBadge(item.type)]">
-                                            {{ item.type_label }}
+                                            {{ __(item.type_label) }}
                                         </span>
                                     </div>
                                 </div>

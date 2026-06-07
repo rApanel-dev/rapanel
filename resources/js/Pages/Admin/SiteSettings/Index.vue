@@ -16,6 +16,7 @@ import {
     NewspaperIcon,
     Squares2X2Icon,
     CursorArrowRaysIcon,
+    RocketLaunchIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -87,15 +88,19 @@ const sections = ref({
 });
 
 const tabs = computed(() => [
-    { key: 'general',     label: 'General',     icon: Cog6ToothIcon },
-    { key: 'home',        label: 'Home',         icon: HomeIcon },
+    { key: 'general',     label: 'General',         icon: Cog6ToothIcon },
+    { key: 'home',        label: 'Home',             icon: HomeIcon },
     ...(sections.value.home_show_info ? [{ key: 'server-info', label: 'Server Info', icon: InformationCircleIcon }] : []),
-    { key: 'seo',         label: 'SEO',          icon: MagnifyingGlassIcon },
-    { key: 'danger',      label: 'Danger Zone',  icon: ExclamationTriangleIcon },
+    ...(sections.value.home_show_features ? [{ key: 'features', label: 'Panel Features', icon: Squares2X2Icon }] : []),
+    ...(sections.value.home_show_cta      ? [{ key: 'cta',      label: 'Call to Action', icon: RocketLaunchIcon }] : []),
+    { key: 'seo',         label: 'SEO',              icon: MagnifyingGlassIcon },
+    { key: 'danger',      label: 'Danger Zone',      icon: ExclamationTriangleIcon },
 ]);
 
 watch(sections, (val) => {
-    if (activeTab.value === 'server-info' && !val.home_show_info) activeTab.value = 'home';
+    if (activeTab.value === 'server-info' && !val.home_show_info)     activeTab.value = 'home';
+    if (activeTab.value === 'features'    && !val.home_show_features) activeTab.value = 'home';
+    if (activeTab.value === 'cta'         && !val.home_show_cta)      activeTab.value = 'home';
 }, { deep: true });
 
 const savingSections = ref(false);
@@ -125,8 +130,14 @@ const sectionRows = [
 
 // --- Info Blocks ---
 const parseInfoBlocks = () => {
-    try { const r = props.settings.home_info_blocks; if (r) return JSON.parse(r) } catch {}
-    return ['rates','level','mode','episode','intl'].map(id => ({ id, show: true, icon_type: 'icon', image: null, svg_code: null }))
+    try {
+        const r = props.settings.home_info_blocks
+        if (r) {
+            const parsed = JSON.parse(r)
+            return parsed.map((b, i) => ({ ...b, color: b.color || infoBlocksMeta[i]?.color || '#4A90E2' }))
+        }
+    } catch {}
+    return infoBlocksMeta.map(m => ({ id: m.id, show: true, icon_type: 'icon', image: null, svg_code: null, color: m.color }))
 }
 
 const infoBlocksMeta = [
@@ -143,11 +154,11 @@ const infoBlocksMeta = [
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>`,
     },
     {
-        id: 'episode', label: 'Episode', color: '#F1C40F',
+        id: 'episode', label: 'Episode', color: '#a855f7',
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>`,
     },
     {
-        id: 'intl', label: 'International', color: '#a855f7',
+        id: 'intl', label: 'International', color: '#E74C3C',
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>`,
     },
 ]
@@ -184,11 +195,9 @@ const submitInfoBlocks = () => {
     infoBlocks.value.forEach((b, i) => {
         fd.append(`blocks[${i}][show]`,      b.show ? '1' : '0')
         fd.append(`blocks[${i}][icon_type]`, b.icon_type)
+        fd.append(`blocks[${i}][color]`,     b.color || infoBlocksMeta[i].color)
+        fd.append(`blocks[${i}][svg_code]`,  b.svg_code ?? '')
         if (infoFiles.value[i]) fd.append(`blocks[${i}][image]`, infoFiles.value[i])
-    })
-    // svg_code por bloque
-    infoBlocks.value.forEach((b, i) => {
-        fd.append(`blocks[${i}][svg_code]`, b.svg_code ?? '')
     })
     // Valores de texto (incluyendo intl)
     Object.entries(infoTextValues.value).forEach(([k, v]) => fd.append(k, v ?? ''))
@@ -324,6 +333,97 @@ const submitSocialNetworks = () => {
     router.post(route('admin.settings.social-networks'), { networks }, {
         preserveScroll: true,
         onSuccess: () => {},
+    });
+};
+
+// --- Panel Features ---
+const defaultFeatureCards = [
+    { title: 'Dashboard',    desc: 'Create and manage game accounts, view characters, reset position — all from your browser.', color: '#4A90E2', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>` },
+    { title: 'Item DB',      desc: 'Full searchable item database imported from rAthena YAML + itemInfo.lua with drop sources and card slots.', color: '#F1C40F', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>` },
+    { title: 'Wiki',         desc: 'Docs-style public knowledge base organized in sections and articles with a rich-text editor.', color: '#2ECC71', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>` },
+    { title: 'MvP Cards',   desc: 'Live MvP card browser with holder counts, item properties and illustrated card portraits.', color: '#a855f7', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>` },
+    { title: 'Live Console', desc: 'Real-time stdout/stderr for each server process via WebSocket. Start, stop, restart with one click.', color: '#4A90E2', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>` },
+    { title: 'Who Sell',     desc: 'Search the live vending market by item name or ID and find sellers in real time.', color: '#F1C40F', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>` },
+];
+
+const parseFeatureCards = () => {
+    try {
+        const raw = props.settings.home_feature_cards;
+        if (raw) {
+            const saved = JSON.parse(raw);
+            return defaultFeatureCards.map((def, i) => {
+                const s = saved[i] ?? {};
+                return {
+                    ...def,
+                    title:     s.title     ?? def.title,
+                    desc:      s.desc      ?? def.desc,
+                    color:     s.color     ?? def.color,
+                    svg_code:  s.svg_code  ?? null,
+                    image:     s.image     ?? null,
+                    icon_type: s.icon_type ?? 'icon',
+                    enabled:   s.enabled   ?? true,
+                };
+            });
+        }
+    } catch {}
+    return defaultFeatureCards.map(c => ({ ...c, svg_code: null, image: null, icon_type: 'icon', enabled: true }));
+};
+
+const featuresTitle    = ref(props.settings.home_features_title    ?? '');
+const featuresSubtitle = ref(props.settings.home_features_subtitle ?? '');
+const featureCards     = ref(parseFeatureCards());
+const featureFiles     = ref([null, null, null, null, null, null]);
+const featurePreviews  = ref(parseFeatureCards().map(c => c.image ? '/storage/' + c.image : null));
+const featuresSaving   = ref(false);
+
+const onFeatureFile = (e, i) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    featureFiles.value[i]    = file;
+    featurePreviews.value[i] = URL.createObjectURL(file);
+    featureCards.value[i].icon_type = 'image';
+    featureCards.value[i].svg_code  = null;
+};
+
+const submitFeatures = () => {
+    featuresSaving.value = true;
+    const fd = new FormData();
+    fd.append('features_title',    featuresTitle.value);
+    fd.append('features_subtitle', featuresSubtitle.value);
+    featureCards.value.forEach((c, i) => {
+        fd.append(`cards[${i}][title]`,     c.title     ?? '');
+        fd.append(`cards[${i}][desc]`,      c.desc      ?? '');
+        fd.append(`cards[${i}][color]`,     c.color     ?? '');
+        fd.append(`cards[${i}][svg_code]`,  c.svg_code  ?? '');
+        fd.append(`cards[${i}][icon_type]`, c.icon_type ?? 'icon');
+        fd.append(`cards[${i}][enabled]`,   c.enabled   ? '1' : '0');
+        if (featureFiles.value[i]) fd.append(`cards[${i}][image]`, featureFiles.value[i]);
+    });
+    router.post(route('admin.settings.home-features'), fd, {
+        forceFormData: true, preserveScroll: true,
+        onFinish: () => { featuresSaving.value = false; },
+    });
+};
+
+// --- Call to Action ---
+const ctaLine1    = ref(props.settings.home_cta_line1    ?? '');
+const ctaLine2    = ref(props.settings.home_cta_line2    ?? '');
+const ctaSubtitle = ref(props.settings.home_cta_subtitle ?? '');
+const ctaBtnText  = ref(props.settings.home_cta_btn_text ?? '');
+const ctaBtnUrl   = ref(props.settings.home_cta_btn_url  ?? '');
+const ctaSaving   = ref(false);
+
+const submitCta = () => {
+    ctaSaving.value = true;
+    router.post(route('admin.settings.home-cta'), {
+        cta_line1:    ctaLine1.value,
+        cta_line2:    ctaLine2.value,
+        cta_subtitle: ctaSubtitle.value,
+        cta_btn_text: ctaBtnText.value,
+        cta_btn_url:  ctaBtnUrl.value,
+    }, {
+        preserveScroll: true,
+        onFinish: () => { ctaSaving.value = false; },
     });
 };
 
@@ -646,8 +746,7 @@ const executeDanger = () => {
                     {{ __('Custom icon recommended size: 40×40 px.') }}
                     {{ __('Free SVG icons:') }}
                     <a href="https://heroicons.com" target="_blank" class="text-rapanel-gold hover:underline">heroicons.com</a> ·
-                    <a href="https://lucide.dev" target="_blank" class="text-rapanel-gold hover:underline">lucide.dev</a> ·
-                    <a href="https://iconify.design" target="_blank" class="text-rapanel-gold hover:underline">iconify.design</a>
+                    <a href="https://lucide.dev" target="_blank" class="text-rapanel-gold hover:underline">lucide.dev</a>
                 </p>
 
                 <div class="space-y-3">
@@ -659,7 +758,7 @@ const executeDanger = () => {
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                                      :style="`background:${infoBlocksMeta[i].color}`"></span>
+                                      :style="`background:${block.color || infoBlocksMeta[i].color}`"></span>
                                 <span class="text-sm font-semibold text-rapanel-navy-900 dark:text-white">{{ __(infoBlocksMeta[i].label) }}</span>
                             </div>
                             <button type="button" role="switch" :aria-checked="block.show"
@@ -681,13 +780,13 @@ const executeDanger = () => {
                                     <!-- Preview actual -->
                                     <div class="relative flex-shrink-0">
                                         <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                                             :style="`background:${infoBlocksMeta[i].color}20; border:1px solid ${infoBlocksMeta[i].color}40`">
+                                             :style="`background:${block.color || infoBlocksMeta[i].color}20; border:1px solid ${block.color || infoBlocksMeta[i].color}40`">
                                             <img v-if="infoPreviews[i]" :src="infoPreviews[i]" class="w-10 h-10 object-contain" />
                                             <span v-else-if="block.svg_code"
-                                                  class="w-6 h-6" :style="`color:${infoBlocksMeta[i].color}`"
+                                                  class="w-6 h-6" :style="`color:${block.color || infoBlocksMeta[i].color}`"
                                                   v-html="block.svg_code" />
                                             <span v-else
-                                                  class="w-6 h-6" :style="`color:${infoBlocksMeta[i].color}`"
+                                                  class="w-6 h-6" :style="`color:${block.color || infoBlocksMeta[i].color}`"
                                                   v-html="infoBlocksMeta[i].svg" />
                                         </div>
                                         <!-- × quita lo custom y vuelve al original -->
@@ -719,6 +818,17 @@ const executeDanger = () => {
                                                       @input="infoPreviews[i] = null; infoFiles[i] = null"
                                                       class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-1.5 text-xs text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none font-mono" />
                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- Color de acento -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Accent Color') }}</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" v-model="block.color"
+                                               class="h-8 w-12 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
+                                        <input type="text" v-model="block.color" maxlength="20" placeholder="#4A90E2"
+                                               class="w-28 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
                                     </div>
                                 </div>
                             </div>
@@ -870,6 +980,209 @@ const executeDanger = () => {
 
         </div>
 
+        <!-- ========== TAB: PANEL FEATURES ========== -->
+        <div v-else-if="activeTab === 'features'" class="space-y-6">
+
+            <!-- Título de sección -->
+            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-4">
+                <div class="flex items-center justify-between mb-1">
+                    <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Section Header') }}</h2>
+                </div>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Leave empty to use the default translated text.') }}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Section Title') }}</label>
+                        <input v-model="featuresTitle" type="text" maxlength="200" placeholder="Panel Features"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Section Subtitle') }}</label>
+                        <input v-model="featuresSubtitle" type="text" maxlength="200" placeholder="Everything in one place"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-1">
+                    <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Feature Cards') }}</h2>
+                    <span v-if="featuresSaving" class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 animate-pulse">{{ __('Saving...') }}</span>
+                </div>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-5">{{ __('Toggle visibility and customize each feature card. Paste SVG code to replace the default icon.') }}</p>
+
+                <div class="space-y-4">
+                    <div v-for="(card, i) in featureCards" :key="i"
+                         class="rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4 transition-opacity"
+                         :class="card.enabled ? '' : 'opacity-40'">
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full flex-shrink-0" :style="`background:${card.color}`"></span>
+                                <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ __('Card') }} {{ i + 1 }}</span>
+                            </div>
+                            <button type="button" role="switch" :aria-checked="card.enabled"
+                                    @click="card.enabled = !card.enabled"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-rapanel-blue focus:ring-offset-2 dark:focus:ring-offset-rapanel-navy-900"
+                                    :class="card.enabled ? 'bg-rapanel-success' : 'bg-rapanel-navy-100 dark:bg-rapanel-navy-700'">
+                                <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200"
+                                      :class="card.enabled ? 'translate-x-6' : 'translate-x-1'" />
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Izquierda: título, descripción, color -->
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Title') }}</label>
+                                    <input v-model="card.title" type="text" maxlength="80"
+                                           class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Description') }}</label>
+                                    <textarea v-model="card.desc" rows="2" maxlength="300"
+                                              class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Accent Color') }}</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" v-model="card.color"
+                                               class="h-8 w-12 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
+                                        <input type="text" v-model="card.color" maxlength="20" placeholder="#4A90E2"
+                                               class="w-28 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Derecha: ícono (mismo patrón que Server Info) -->
+                            <div class="space-y-2">
+                                <p class="text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 uppercase tracking-wide">{{ __('Icon') }}</p>
+
+                                <div class="flex items-start gap-3">
+                                    <!-- Preview actual -->
+                                    <div class="relative flex-shrink-0">
+                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
+                                             :style="`background:${card.color}20; border:1px solid ${card.color}40`">
+                                            <img v-if="featurePreviews[i]" :src="featurePreviews[i]" class="w-10 h-10 object-contain" />
+                                            <span v-else-if="card.svg_code"
+                                                  class="w-6 h-6" :style="`color:${card.color}`"
+                                                  v-html="card.svg_code" />
+                                            <span v-else
+                                                  class="w-6 h-6" :style="`color:${card.color}`"
+                                                  v-html="defaultFeatureCards[i].icon" />
+                                        </div>
+                                        <!-- × quita lo custom y vuelve al original -->
+                                        <button v-if="featurePreviews[i] || card.svg_code" type="button"
+                                                @click="featurePreviews[i] = null; card.icon_type = 'icon'; featureFiles[i] = null; card.svg_code = null"
+                                                class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rapanel-danger flex items-center justify-center shadow hover:opacity-80 transition-opacity z-10"
+                                                title="Volver al ícono original">
+                                            <svg class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Opciones de cambio -->
+                                    <div class="min-w-0 flex-1 space-y-2">
+                                        <!-- Subir archivo -->
+                                        <input type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg"
+                                               @change="onFeatureFile($event, i)"
+                                               class="block w-full text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">PNG / WebP · 40×40 px</p>
+
+                                        <!-- Pegar código SVG -->
+                                        <div>
+                                            <label class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">
+                                                {{ __('Or paste SVG code (e.g. from heroicons):') }}
+                                            </label>
+                                            <textarea v-model="card.svg_code" rows="2" spellcheck="false"
+                                                      placeholder="<svg viewBox=&quot;0 0 24 24&quot; ...>...</svg>"
+                                                      @input="featurePreviews[i] = null; featureFiles[i] = null; card.icon_type = 'svg'"
+                                                      class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-1.5 text-xs text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none font-mono" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 flex justify-end">
+                    <button type="button" @click="submitFeatures" :disabled="featuresSaving"
+                            class="px-5 py-2 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
+                        {{ featuresSaving ? __('Saving...') : __('Save Panel Features') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB: CALL TO ACTION ========== -->
+        <div v-else-if="activeTab === 'cta'" class="max-w-2xl space-y-6">
+
+            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
+                <div class="flex items-center justify-between mb-1">
+                    <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Call to Action') }}</h2>
+                    <span v-if="ctaSaving" class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 animate-pulse">{{ __('Saving...') }}</span>
+                </div>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Leave any field empty to use the default translated text.') }}</p>
+
+                <!-- Heading Line 1 -->
+                <div>
+                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Heading — Line 1') }}</label>
+                    <input v-model="ctaLine1" type="text" maxlength="100" placeholder="Start Your"
+                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                    <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Displayed in regular color.') }}</p>
+                </div>
+
+                <!-- Heading Line 2 -->
+                <div>
+                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Heading — Line 2') }}</label>
+                    <input v-model="ctaLine2" type="text" maxlength="100" placeholder="Adventure"
+                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                    <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Displayed with gradient color.') }}</p>
+                </div>
+
+                <!-- Subtitle -->
+                <div>
+                    <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Subtitle') }}</label>
+                    <textarea v-model="ctaSubtitle" rows="3" maxlength="300"
+                        placeholder="Join our community and experience Ragnarok Online the way it was meant to be played."
+                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
+                </div>
+
+                <!-- Button text + URL -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Button Text') }}</label>
+                        <input v-model="ctaBtnText" type="text" maxlength="60" placeholder="Register Free"
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Button URL') }}</label>
+                        <input v-model="ctaBtnUrl" type="text" maxlength="500" placeholder="/register  o  https://..."
+                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Leave empty to use the register page.') }}</p>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="rounded-xl bg-rapanel-navy-50 dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-white/10 p-6 text-center">
+                    <p class="text-xs font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider mb-4 opacity-50">{{ __('Preview') }}</p>
+                    <p class="text-2xl font-bold text-rapanel-navy-900 dark:text-white leading-tight">{{ ctaLine1 || 'Start Your' }}</p>
+                    <p class="text-2xl font-bold text-rapanel-gold leading-tight mb-3">{{ ctaLine2 || 'Adventure' }}</p>
+                    <p class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 mb-4 max-w-sm mx-auto">{{ ctaSubtitle || 'Join our community and experience Ragnarok Online the way it was meant to be played.' }}</p>
+                    <span class="inline-block px-6 py-2 rounded-xl bg-rapanel-blue text-white text-sm font-bold uppercase tracking-widest">{{ ctaBtnText || 'Register Free' }}</span>
+                </div>
+            </div>
+
+            <div>
+                <button type="button" @click="submitCta" :disabled="ctaSaving"
+                        class="px-6 py-2.5 bg-rapanel-blue hover:bg-rapanel-blue/90 disabled:opacity-60 text-white text-sm font-bold rounded-lg transition-colors">
+                    {{ ctaSaving ? __('Saving...') : __('Save Call to Action') }}
+                </button>
+            </div>
+        </div>
+
         <!-- ========== TAB: SEO ========== -->
         <div v-else-if="activeTab === 'seo'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
@@ -990,7 +1303,7 @@ const executeDanger = () => {
 
         <!-- Danger Confirm Modal -->
         <Teleport to="body">
-            <div v-if="dangerConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div v-if="dangerConfirm" role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                 <div class="bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 border border-rapanel-navy-100 dark:border-white/10">
                     <div class="flex items-center gap-3 mb-3">
                         <ExclamationTriangleIcon class="w-6 h-6 text-rapanel-danger shrink-0" />

@@ -19,8 +19,8 @@ const accentStrip = {
     <div :class="[
         'rounded-xl border shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md overflow-hidden',
         muted
-            ? 'bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/10'
-            : 'bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-white/[0.08] dark:shadow-black/20',
+            ? 'bg-rapanel-navy-100/70 dark:bg-rapanel-surface border-rapanel-navy-100 dark:border-white/10'
+            : 'bg-white dark:bg-rapanel-surface border-rapanel-navy-100 dark:border-white/[0.08] dark:shadow-black/20',
     ]">
         <!-- Top accent gradient strip -->
         <div :class="['h-[3px] bg-gradient-to-r', accentStrip[accent] ?? accentStrip.blue]" />

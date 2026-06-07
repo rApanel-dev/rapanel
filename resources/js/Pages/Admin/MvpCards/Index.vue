@@ -125,7 +125,7 @@ const locationBadgeClass = (loc) => {
 
         <!-- ── Tabla ── -->
         <div v-else
-            class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
+            class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)] overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="border-b border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/5">
@@ -215,6 +215,7 @@ const locationBadgeClass = (loc) => {
         ══════════════════════════════════════ -->
         <Teleport to="body">
             <div v-if="showHoldersModal"
+                role="dialog" aria-modal="true"
                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
                 @click.self="showHoldersModal = false">
 
@@ -224,7 +225,7 @@ const locationBadgeClass = (loc) => {
                         <div class="h-[3px] bg-gradient-to-r from-rapanel-gold/70 via-rapanel-gold/30 to-transparent" />
                         <div class="flex items-center justify-between px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
                             <div class="flex items-center gap-3">
-                                <div v-if="holdersRow" class="w-10 h-10 rounded-lg overflow-hidden bg-rapanel-navy-50 dark:bg-rapanel-navy-800">
+                                <div v-if="holdersRow" class="w-10 h-10 rounded-lg overflow-hidden bg-rapanel-navy-50 dark:bg-rapanel-surface">
                                     <img v-if="holdersRow.image_exists"
                                         :src="`/data/items/cards/${holdersRow.card_item_id}.png`"
                                         class="w-full h-full object-contain" />

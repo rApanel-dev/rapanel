@@ -1,6 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import {
     PlusIcon,
     CheckCircleIcon,
@@ -8,6 +9,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
 import ActionButton from '@/Components/ActionButton.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
     news: Object,
@@ -32,10 +34,19 @@ const typeBadgeClass = (type) => {
 
 const openUrl = (url) => window.open(url, '_blank');
 
-const confirmDelete = (id) => {
-    if (confirm(__('Delete this news item?'))) {
-        router.delete(safeRoute('admin.news.destroy', { news: id }));
-    }
+const confirmState = ref(null);
+const askConfirm = (opts) => { confirmState.value = opts; };
+const doConfirm   = () => { confirmState.value?.action?.(); confirmState.value = null; };
+const closeConfirm = () => { confirmState.value = null; };
+
+const confirmDelete = (id, title) => {
+    askConfirm({
+        title:        __('Delete News'),
+        entity:       title,
+        confirmLabel: __('Delete'),
+        variant:      'danger',
+        action:       () => router.delete(safeRoute('admin.news.destroy', { news: id })),
+    });
 };
 </script>
 
@@ -52,7 +63,7 @@ const confirmDelete = (id) => {
             </PageHeader>
 
             <!-- Table -->
-            <div class="bg-white dark:bg-[#0f1829] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.5)]">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
@@ -127,7 +138,7 @@ const confirmDelete = (id) => {
                                         </ActionButton>
                                         <!-- Delete -->
                                         <ActionButton variant="danger" size="icon" :title="__('Delete news')"
-                                            @click="confirmDelete(item.id)">
+                                            @click="confirmDelete(item.id, item.title)">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                                         </ActionButton>
                                     </div>
@@ -161,4 +172,14 @@ const confirmDelete = (id) => {
 
         </div>
     </AdminLayout>
+
+    <ConfirmModal
+        :show="!!confirmState"
+        :title="confirmState?.title ?? ''"
+        :entity="confirmState?.entity ?? ''"
+        :confirm-label="confirmState?.confirmLabel ?? ''"
+        :variant="confirmState?.variant ?? 'danger'"
+        @confirm="doConfirm"
+        @close="closeConfirm"
+    />
 </template>
