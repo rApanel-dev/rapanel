@@ -4,6 +4,8 @@ import { router, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 import CountryFlag from 'vue-country-flag-next';
 
+defineProps({ compact: { type: Boolean, default: false } });
+
 const currentLocale = computed(() => usePage().props.locale || 'en');
 
 const languages = [
@@ -23,7 +25,9 @@ const changeLocale = (locale) => {
 
 <template>
     <Menu as="div" class="relative inline-block text-left">
-        <MenuButton class="flex items-center justify-center w-10 h-10 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition">
+        <MenuButton :class="compact
+            ? 'flex items-center justify-center w-7 h-7 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition'
+            : 'flex items-center justify-center w-10 h-10 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition'">
             <div style="width:28px;height:21px;overflow:hidden;border-radius:3px;flex-shrink:0">
                 <CountryFlag
                     :country="currentLocale === 'en' ? 'us' : currentLocale"
@@ -41,7 +45,7 @@ const changeLocale = (locale) => {
             leave-from-class="transform scale-100 opacity-100"
             leave-to-class="transform scale-95 opacity-0"
         >
-            <MenuItems class="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-900 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+            <MenuItems class="absolute top-full mt-2 right-0 w-44 origin-top-right rounded-md bg-white dark:bg-rapanel-navy-800 border border-rapanel-navy-100 dark:border-rapanel-navy-900 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                 <div class="py-1">
                     <MenuItem v-for="lang in languages" :key="lang.code" v-slot="{ active }">
                         <button

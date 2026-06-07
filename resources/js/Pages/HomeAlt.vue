@@ -485,8 +485,12 @@ onUnmounted(() => {
             </section>
 
             <!-- ══════════ SERVER INFO ══════════ -->
-            <section v-if="st.home_show_info !== '0'" ref="infoRef" class="py-24 px-6 ha-info-section">
-                <div class="max-w-6xl mx-auto">
+            <section v-if="st.home_show_info !== '0'" ref="infoRef" class="py-24 px-6 ha-info-section relative overflow-hidden">
+                <img src="/images/bg-main-rapanel.svg"
+                     aria-hidden="true"
+                     class="absolute inset-0 w-full h-full object-cover scale-105 blur-md pointer-events-none select-none" />
+                <div class="absolute inset-0 ha-hero-overlay pointer-events-none" />
+                <div class="relative z-10 max-w-6xl mx-auto">
 
                     <div class="text-center mb-16">
                         <p class="text-[#F1C40F] text-xs uppercase tracking-[0.3em] font-semibold mb-4">{{ __('The World Awaits') }}</p>
@@ -711,7 +715,7 @@ onUnmounted(() => {
 
 /* ── Hero overlay ───────────────────────────────────────────── */
 .ha-hero-overlay {
-    background: linear-gradient(135deg, rgba(239,246,255,0.70) 0%, rgba(238,242,255,0.65) 50%, rgba(245,243,255,0.62) 100%);
+    background: linear-gradient(135deg, rgba(239,246,255,0.40) 0%, rgba(238,242,255,0.35) 50%, rgba(245,243,255,0.32) 100%);
 }
 .dark .ha-hero-overlay {
     background: rgba(15, 23, 42, 0.8);
@@ -789,13 +793,13 @@ onUnmounted(() => {
 
 /* ── Glass card ─────────────────────────────────────────────── */
 .ha-glass {
-    background: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.95);
     border: 1px solid rgba(15,23,42,0.08);
     backdrop-filter: blur(14px);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
 }
 .dark .ha-glass {
-    background: rgba(255,255,255,0.04);
+    background: #0f172a;
     border-color: rgba(255,255,255,0.07);
 }
 .ha-glass:hover {
@@ -902,7 +906,7 @@ onUnmounted(() => {
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .dark .ha-hcard {
-    background: rgba(255,255,255,0.05);
+    background: #0f172a;
     border-color: rgba(255,255,255,0.08);
 }
 .ha-hcard:hover {

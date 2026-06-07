@@ -28,7 +28,7 @@ const activeNetworks = computed(() => {
 </script>
 
 <template>
-    <footer class="bg-white dark:bg-rapanel-navy-900 transition-colors duration-200">
+    <footer class="bg-rapanel-navy-50 dark:bg-rapanel-navy-900 transition-colors duration-200">
 
         <!-- Accent gradient line -->
         <div class="h-px bg-gradient-to-r from-rapanel-blue via-rapanel-purple to-rapanel-gold opacity-60 dark:opacity-40"></div>
