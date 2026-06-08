@@ -474,7 +474,7 @@ onUnmounted(() => {
 
                         <!-- Peak Players (al final) -->
                         <div class="stat-chip opacity-0 text-center min-w-[90px]">
-                            <div class="font-display text-3xl font-bold text-[#4A90E2]">
+                            <div class="font-display text-3xl font-bold text-rapanel-danger">
                                 <span :data-count="srv.peak ?? 0">{{ srv.peak ?? 0 }}</span>
                             </div>
                             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __('Peak Players') }}</div>

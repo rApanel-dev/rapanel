@@ -212,24 +212,34 @@ function playNow(event) {
                         </template>
                     </div>
 
-                    <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold ml-4 shrink-0">
-                        <div class="flex items-center gap-2">
-                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
-                            
-                            <span v-if="$page.props.serverStatus.online" class="flex items-center gap-1.5 text-rapanel-success">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
-                                {{ __('Online') }}
-                            </span>
-                            
-                            <span v-else class="flex items-center gap-1.5 text-rapanel-danger">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rapanel-danger"></span>
-                                {{ __('Offline') }}
-                            </span>
+                    <div class="flex items-center gap-1.5 ml-4 shrink-0">
+                        <!-- Chip: servidor -->
+                        <div :class="[
+                                'flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-semibold transition-colors',
+                                $page.props.serverStatus.online
+                                    ? 'border-rapanel-success/60 bg-rapanel-success/30 text-green-700 dark:text-rapanel-success'
+                                    : 'border-rapanel-danger/60 bg-rapanel-danger/30 text-red-700 dark:text-rapanel-danger',
+                             ]">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.online ? __('Online') : __('Offline') }}
                         </div>
 
-                        <div class="flex items-center gap-2 border-l border-rapanel-navy-100 dark:border-white/10 pl-6 h-4">
-                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Players Online:') }}</span>
-                            <span class="text-rapanel-gold">{{ $page.props.serverStatus.players }}</span>
+                        <!-- Chip: jugadores -->
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-rapanel-blue/60 bg-rapanel-blue/30 text-blue-700 dark:text-rapanel-blue text-xs font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.players }}
+                        </div>
+
+                        <!-- Chip: tiendas -->
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-rapanel-gold/60 bg-rapanel-gold/30 text-amber-700 dark:text-rapanel-gold text-xs font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.vendings }}
                         </div>
                     </div>
 
@@ -297,21 +307,32 @@ function playNow(event) {
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-rapanel-navy-100 dark:border-white/10 space-y-3 px-2">
-                        <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Server Status:') }}</span>
-                            <span v-if="$page.props.serverStatus.online" class="flex items-center gap-1.5 text-rapanel-success">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
-                                {{ __('Online') }}
-                            </span>
-                            <span v-else class="flex items-center gap-1.5 text-rapanel-danger">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rapanel-danger"></span>
-                                {{ __('Offline') }}
-                            </span>
+                    <div class="mt-4 pt-4 border-t border-rapanel-navy-100 dark:border-white/10 flex flex-wrap gap-2 px-2">
+                        <!-- Chip: servidor -->
+                        <div :class="[
+                                'flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-semibold',
+                                $page.props.serverStatus.online
+                                    ? 'border-rapanel-success/60 bg-rapanel-success/30 text-green-700 dark:text-rapanel-success'
+                                    : 'border-rapanel-danger/60 bg-rapanel-danger/30 text-red-700 dark:text-rapanel-danger',
+                             ]">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.online ? __('Online') : __('Offline') }}
                         </div>
-                        <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                            <span class="text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Players Online:') }}</span>
-                            <span class="text-rapanel-gold">{{ $page.props.serverStatus.players }}</span>
+                        <!-- Chip: jugadores -->
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-rapanel-blue/60 bg-rapanel-blue/30 text-blue-700 dark:text-rapanel-blue text-xs font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.players }}
+                        </div>
+                        <!-- Chip: tiendas -->
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-rapanel-gold/60 bg-rapanel-gold/30 text-amber-700 dark:text-rapanel-gold text-xs font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+                            </svg>
+                            {{ $page.props.serverStatus.vendings }}
                         </div>
                     </div>
 

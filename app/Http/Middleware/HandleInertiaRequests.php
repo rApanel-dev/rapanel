@@ -40,14 +40,15 @@ class HandleInertiaRequests extends Middleware
                     ->value('users') ?? 0;
 
                 return [
-                    'online'  => $login,
-                    'players' => $this->getOnlinePlayersCount(),
-                    'peak'    => (int) $peak,
-                    'login'   => $login,
-                    'char'    => $char,
-                    'map'     => $map,
-                    'web'     => $web,
-                    'ws'      => $ws,
+                    'online'   => $login,
+                    'players'  => $this->getOnlinePlayersCount(),
+                    'vendings' => (int) DB::connection('mysql_main')->table('vendings')->count(),
+                    'peak'     => (int) $peak,
+                    'login'    => $login,
+                    'char'     => $char,
+                    'map'      => $map,
+                    'web'      => $web,
+                    'ws'       => $ws,
                 ];
             }),
 
