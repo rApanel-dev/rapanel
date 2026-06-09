@@ -36,6 +36,28 @@ const submitImport = () => {
     });
 };
 
+// ── Import Skills form ────────────────────────────────────────────────
+const skillForm      = useForm({ skill_file: null });
+const skillFileInput = ref(null);
+const skillFileName  = ref('');
+
+const onSkillFileChange = (e) => {
+    const file = e.target.files?.[0] ?? null;
+    skillForm.skill_file = file;
+    skillFileName.value  = file?.name ?? '';
+};
+
+const submitSkillImport = () => {
+    skillForm.post(route('admin.mob-db.import-skills'), {
+        forceFormData: true,
+        onSuccess: () => {
+            skillForm.reset();
+            skillFileName.value = '';
+            if (skillFileInput.value) skillFileInput.value.value = '';
+        },
+    });
+};
+
 // ── Clear modal ───────────────────────────────────────────────────────
 const showClearModal = ref(false);
 
@@ -152,10 +174,10 @@ const submitClear = () => {
                 </form>
             </div>
 
-            <!-- ── Result + Info ── -->
+            <!-- ── Result + Import Skills ── -->
             <div class="space-y-4">
 
-                <!-- Result (tras import) -->
+                <!-- Result (tras import mob_db) -->
                 <div v-if="flash.imported !== undefined"
                     class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
                     <div class="h-[3px] bg-rapanel-success" />
@@ -175,18 +197,103 @@ const submitClear = () => {
                     </div>
                 </div>
 
-                <!-- Info / Last sync -->
-                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm p-5 space-y-3">
-                    <p class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Last sync') }}</p>
-                    <p class="text-sm font-medium text-rapanel-navy-900 dark:text-white">
-                        {{ stats.last_sync ?? __('Never') }}
-                    </p>
-                    <div class="border-t border-rapanel-navy-100 dark:border-white/[0.07] pt-3 text-xs text-rapanel-text-light dark:text-rapanel-text-dark space-y-1 leading-relaxed">
-                        <p>{{ __('MVPs are detected automatically via') }} <span class="font-mono text-rapanel-navy-900 dark:text-white">Modes.Mvp: true</span>.</p>
-                        <p>{{ __('Import this database before adding MVP cards.') }}</p>
+                <!-- Import Skills card -->
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+                    <div class="h-[3px] bg-gradient-to-r from-rapanel-gold/70 via-rapanel-gold/30 to-transparent" />
+                    <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/[0.07]">
+                        <h2 class="font-bold text-rapanel-navy-900 dark:text-white">{{ __('Import Mob Skills') }}</h2>
+                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark mt-0.5">mob_skill_db.txt</p>
                     </div>
+
+                    <form @submit.prevent="submitSkillImport" class="px-6 py-5 space-y-5">
+
+                        <!-- Info -->
+                        <div class="flex gap-3 px-3 py-3 rounded-lg bg-rapanel-blue/5 border border-rapanel-blue/20">
+                            <svg class="w-4 h-4 shrink-0 mt-0.5 text-rapanel-blue" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div class="text-xs text-rapanel-blue/80 dark:text-rapanel-blue/70 space-y-1 leading-relaxed">
+                                <p class="font-bold text-rapanel-blue">{{ __('Same format for Pre-Renewal and Renewal.') }}</p>
+                                <p>{{ __('Mobs not yet imported into Mob DB will be skipped. Import mob_db.yml first.') }}</p>
+                            </div>
+                        </div>
+
+                        <!-- File -->
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-2">
+                                mob_skill_db.txt <span class="text-rapanel-danger">*</span>
+                            </label>
+                            <input
+                                ref="skillFileInput"
+                                type="file"
+                                accept=".txt"
+                                required
+                                @change="onSkillFileChange"
+                                class="w-full text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-gold/10 file:text-rapanel-gold hover:file:bg-rapanel-gold/20 transition" />
+                            <div v-if="skillFileName" class="mt-2">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rapanel-gold/10 text-rapanel-gold text-[10px] font-bold border border-rapanel-gold/20">
+                                    {{ skillFileName }}
+                                </span>
+                            </div>
+                            <p v-if="skillForm.errors.skill_file" class="mt-1 text-xs text-rapanel-danger">{{ skillForm.errors.skill_file }}</p>
+                        </div>
+
+                        <!-- Result tras import skills -->
+                        <div v-if="flash.skills_updated !== undefined"
+                            class="bg-rapanel-navy-50 dark:bg-white/[0.03] rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] p-4">
+                            <p class="text-xs font-bold text-rapanel-navy-900 dark:text-white mb-3">{{ __('Skill import complete') }}</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div v-for="(val, label) in {
+                                    [__('Mobs updated')]: flash.skills_updated,
+                                    [__('Mobs skipped')]: flash.skills_skipped,
+                                }" :key="label"
+                                    class="text-center p-2.5 rounded-lg bg-white dark:bg-white/[0.04]">
+                                    <p class="text-lg font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ val ?? 0 }}</p>
+                                    <p class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark uppercase tracking-wide">{{ label }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-1">
+                            <button type="submit" :disabled="skillForm.processing"
+                                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-rapanel-gold text-rapanel-navy-900 text-sm font-bold hover:opacity-90 transition disabled:opacity-60">
+                                <svg v-if="skillForm.processing" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                                {{ skillForm.processing ? __('Importing...') : __('Import Skills') }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
+        </div>
+
+        <!-- ── Last sync (2 cols) ── -->
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm p-5 space-y-3">
+                <p class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Last sync') }} · mob_db</p>
+                <p class="text-sm font-medium text-rapanel-navy-900 dark:text-white">
+                    {{ stats.last_sync ?? __('Never') }}
+                </p>
+                <div class="border-t border-rapanel-navy-100 dark:border-white/[0.07] pt-3 text-xs text-rapanel-text-light dark:text-rapanel-text-dark space-y-1 leading-relaxed">
+                    <p>{{ __('MVPs are detected automatically via') }} <span class="font-mono text-rapanel-navy-900 dark:text-white">Modes.Mvp: true</span>.</p>
+                    <p>{{ __('Import this database before adding MVP cards.') }}</p>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/[0.07] shadow-sm p-5 space-y-3">
+                <p class="text-xs font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Last sync') }} · mob_skill_db</p>
+                <p class="text-sm font-medium text-rapanel-navy-900 dark:text-white">
+                    {{ stats.skills_last_sync ?? __('Never') }}
+                </p>
+                <div class="border-t border-rapanel-navy-100 dark:border-white/[0.07] pt-3 text-xs text-rapanel-text-light dark:text-rapanel-text-dark space-y-1 leading-relaxed">
+                    <p>{{ __('Skills are stored per-mob and shown in the Skills tab of the Monster modal.') }}</p>
+                    <p>{{ __('Global entries (-1, -2, -3) are ignored.') }}</p>
+                </div>
+            </div>
+
         </div>
 
         <!-- ── Clear modal ── -->

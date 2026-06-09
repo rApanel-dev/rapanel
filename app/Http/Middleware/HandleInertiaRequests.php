@@ -65,6 +65,9 @@ class HandleInertiaRequests extends Middleware
             }),
 
             'serverName'      => config('services.ra.server_name', 'rApanel'),
+            'baseExpRate'     => config('services.ra.base_exp_rate', 1),
+            'jobExpRate'      => config('services.ra.job_exp_rate', 1),
+            'mvpExpRate'      => config('services.ra.mvp_exp_rate', 100),
             'roBrowserUrl'    => config('services.ra.robrowser_url', ''),
             'discordServerId' => config('services.discord.server_id'),
             'twoFactorEnabled'     => config('services.ra.2fa_enabled', false),

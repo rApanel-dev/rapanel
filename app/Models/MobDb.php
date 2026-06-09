@@ -14,7 +14,7 @@ class MobDb extends Model
     protected $fillable = [
         'id', 'aegis_name', 'name', 'level', 'hp', 'base_exp', 'mvp_exp',
         'is_mvp', 'element', 'race', 'size', 'class',
-        'stats', 'modes', 'race_groups', 'drops', 'mvp_drops',
+        'stats', 'modes', 'race_groups', 'drops', 'mvp_drops', 'skills',
     ];
 
     protected $casts = [
@@ -29,5 +29,6 @@ class MobDb extends Model
         'race_groups'=> 'array',
         'drops'      => 'array',
         'mvp_drops'  => 'array',
+        'skills'     => 'array',
     ];
 }

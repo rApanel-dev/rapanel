@@ -71,7 +71,10 @@ return [
         'map_port'      => env('RA_MAP_PORT',    5121),
         'web_ip'        => env('RA_WEB_IP',    '127.0.0.1'),
         'web_port'      => env('RA_WEB_PORT',    8080),
-        'robrowser_url' => env('RA_ROBROWSER_URL', ''),
+        'robrowser_url'  => env('RA_ROBROWSER_URL', ''),
+        'base_exp_rate'  => (int) env('RA_BASE_EXP_RATE', 100),
+        'job_exp_rate'   => (int) env('RA_JOB_EXP_RATE', 100),
+        'mvp_exp_rate'   => (int) env('RA_MVP_EXP_RATE', 100),
     ],
 
 ];

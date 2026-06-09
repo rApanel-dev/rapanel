@@ -19,7 +19,8 @@ class MobDbController extends Controller
             'mvps'      => MobDb::where('is_mvp', true)->count(),
             'boss'      => MobDb::where('is_mvp', false)->where('class', 'Boss')->count(),
             'normal'    => MobDb::where('is_mvp', false)->where('class', '!=', 'Boss')->count(),
-            'last_sync' => MobDb::max('updated_at'),
+            'last_sync'        => MobDb::max('updated_at'),
+            'skills_last_sync' => MobDb::whereNotNull('skills')->max('updated_at'),
         ];
 
         $raw          = config('services.ra.game_mode', 'renewal');
@@ -157,6 +158,115 @@ class MobDbController extends Controller
             'imported' => $imported,
             'updated'  => $updated,
             'failed'   => $failed,
+        ]);
+    }
+
+    public function importSkills(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'skill_file' => 'required|file|max:10240',
+        ]);
+
+        set_time_limit(0);
+
+        $lines = file($request->file('skill_file')->getRealPath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        // Group skills by MobID
+        $skillsByMob = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // Skip comments and empty lines
+            if ($line === '' || str_starts_with($line, '//') || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            $cols = str_getcsv($line, ',');
+
+            // Need at minimum 12 columns (up to condition value)
+            if (count($cols) < 12) {
+                continue;
+            }
+
+            $mobId = (int) trim($cols[0]);
+
+            // Skip global skill modifiers (-1, -2, -3)
+            if ($mobId <= 0) {
+                continue;
+            }
+
+            $dummy     = trim($cols[1] ?? '');
+            $state     = strtolower(trim($cols[2] ?? ''));
+            $skillId   = (int) trim($cols[3] ?? '0');
+            $level     = (int) trim($cols[4] ?? '1');
+            $rate      = (int) trim($cols[5] ?? '0');
+            $castTime  = (int) trim($cols[6] ?? '0');
+            $delay     = (int) trim($cols[7] ?? '0');
+            $cancelStr = strtolower(trim($cols[8] ?? 'no'));
+            $target    = strtolower(trim($cols[9] ?? 'target'));
+            $condition = strtolower(trim($cols[10] ?? 'always'));
+            $condVal   = trim($cols[11] ?? '0');
+            $condVal   = ($condVal === '' || $condVal === null) ? 0 : (int) $condVal;
+
+            // Extract skill aegis name from "MobName@SkillName"
+            $skillName = $dummy;
+            if (str_contains($dummy, '@')) {
+                $skillName = substr($dummy, strpos($dummy, '@') + 1);
+            }
+
+            // Parse val1-val5 (cols 12-16), keep only non-empty ones
+            $vals = [];
+            for ($i = 12; $i <= 16; $i++) {
+                $v = trim($cols[$i] ?? '');
+                $vals[] = ($v !== '') ? (int) $v : null;
+            }
+
+            $skillsByMob[$mobId][] = array_filter([
+                'name'            => $skillName,
+                'skill_id'        => $skillId,
+                'level'           => $level,
+                'state'           => $state,
+                'rate'            => $rate,
+                'cast_time'       => $castTime,
+                'delay'           => $delay,
+                'cancelable'      => $cancelStr === 'yes',
+                'target'          => $target,
+                'condition'       => $condition,
+                'condition_value' => $condVal !== 0 ? $condVal : null,
+                'val1'            => $vals[0],
+                'val2'            => $vals[1],
+                'val3'            => $vals[2],
+                'val4'            => $vals[3],
+                'val5'            => $vals[4],
+            ], fn ($v) => $v !== null);
+        }
+
+        if (empty($skillsByMob)) {
+            return back()->withErrors(['skill_file' => __('No valid skill entries found in the file.')]);
+        }
+
+        $updated = 0;
+        $skipped = 0;
+
+        foreach (array_chunk($skillsByMob, 500, true) as $chunk) {
+            $ids   = array_keys($chunk);
+            $mobs  = MobDb::whereIn('id', $ids)->get()->keyBy('id');
+
+            foreach ($chunk as $mobId => $skills) {
+                if (!isset($mobs[$mobId])) {
+                    $skipped++;
+                    continue;
+                }
+                $mobs[$mobId]->update(['skills' => $skills]);
+                $updated++;
+            }
+        }
+
+        return back()->with([
+            'skills_success' => __('Skill import complete'),
+            'skills_updated' => $updated,
+            'skills_skipped' => $skipped,
         ]);
     }
 

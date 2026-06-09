@@ -203,9 +203,10 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
 
     // Mob DB admin
     Route::get('mob-db',                [AdminMobDbController::class, 'index'])->name('mob-db.index');
-    Route::post('mob-db/import',        [AdminMobDbController::class, 'import'])->name('mob-db.import');
-    Route::post('mob-db/import-sql',    [AdminMobDbController::class, 'importSql'])->name('mob-db.import-sql');
-    Route::delete('mob-db',             [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
+    Route::post('mob-db/import',          [AdminMobDbController::class, 'import'])->name('mob-db.import');
+    Route::post('mob-db/import-sql',      [AdminMobDbController::class, 'importSql'])->name('mob-db.import-sql');
+    Route::post('mob-db/import-skills',   [AdminMobDbController::class, 'importSkills'])->name('mob-db.import-skills');
+    Route::delete('mob-db',               [AdminMobDbController::class, 'destroy'])->name('mob-db.destroy');
 
     // Map DB admin
     Route::get('map-db',                              [AdminMapDbController::class, 'index'])->name('map-db.index');
