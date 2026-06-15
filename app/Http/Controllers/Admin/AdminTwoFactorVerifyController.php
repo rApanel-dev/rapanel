@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,8 +33,26 @@ class AdminTwoFactorVerifyController extends Controller
         );
 
         if (! $valid) {
+            ActionLog::create([
+                'user_id'    => $user->id,
+                'category'   => 'AUTH',
+                'action'     => 'admin_two_factor_failed',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'metadata'   => null,
+            ]);
+
             return back()->withErrors(['code' => __('The provided two factor authentication code was invalid.')]);
         }
+
+        ActionLog::create([
+            'user_id'    => $user->id,
+            'category'   => 'AUTH',
+            'action'     => 'admin_two_factor_verified',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => null,
+        ]);
 
         $request->session()->put('two_factor_verified_at', now()->timestamp);
 

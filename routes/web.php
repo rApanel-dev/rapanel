@@ -270,7 +270,7 @@ Route::get('/guild-emblem/{guild_id}', [GuildController::class, 'emblem'])
     ->name('guild.emblem');
 
 Route::get('profile/delete-confirm/{id}/{hash}', [ProfileController::class, 'confirmDeletion'])
-    ->middleware(['signed', 'throttle:3,1'])
+    ->middleware(['signed', 'auth', 'throttle:3,1'])
     ->name('profile.delete-confirm');
 
 Route::get('lang/{locale}', function ($locale) {

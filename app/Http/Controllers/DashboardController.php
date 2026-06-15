@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use App\Models\AccountLink; // Modelo para guardar los códigos
-use Illuminate\Support\Str; // Para generar códigos aleatorios
+use App\Models\AccountLink;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -21,6 +22,14 @@ class DashboardController extends Controller
         if ($user->role === 'Admin' && $request->filled('as')) {
             $target = \App\Models\User::find((int) $request->as);
             if ($target) {
+                ActionLog::create([
+                    'user_id'    => Auth::id(),
+                    'category'   => 'ADMIN',
+                    'action'     => 'admin_viewed_user_dashboard',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'metadata'   => ['viewed_user_id' => $target->id, 'viewed_user_name' => $target->name],
+                ]);
                 $user = $target;
             }
         }
@@ -64,7 +73,7 @@ class DashboardController extends Controller
         AccountLink::where('user_id', $user->id)->delete();
 
         // 4. Creamos el nuevo token
-        $newToken = 'RA-' . strtoupper(Str::random(6));
+        $newToken = 'RA-' . strtoupper(Str::random(8));
         
         $link = AccountLink::create([
             'user_id' => $user->id,

@@ -65,7 +65,7 @@ class ForgotGamePasswordController extends Controller
         GamePasswordReset::create([
             'user_id'    => Auth::id(),
             'account_id' => $account->account_id,
-            'token'      => $token,
+            'token'      => hash('sha256', $token),
             'used'       => false,
             'expires_at' => now()->addMinutes(30),
             'request_ip' => $request->ip(),
@@ -83,7 +83,7 @@ class ForgotGamePasswordController extends Controller
 
     public function reset(string $token)
     {
-        $record = GamePasswordReset::where('token', $token)
+        $record = GamePasswordReset::where('token', hash('sha256', $token))
             ->where('used', false)
             ->where('expires_at', '>', now())
             ->first();
@@ -113,7 +113,7 @@ class ForgotGamePasswordController extends Controller
             'password_confirmation' => ['required', 'same:password'],
         ]);
 
-        $record = GamePasswordReset::where('token', $token)
+        $record = GamePasswordReset::where('token', hash('sha256', $token))
             ->where('used', false)
             ->where('expires_at', '>', now())
             ->first();

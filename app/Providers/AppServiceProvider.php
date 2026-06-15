@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
+use App\Listeners\LogFailedLogin;
+use App\Listeners\LogLockout;
 use App\Listeners\UpdateUserLoginDetails;
 use App\Listeners\WarmGeoCache;
 use Illuminate\Support\Facades\Event;
@@ -40,7 +44,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('siteSettings', $settings);
         });
 
-        Event::listen(Login::class, UpdateUserLoginDetails::class);
-        Event::listen(Login::class, WarmGeoCache::class);
+        Event::listen(Login::class,   UpdateUserLoginDetails::class);
+        Event::listen(Login::class,   WarmGeoCache::class);
+        Event::listen(Failed::class,  LogFailedLogin::class);
+        Event::listen(Lockout::class, LogLockout::class);
     }
 }

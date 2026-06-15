@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -80,6 +81,15 @@ class TwoFactorController extends Controller
             'two_factor_recovery_codes' => encrypt(json_encode($codes)),
         ])->save();
 
+        ActionLog::create([
+            'user_id'    => $user->id,
+            'category'   => 'MASTER_ACCOUNT',
+            'action'     => 'two_factor_enabled',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => null,
+        ]);
+
         return redirect()->route('two-factor.show')
             ->with('status', '2fa-enabled');
     }
@@ -127,6 +137,15 @@ class TwoFactorController extends Controller
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at'   => null,
         ])->save();
+
+        ActionLog::create([
+            'user_id'    => $user->id,
+            'category'   => 'MASTER_ACCOUNT',
+            'action'     => 'two_factor_disabled',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => null,
+        ]);
 
         return redirect()->route('two-factor.show')
             ->with('status', '2fa-disabled');

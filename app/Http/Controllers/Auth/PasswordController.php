@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionLog;
 use App\Notifications\SecurityAlertNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,6 +53,15 @@ class PasswordController extends Controller
 
         $user->update([
             'password' => Hash::make($validated['password']),
+        ]);
+
+        ActionLog::create([
+            'user_id'    => $user->id,
+            'category'   => 'MASTER_ACCOUNT',
+            'action'     => 'password_changed',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => null,
         ]);
 
         if (config('services.ra.require_email_verify', false)) {

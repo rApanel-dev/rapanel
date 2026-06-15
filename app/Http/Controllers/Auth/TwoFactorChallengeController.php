@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -67,6 +68,15 @@ class TwoFactorChallengeController extends Controller
             }
         }
 
+        ActionLog::create([
+            'user_id'    => $userId,
+            'category'   => 'AUTH',
+            'action'     => 'two_factor_failed',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => ['method' => $request->filled('recovery_code') ? 'recovery' : 'totp'],
+        ]);
+
         return back()->withErrors(['code' => __('The provided two factor authentication code was invalid.')]);
     }
 
@@ -77,6 +87,15 @@ class TwoFactorChallengeController extends Controller
 
         Auth::login($user, $remember);
         $request->session()->regenerate();
+
+        ActionLog::create([
+            'user_id'    => $user->id,
+            'category'   => 'AUTH',
+            'action'     => 'two_factor_success',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata'   => null,
+        ]);
 
         // Registra el momento de verificación para habilitar acceso al panel admin
         $request->session()->put('two_factor_verified_at', now()->timestamp);

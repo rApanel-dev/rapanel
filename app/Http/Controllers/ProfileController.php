@@ -193,6 +193,10 @@ class ProfileController extends Controller
 
     public function confirmDeletion(Request $request, string $id, string $hash): RedirectResponse
     {
+        if (Auth::id() !== (int) $id) {
+            abort(403);
+        }
+
         $user = User::findOrFail($id);
 
         if (! hash_equals($hash, sha1($user->email . $user->id . 'delete'))) {
