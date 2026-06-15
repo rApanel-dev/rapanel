@@ -135,7 +135,7 @@ RA_WS_SECRET=your_secret_here</pre>
             <template v-else>
 
                 <!-- Server tabs + controls in one row -->
-                <div class="grid gap-3 items-stretch" style="grid-template-columns: 55fr 45fr">
+                <div class="flex flex-col gap-3 sm:grid sm:items-stretch" style="grid-template-columns: 55fr 45fr">
 
                     <!-- Left: server selector tabs -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -149,14 +149,14 @@ RA_WS_SECRET=your_secret_here</pre>
                             ]">
                             <span :class="['w-2 h-2 rounded-full shrink-0', statusDot(consoles[name].status.value)]" />
                             <span class="capitalize text-rapanel-text-light dark:text-white">{{ name }}-server</span>
-                            <span :class="['text-xs font-normal capitalize', statusColor(consoles[name].status.value)]">
+                            <span :class="['text-xs font-normal capitalize hidden sm:inline', statusColor(consoles[name].status.value)]">
                                 {{ consoles[name].status.value }}
                             </span>
                         </button>
                     </div>
 
                     <!-- Right: controls bar -->
-                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 px-4 flex items-center gap-3 flex-wrap">
+                    <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-3 sm:px-4 sm:py-0 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 sm:flex-wrap">
                         <!-- Status + connection -->
                         <div class="flex items-center gap-3">
                             <div class="flex items-center gap-2">
@@ -177,22 +177,22 @@ RA_WS_SECRET=your_secret_here</pre>
                         </div>
 
                         <!-- Action buttons -->
-                        <div class="flex gap-2 ml-auto flex-wrap">
+                        <div class="grid grid-cols-2 gap-1.5 sm:flex sm:gap-2 sm:ml-auto sm:flex-wrap">
                             <button @click="serverAction(activeServer, 'start')"
                                 :disabled="['running','starting'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
-                                class="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
+                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                 <PlayIcon class="w-3.5 h-3.5" />
                                 {{ __('Start') }}
                             </button>
                             <button @click="serverAction(activeServer, 'stop')"
                                 :disabled="['stopped','stopping'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
-                                class="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
+                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                 <StopIcon class="w-3.5 h-3.5" />
                                 {{ __('Stop') }}
                             </button>
                             <button @click="serverAction(activeServer, 'restart')"
                                 :disabled="consoles[activeServer].status.value === 'stopped' || controlling[activeServer]"
-                                class="flex items-center gap-1.5 px-3 py-1.5 bg-rapanel-blue hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
+                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-rapanel-blue hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                 <ArrowPathIcon class="w-3.5 h-3.5" :class="{ 'animate-spin': controlling[activeServer] === 'restart' }" />
                                 {{ __('Restart') }}
                             </button>
@@ -200,7 +200,7 @@ RA_WS_SECRET=your_secret_here</pre>
                                 :class="autoScroll
                                     ? 'bg-rapanel-navy-700 text-white border-rapanel-navy-600'
                                     : 'bg-transparent text-rapanel-text-light/50 dark:text-white/40 border-rapanel-navy-100 dark:border-white/10'"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-lg border transition">
+                                class="flex items-center justify-center px-3 py-2 sm:py-1.5 text-xs font-semibold rounded-lg border transition">
                                 {{ __('Auto-scroll') }}
                             </button>
                         </div>
@@ -208,7 +208,7 @@ RA_WS_SECRET=your_secret_here</pre>
                 </div>
 
                 <!-- Terminal window -->
-                <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden flex flex-col" style="height: calc(100vh - 17rem)">
+                <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden flex flex-col h-[calc(100vh-28rem)] sm:h-[calc(100vh-17rem)]">
                         <!-- Titlebar -->
                         <div class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 border-b border-slate-700 shrink-0">
                             <div class="flex gap-1.5">
@@ -223,7 +223,7 @@ RA_WS_SECRET=your_secret_here</pre>
                         </div>
                         <!-- Output -->
                         <div ref="termRef"
-                            class="flex-1 overflow-y-auto p-4 font-mono text-xs leading-relaxed">
+                            class="flex-1 overflow-y-auto p-3 sm:p-4 font-mono text-[11px] sm:text-xs leading-relaxed">
                             <div v-if="!consoles[activeServer].lines.value.length"
                                 class="text-slate-600 italic select-none">
                                 {{ __('No output yet…') }}

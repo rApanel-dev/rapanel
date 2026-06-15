@@ -12,6 +12,7 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ClaimAccountModal from '@/Components/ClaimAccountModal.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatsCard from '@/Components/StatsCard.vue';
+import { ShieldExclamationIcon, ClockIcon } from '@heroicons/vue/24/outline';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import EmptyState from '@/Components/EmptyState.vue';
 import BgMain from '@/Components/BgMain.vue';
@@ -90,27 +91,27 @@ const openClaimModal = () => {
             <!-- Play Now banner -->
             <a v-if="$page.props.roBrowserUrl"
                 :href="$page.props.roBrowserUrl" target="_blank" rel="noopener"
-                class="group flex items-center justify-between gap-4
+                class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4
                        bg-white dark:bg-gradient-to-r dark:from-rapanel-navy-800 dark:to-[#0a1120]
                        border border-rapanel-gold/40 hover:border-rapanel-gold/70
-                       rounded-xl px-6 py-5 shadow-sm dark:shadow-xl
+                       rounded-xl px-5 py-4 sm:px-6 sm:py-5 shadow-sm dark:shadow-xl
                        transition-all duration-200 hover:shadow-rapanel-gold/10 hover:shadow-2xl"
                 @click="(e) => playNowMobile(e, $page.props.roBrowserUrl)">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-rapanel-gold/15 border border-rapanel-gold/30 flex items-center justify-center shrink-0 group-hover:bg-rapanel-gold/25 transition">
-                        <svg class="w-6 h-6 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-rapanel-gold/15 border border-rapanel-gold/30 flex items-center justify-center shrink-0 group-hover:bg-rapanel-gold/25 transition">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
                     </div>
                     <div>
-                        <p class="text-rapanel-text-light dark:text-white font-bold text-base leading-tight">{{ __('Play Now in your Browser') }}</p>
+                        <p class="text-rapanel-text-light dark:text-white font-bold text-sm sm:text-base leading-tight">{{ __('Play Now in your Browser') }}</p>
                         <p class="text-rapanel-text-light/50 dark:text-white/50 text-xs mt-0.5">{{ __('No download required — play directly from this page') }}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 shrink-0">
+                <div class="flex items-center gap-3 sm:shrink-0">
                     <div v-if="$page.props.serverStatus?.online" class="hidden sm:flex items-center gap-1.5 text-rapanel-success text-xs font-bold uppercase tracking-wider">
                         <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse"></span>
                         {{ __('Online') }}
                     </div>
-                    <span class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-rapanel-gold text-rapanel-navy-900 text-sm font-black uppercase tracking-wider group-hover:opacity-90 transition shadow">
+                    <span class="flex flex-1 sm:flex-none items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-rapanel-gold text-rapanel-navy-900 text-sm font-black uppercase tracking-wider group-hover:opacity-90 transition shadow">
                         {{ __('Play Now') }}
                         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                     </span>
@@ -285,6 +286,50 @@ const openClaimModal = () => {
                     </div>
                 </div>
             </div>
+
+            <!-- ── WOE Widget ───────────────────────────────────────────────── -->
+            <div v-if="$page.props.woeStatus?.total > 0"
+                class="mt-6 bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <ShieldExclamationIcon class="w-5 h-5 text-rapanel-text-light dark:text-rapanel-text-dark" />
+                        <h3 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">
+                            {{ __('War of Emperium') }}
+                        </h3>
+                        <span v-if="$page.props.woeStatus.active"
+                            class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rapanel-success/10 border border-rapanel-success/20 text-xs font-bold text-rapanel-success">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse" />
+                            {{ __('Active') }}
+                        </span>
+                    </div>
+                    <Link :href="route('info.woe')"
+                        class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue transition">
+                        {{ __('View schedule') }} →
+                    </Link>
+                </div>
+                <div class="px-6 py-4">
+                    <div v-if="$page.props.woeStatus.active" class="text-sm text-rapanel-navy-900 dark:text-white">
+                        {{ __('WOE is currently active!') }}
+                        <span v-if="$page.props.woeStatus.active_types?.length" class="text-rapanel-text-light dark:text-rapanel-text-dark ml-2">
+                            ({{ $page.props.woeStatus.active_types.map(t => ({ 1: 'WOE 1', 2: 'WOE 2', 3: 'WOE TE' })[t]).join(', ') }})
+                        </span>
+                    </div>
+                    <div v-else-if="$page.props.woeStatus.next" class="flex items-center gap-2 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+                        <ClockIcon class="w-4 h-4 shrink-0" />
+                        {{ __('Next WOE') }}:
+                        <span class="font-semibold text-rapanel-navy-900 dark:text-white">
+                            {{ $page.props.woeStatus.next.label }}
+                        </span>
+                        <span class="text-xs">
+                            — {{ $page.props.woeStatus.next.day }} {{ $page.props.woeStatus.next.start_time }}
+                        </span>
+                    </div>
+                    <div v-else class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+                        {{ __('No upcoming WOE sessions.') }}
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <Modal :show="creatingGameAccount" @close="closeCreateModal">

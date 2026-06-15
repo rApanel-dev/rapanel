@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\News;
 use App\Models\SiteSetting;
+use App\Models\WoeSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -93,6 +94,14 @@ class HandleInertiaRequests extends Middleware
                         'is_pinned'      => (bool) $n->is_pinned,
                     ])
                     ->toArray();
+            }),
+
+            'woeStatus' => Cache::remember('ra_woe_status', 60, function () {
+                try {
+                    return WoeSchedule::buildStatus();
+                } catch (\Exception) {
+                    return ['active' => false, 'active_types' => [], 'next' => null, 'total' => 0];
+                }
             }),
 
             'discordStatus' => Cache::remember('discord_widget_status', 300, function () {

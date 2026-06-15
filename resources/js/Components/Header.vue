@@ -259,7 +259,7 @@ function playNow(event) {
 
                         <div v-else class="space-y-0.5">
                             <button @click="toggleMobileSubmenu(item.name)"
-                                class="w-full flex items-center justify-between px-3 py-3 rounded-md text-sm font-bold text-rapanel-text-light dark:text-rapanel-text-dark uppercase tracking-widest hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                class="w-full flex items-center justify-between px-3 py-3 rounded-md text-base font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                                 {{ __(item.name) }}
                                 <ChevronDownIcon class="w-4 h-4 opacity-50 transition-transform duration-200"
                                     :class="{ 'rotate-180': openMobileSubmenus[item.name] }" />
@@ -307,7 +307,7 @@ function playNow(event) {
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-rapanel-navy-100 dark:border-white/10 flex flex-wrap gap-2 px-2">
+                    <div class="mt-4 pt-4 border-t border-rapanel-navy-100 dark:border-white/10 flex flex-wrap justify-center gap-2 px-2">
                         <!-- Chip: servidor -->
                         <div :class="[
                                 'flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-semibold',
@@ -344,9 +344,10 @@ function playNow(event) {
 </template>
 
 <style scoped>
-/* ─── Wrapper del nav: cubre al botón durante su animación de entrada en mobile ─── */
+/* ─── Wrapper del nav: sticky en móvil para que el botón Play Now siempre quede anclado debajo ─── */
 .ro-nav-wrapper {
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10000;
 }
 @media (min-width: 768px) {
@@ -359,7 +360,7 @@ function playNow(event) {
 /* ─── Botón Play Now fijo en el top del viewport ─── */
 .ro-top-play-btn {
     position: fixed;
-    top: 5rem; /* mobile: debajo del header (h-20 = 80px) */
+    top: 5rem; /* mobile: debajo del header sticky (h-20 = 80px) */
     left: 50%;
     z-index: 9999;
     display: flex;
@@ -392,6 +393,7 @@ function playNow(event) {
 
 @media (min-width: 768px) {
     .ro-top-play-btn {
+        display: flex;
         top: 0; /* desktop: cuelga del top del viewport */
     }
 }

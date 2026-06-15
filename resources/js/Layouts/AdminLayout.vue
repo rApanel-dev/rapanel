@@ -29,6 +29,7 @@ import {
     DocumentTextIcon,
     Squares2X2Icon,
     ChevronRightIcon,
+    ShieldExclamationIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -36,7 +37,7 @@ import LocaleSelector from '@/Components/LocaleSelector.vue';
 const page = usePage();
 const sidebarOpen      = ref(false);
 const isDesktop        = () => window.innerWidth >= 1024;
-const sidebarCollapsed = ref(isDesktop() ? localStorage.getItem('admin_sidebar_collapsed') === 'true' : true);
+const sidebarCollapsed = ref(isDesktop() ? localStorage.getItem('admin_sidebar_collapsed') === 'true' : false);
 watch(sidebarCollapsed, (v) => { if (isDesktop()) localStorage.setItem('admin_sidebar_collapsed', String(v)); });
 const __ = (key, rep = {}) => {
     let t = page.props.translations?.[key] || key;
@@ -76,6 +77,13 @@ const groups = [
         items: [
             { name: 'Files',            route: 'admin.downloads.index',              icon: ArrowDownTrayIcon },
             { name: 'Categories',       route: 'admin.download-categories.index',    icon: TagIcon           },
+        ],
+    },
+    {
+        label: 'WOE',
+        icon: ShieldExclamationIcon,
+        items: [
+            { name: 'WOE Schedule', route: 'admin.woe.index', icon: ShieldExclamationIcon },
         ],
     },
     {

@@ -127,6 +127,16 @@ const fmtMs = (ms) => {
     return (Number.isInteger(s) ? s : parseFloat(s.toFixed(1))) + 's';
 };
 
+const fmtRespawn = (ms) => {
+    if (!ms || ms <= 0) return null;
+    const s = Math.round(ms / 1000);
+    if (s < 60)  return `${s}s`;
+    const m = Math.floor(s / 60), rs = s % 60;
+    if (m < 60)  return rs ? `${m}m ${rs}s` : `${m}m`;
+    const h = Math.floor(m / 60), rm = m % 60;
+    return rm ? `${h}h ${rm}m` : `${h}h`;
+};
+
 const stateBadge = (state) => {
     const map = {
         attack:      'bg-red-500/15 text-red-400 border-red-500/25',
@@ -227,7 +237,7 @@ const skillConditionVal = (skill) => {
                     </div>
 
                     <!-- ── Tab bar ── -->
-                    <div class="flex shrink-0 bg-white dark:bg-rapanel-navy-900 border-b border-rapanel-navy-100 dark:border-white/10">
+                    <div class="grid grid-cols-2 sm:flex shrink-0 bg-white dark:bg-rapanel-navy-900 border-b border-rapanel-navy-100 dark:border-white/10">
 
                         <button @click="mobTab = 'info'"
                             :class="mobTab === 'info'
@@ -318,7 +328,7 @@ const skillConditionVal = (skill) => {
                         <div v-else-if="mobDetail && mobTab === 'info'" class="space-y-3">
 
                             <!-- ── Vitals + Stats (2 cols) ── -->
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <!-- HP / SP -->
                                 <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4 space-y-3">
                                     <div>
@@ -431,77 +441,94 @@ const skillConditionVal = (skill) => {
                                 </div>
                             </div>
 
-                            <!-- ── EXP ── -->
-                            <div v-if="mobDetail.base_exp || mobDetail.stats?.job_exp || mobDetail.mvp_exp"
-                                class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
-                                <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 px-4 pt-4 pb-3">EXP</p>
-                                <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06] border-t border-rapanel-navy-100 dark:border-white/[0.06]">
-                                    <div v-if="mobDetail.base_exp" class="flex items-center gap-3 px-4 py-3">
-                                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                                            <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Base EXP') }}</p>
-                                            <p class="text-base font-bold text-rapanel-navy-900 dark:text-white tabular-nums">
-                                                {{ Math.round(mobDetail.base_exp * $page.props.baseExpRate / 100).toLocaleString() }}
-                                            </p>
-                                        </div>
-                                        <span v-if="$page.props.baseExpRate !== 100"
-                                            class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
-                                            ×{{ $page.props.baseExpRate / 100 }}
-                                        </span>
-                                    </div>
-                                    <div v-if="mobDetail.stats?.job_exp" class="flex items-center gap-3 px-4 py-3">
-                                        <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-                                            <svg class="w-3.5 h-3.5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"/>
-                                                <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">{{ __('Job EXP') }}</p>
-                                            <p class="text-base font-bold text-rapanel-navy-900 dark:text-white tabular-nums">
-                                                {{ Math.round(Number(mobDetail.stats.job_exp) * $page.props.jobExpRate / 100).toLocaleString() }}
-                                            </p>
-                                        </div>
-                                        <span v-if="$page.props.jobExpRate !== 100"
-                                            class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-                                            ×{{ $page.props.jobExpRate / 100 }}
-                                        </span>
-                                    </div>
-                                    <div v-if="mobDetail.mvp_exp" class="flex items-center gap-3 px-4 py-3">
-                                        <div class="w-7 h-7 rounded-lg bg-rapanel-gold/15 flex items-center justify-center shrink-0">
-                                            <svg class="w-3.5 h-3.5 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35">MVP EXP</p>
-                                            <p class="text-base font-bold text-rapanel-gold tabular-nums">
-                                                {{ Math.round(mobDetail.mvp_exp * $page.props.mvpExpRate / 100).toLocaleString() }}
-                                            </p>
-                                        </div>
-                                        <span v-if="$page.props.mvpExpRate !== 100"
-                                            class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rapanel-gold/10 text-rapanel-gold border border-rapanel-gold/20 shrink-0">
-                                            ×{{ $page.props.mvpExpRate / 100 }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- ── EXP + Monster Modes (2 cols) ── -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                            <!-- ── Monster Modes ── -->
-                            <div v-if="activeModes.length"
-                                class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4">
-                                <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-3">{{ __('Monster Mode') }}</p>
-                                <div class="flex flex-wrap gap-2">
-                                    <span v-for="mode in activeModes" :key="mode"
-                                        :class="mode === 'MVP' ? 'bg-rapanel-gold/15 text-rapanel-gold border-rapanel-gold/30' : 'bg-rapanel-navy-100/60 dark:bg-white/[0.06] text-rapanel-text-light dark:text-white/60 border-rapanel-navy-200 dark:border-white/10'"
-                                        class="text-[10px] font-bold px-2.5 py-1 rounded-full border">
-                                        {{ mode }}
-                                    </span>
+                                <!-- Monster Modes -->
+                                <div v-if="activeModes.length"
+                                    :class="!(mobDetail.base_exp || mobDetail.stats?.job_exp || mobDetail.mvp_exp) ? 'col-span-2' : ''"
+                                    class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4">
+                                    <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 mb-3">{{ __('Monster Mode') }}</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span v-for="mode in activeModes" :key="mode"
+                                            :class="mode === 'MVP' ? 'bg-rapanel-gold/15 text-rapanel-gold border-rapanel-gold/30' : 'bg-rapanel-navy-100/60 dark:bg-white/[0.06] text-rapanel-text-light dark:text-white/60 border-rapanel-navy-200 dark:border-white/10'"
+                                            class="text-[10px] font-bold px-2.5 py-1 rounded-full border">
+                                            {{ mode }}
+                                        </span>
+                                    </div>
                                 </div>
+
+                                <!-- EXP -->
+                                <div v-if="mobDetail.base_exp || mobDetail.stats?.job_exp || mobDetail.mvp_exp"
+                                    :class="!activeModes.length ? 'col-span-2' : ''"
+                                    class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                                    <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 px-4 pt-4 pb-3">EXP</p>
+                                    <div class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06] border-t border-rapanel-navy-100 dark:border-white/[0.06]">
+
+                                        <!-- Base EXP -->
+                                        <div v-if="mobDetail.base_exp" class="flex items-start gap-3 px-4 py-2.5">
+                                            <div class="w-7 h-7 mt-0.5 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                                <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 leading-5">{{ __('Base EXP') }}</p>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <span class="text-sm font-bold tabular-nums block leading-5 text-blue-400">
+                                                    {{ Math.round(mobDetail.base_exp * $page.props.baseExpRate / 100).toLocaleString() }}
+                                                </span>
+                                                <span v-if="$page.props.baseExpRate !== 100" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums block mt-0.5">
+                                                    {{ mobDetail.base_exp.toLocaleString() }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Job EXP -->
+                                        <div v-if="mobDetail.stats?.job_exp" class="flex items-start gap-3 px-4 py-2.5">
+                                            <div class="w-7 h-7 mt-0.5 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                                                <svg class="w-3.5 h-3.5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                                    <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 leading-5">{{ __('Job EXP') }}</p>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <span class="text-sm font-bold tabular-nums block leading-5 text-purple-400">
+                                                    {{ Math.round(Number(mobDetail.stats.job_exp) * $page.props.jobExpRate / 100).toLocaleString() }}
+                                                </span>
+                                                <span v-if="$page.props.jobExpRate !== 100" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums block mt-0.5">
+                                                    {{ Number(mobDetail.stats.job_exp).toLocaleString() }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- MVP EXP -->
+                                        <div v-if="mobDetail.mvp_exp" class="flex items-start gap-3 px-4 py-2.5">
+                                            <div class="w-7 h-7 mt-0.5 rounded-lg bg-rapanel-gold/15 flex items-center justify-center shrink-0">
+                                                <svg class="w-3.5 h-3.5 text-rapanel-gold" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/50 dark:text-white/35 leading-5">MVP EXP</p>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <span class="text-sm font-bold tabular-nums block leading-5 text-rapanel-gold">
+                                                    {{ Math.round(mobDetail.mvp_exp * $page.props.mvpExpRate / 100).toLocaleString() }}
+                                                </span>
+                                                <span v-if="$page.props.mvpExpRate !== 100" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums block mt-0.5">
+                                                    {{ mobDetail.mvp_exp.toLocaleString() }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
@@ -523,9 +550,9 @@ const skillConditionVal = (skill) => {
                                     <button v-for="drop in mobDetail.drops" :key="drop.item"
                                         :disabled="!drop.item_data"
                                         @click="drop.item_data && openItemDb(drop.item_data.item_id, drop.item_data)"
-                                        :class="['flex items-center gap-3 px-4 py-2.5 text-left transition',
+                                        :class="['flex items-start gap-3 px-4 py-2.5 text-left transition',
                                                  drop.item_data ? 'hover:bg-rapanel-navy-50 dark:hover:bg-white/5 cursor-pointer' : 'cursor-default']">
-                                        <div class="shrink-0 w-7 h-7 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
+                                        <div class="shrink-0 w-7 h-7 mt-0.5 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
                                             <img v-if="drop.item_data"
                                                 :src="`/data/items/item/${drop.item_data.item_id}.png`"
                                                 :alt="drop.item_data.display_name || drop.item_data.name"
@@ -549,10 +576,10 @@ const skillConditionVal = (skill) => {
                                         </div>
                                         <div class="text-right shrink-0">
                                             <span :class="[
-                                                'text-sm font-bold tabular-nums block',
+                                                'text-sm font-bold tabular-nums block leading-5',
                                                 (drop.adjusted_rate ?? drop.rate / 100) >= 50 ? 'text-rapanel-success' : (drop.adjusted_rate ?? drop.rate / 100) >= 5 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
                                             ]">{{ fmtAdjusted(drop.adjusted_rate) ?? fmtRate(drop.rate) }}</span>
-                                            <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums">{{ fmtRate(drop.rate) }}</span>
+                                            <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums block mt-0.5">{{ fmtRate(drop.rate) }}</span>
                                         </div>
                                     </button>
                                 </div>
@@ -572,9 +599,9 @@ const skillConditionVal = (skill) => {
                                     <button v-for="drop in mobDetail.mvp_drops" :key="drop.item"
                                         :disabled="!drop.item_data"
                                         @click="drop.item_data && openItemDb(drop.item_data.item_id, drop.item_data)"
-                                        :class="['flex items-center gap-3 px-4 py-2.5 text-left transition',
+                                        :class="['flex items-start gap-3 px-4 py-2.5 text-left transition',
                                                  drop.item_data ? 'hover:bg-rapanel-navy-50 dark:hover:bg-white/5 cursor-pointer' : 'cursor-default']">
-                                        <div class="shrink-0 w-7 h-7 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
+                                        <div class="shrink-0 w-7 h-7 mt-0.5 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 flex items-center justify-center overflow-hidden">
                                             <img v-if="drop.item_data"
                                                 :src="`/data/items/item/${drop.item_data.item_id}.png`"
                                                 :alt="drop.item_data.display_name || drop.item_data.name"
@@ -592,10 +619,10 @@ const skillConditionVal = (skill) => {
                                         </div>
                                         <div class="text-right shrink-0">
                                             <span :class="[
-                                                'text-sm font-bold tabular-nums block',
+                                                'text-sm font-bold tabular-nums block leading-5',
                                                 (drop.adjusted_rate ?? drop.rate / 100) >= 50 ? 'text-rapanel-success' : (drop.adjusted_rate ?? drop.rate / 100) >= 5 ? 'text-rapanel-gold' : 'text-rapanel-text-light dark:text-white/60'
                                             ]">{{ fmtAdjusted(drop.adjusted_rate) ?? fmtRate(drop.rate) }}</span>
-                                            <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums">{{ fmtRate(drop.rate) }}</span>
+                                            <span v-if="drop.adjusted_rate !== null" class="text-[10px] text-rapanel-text-light/40 dark:text-white/30 tabular-nums block mt-0.5">{{ fmtRate(drop.rate) }}</span>
                                         </div>
                                     </button>
                                 </div>
@@ -760,14 +787,14 @@ const skillConditionVal = (skill) => {
                                     </div>
                                 </div>
 
-                                <!-- Cards compactas: 4 columnas -->
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <!-- Cards: 2 columnas -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     <a v-for="spawn in sortedSpawns" :key="spawn.map_name"
                                         :href="`/info/map-db/${spawn.map_name}`"
-                                        class="group flex items-center gap-2.5 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-2 hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200">
+                                        class="group flex items-start gap-3 bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-3 hover:shadow-md hover:border-rapanel-blue/40 dark:hover:border-rapanel-blue/40 transition-all duration-200">
 
-                                        <!-- Thumbnail pequeño -->
-                                        <div class="shrink-0 w-12 h-12 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.04] overflow-hidden relative">
+                                        <!-- Thumbnail -->
+                                        <div class="shrink-0 w-14 h-14 rounded-lg bg-rapanel-navy-50 dark:bg-white/[0.04] overflow-hidden relative">
                                             <img :src="`/data/maps/${spawn.map_name}.png`"
                                                 :alt="spawn.map_name"
                                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
@@ -779,11 +806,29 @@ const skillConditionVal = (skill) => {
                                         </div>
 
                                         <!-- Info -->
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[10px] font-bold text-rapanel-navy-900 dark:text-white truncate leading-tight">{{ spawn.map_name }}</p>
-                                            <p class="text-base font-black text-rapanel-blue tabular-nums leading-tight mt-0.5">
-                                                ×{{ spawn.total_amount }}
+                                        <div class="flex-1 min-w-0 pt-0.5">
+                                            <!-- Nombre del mapa -->
+                                            <p class="text-sm font-bold text-rapanel-navy-900 dark:text-white truncate leading-tight">
+                                                {{ spawn.display_name || spawn.map_name }}
                                             </p>
+                                            <p v-if="spawn.display_name" class="text-[10px] font-mono text-rapanel-text-light/50 dark:text-white/35 truncate leading-tight mt-0.5">
+                                                {{ spawn.map_name }}
+                                            </p>
+
+                                            <!-- Cantidad + respawn -->
+                                            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                                <span class="text-[11px] font-black text-rapanel-blue tabular-nums">
+                                                    ×{{ spawn.total_amount }}
+                                                </span>
+                                                <span v-if="fmtRespawn(spawn.min_delay)"
+                                                    class="inline-flex items-center gap-1 text-[11px] font-bold text-rapanel-text-light/60 dark:text-white/40 tabular-nums">
+                                                    <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <circle cx="12" cy="12" r="9" stroke-linecap="round"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3" />
+                                                    </svg>
+                                                    {{ fmtRespawn(spawn.min_delay) }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </a>
                                 </div>

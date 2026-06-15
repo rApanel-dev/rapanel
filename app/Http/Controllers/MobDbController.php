@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ItemDb;
+use App\Models\MapSize;
 use App\Models\MobDb;
 use App\Models\SpawnEntry;
 use App\Services\DropRateCalculator;
@@ -34,7 +35,8 @@ class MobDbController extends Controller
             ->when($filter === 'normal', fn ($q) => $q->where('is_mvp', false)->where('class', '!=', 'Boss'))
             ->when($race    !== '',      fn ($q) => $q->where('race', $race))
             ->when($element !== '',      fn ($q) => $q->where('element', $element))
-            ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'element', 'race', 'size', 'class'])
+            ->select(['id', 'aegis_name', 'name', 'level', 'hp', 'is_mvp', 'element', 'race', 'size', 'class',
+                DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(stats, '$.element_level')) AS UNSIGNED) as element_level")])
             ->orderBy('id')
             ->paginate(40)
             ->withQueryString();
@@ -89,7 +91,7 @@ class MobDbController extends Controller
         $data['drops']     = $enrich($mob->drops     ?? [], false);
         $data['mvp_drops'] = $enrich($mob->mvp_drops ?? [], true);
 
-        $data['spawns'] = SpawnEntry::where('mob_id', $id)
+        $spawns = SpawnEntry::where('mob_id', $id)
             ->select(
                 'map_name',
                 DB::raw('SUM(amount) as total_amount'),
@@ -102,6 +104,15 @@ class MobDbController extends Controller
             ->orderBy('map_name')
             ->get()
             ->toArray();
+
+        $mapNames    = array_column($spawns, 'map_name');
+        $displayNames = MapSize::whereIn('map_name', $mapNames)
+            ->pluck('display_name', 'map_name');
+
+        $data['spawns'] = array_map(function ($spawn) use ($displayNames) {
+            $spawn['display_name'] = $displayNames[$spawn['map_name']] ?? null;
+            return $spawn;
+        }, $spawns);
 
         return response()->json($data);
     }

@@ -42,6 +42,8 @@ use App\Http\Controllers\WikiController;
 use App\Http\Controllers\Admin\WikiSectionController;
 use App\Http\Controllers\Admin\WikiArticleController;
 use App\Http\Controllers\Admin\HealthCheckController;
+use App\Http\Controllers\Admin\WoeScheduleController;
+use App\Http\Controllers\WoeController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -85,13 +87,14 @@ Route::prefix('info')->name('info.')->group(function() {
     Route::get('/item-db/{itemId}', [ItemDbController::class, 'show'])->name('item-db.show')->where('itemId', '[0-9]+');
     Route::get('/item-db/{itemId}/monsters', [ItemDbController::class, 'monsters'])->name('item-db.monsters')->where('itemId', '[0-9]+');
     Route::get('/item-db/{itemId}/trade', [ItemDbController::class, 'trade'])->name('item-db.trade')->where('itemId', '[0-9]+');
+    Route::get('/woe', [WoeController::class, 'index'])->name('woe');
 });
 
 // Rutas de Ranking
 Route::prefix('rank')->name('rank.')->group(function() {
     Route::get('/battleground', fn() => Inertia::render('ComingSoon', ['title' => 'Battlegrounds']))->name('battleground');
     Route::get('/woe-damage', fn() => Inertia::render('ComingSoon', ['title' => 'Guild vs Guild']))->name('woe-damage');
-    Route::get('/woe', fn() => Inertia::render('ComingSoon', ['title' => 'War of Emperium']))->name('woe');
+    Route::get('/woe', fn() => Inertia::render('ComingSoon', ['title' => 'WOE Rankings']))->name('woe');
     Route::get('/mvps', fn() => Inertia::render('ComingSoon', ['title' => 'MvP']))->name('mvps');
     Route::get('/pvp', fn() => Inertia::render('ComingSoon', ['title' => 'PvP']))->name('pvp');
     Route::get('/cashpoints', fn() => Inertia::render('ComingSoon', ['title' => 'Cash']))->name('cashpoints');
@@ -216,6 +219,13 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::delete('map-db/map-cache',                 [AdminMapDbController::class, 'destroyMapCache'])->name('map-db.destroy-map-cache');
     Route::delete('map-db/spawns',                    [AdminMapDbController::class, 'destroySpawns'])->name('map-db.destroy-spawns');
     Route::delete('map-db/{mapName}/spawns',          [AdminMapDbController::class, 'destroyMapSpawns'])->name('map-db.destroy-map-spawns')->where('mapName', '[a-zA-Z0-9_@]+');
+
+    // WOE Schedules admin
+    Route::get('woe',                         [WoeScheduleController::class, 'index'])->name('woe.index');
+    Route::post('woe',                        [WoeScheduleController::class, 'store'])->name('woe.store');
+    Route::put('woe/{woe}',                   [WoeScheduleController::class, 'update'])->name('woe.update');
+    Route::delete('woe/{woe}',                [WoeScheduleController::class, 'destroy'])->name('woe.destroy');
+    Route::patch('woe/{woe}/toggle',          [WoeScheduleController::class, 'toggleEnabled'])->name('woe.toggle');
 
     // Drop Rates admin
     Route::get('drop-rates',         [DropRatesController::class, 'index'])->name('drop-rates.index');

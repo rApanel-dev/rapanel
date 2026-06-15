@@ -200,13 +200,17 @@ const { openMobDb } = useMobDbModal();
                                 HP: {{ mob.hp.toLocaleString() }}
                             </div>
 
-                            <!-- Badges element + race -->
+                            <!-- Badges element + race + size -->
                             <div class="flex flex-wrap gap-1">
                                 <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', elementBadge(mob.element)]">
-                                    {{ mob.element }}
+                                    {{ mob.element }}{{ mob.element_level > 1 ? ` ${mob.element_level}` : '' }}
                                 </span>
                                 <span :class="['text-[9px] font-bold px-1.5 py-0.5 rounded-full border', raceBadge(mob.race)]">
                                     {{ mob.race }}
+                                </span>
+                                <span v-if="mob.size"
+                                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-200 dark:border-white/10">
+                                    {{ mob.size }}
                                 </span>
                             </div>
                         </div>
