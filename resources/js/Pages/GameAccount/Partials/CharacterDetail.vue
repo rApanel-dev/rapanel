@@ -278,7 +278,7 @@ const { openItemDb } = useItemDbModal();
                                         <!-- Sub-tarjeta Guild -->
                                         <div class="rounded-xl border border-rapanel-blue/25 overflow-hidden flex flex-col">
                                             <div class="flex items-center gap-2 px-3 py-2 bg-rapanel-blue/10 border-b border-rapanel-blue/20">
-                                                <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" alt="" />
+                                                <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}?v=${char.guild_emblem_id ?? 0}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" alt="" />
                                                 <span v-else class="w-2 h-2 rounded-full bg-rapanel-blue shrink-0"></span>
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue">{{ __('Guild') }}</span>
                                             </div>

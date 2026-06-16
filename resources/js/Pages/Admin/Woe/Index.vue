@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -8,7 +8,19 @@ import {
     PencilIcon,
     TrashIcon,
     ShieldExclamationIcon,
+    PhotoIcon,
+    XMarkIcon,
+    EyeIcon,
+    EyeSlashIcon,
 } from '@heroicons/vue/24/outline';
+
+// ── WOE preview toggle (shared with WoeLiveBanner via localStorage) ─
+const previewActive = ref(localStorage.getItem('woe_preview') === '1');
+const togglePreview = () => {
+    previewActive.value = !previewActive.value;
+    localStorage.setItem('woe_preview', previewActive.value ? '1' : '0');
+    window.dispatchEvent(new Event('woe-preview-changed'));
+};
 
 const props = defineProps({
     schedules: { type: Array, default: () => [] },
@@ -21,7 +33,10 @@ const __ = (key, rep = {}) => {
     return t;
 };
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_NAMES = computed(() => [
+    __('Sunday'), __('Monday'), __('Tuesday'), __('Wednesday'),
+    __('Thursday'), __('Friday'), __('Saturday'),
+]);
 const TYPE_LABELS = { 1: 'WOE 1 (FE)', 2: 'WOE 2 (SE)', 3: 'WOE TE' };
 const TYPE_COLORS = {
     1: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
@@ -30,9 +45,14 @@ const TYPE_COLORS = {
 };
 
 // ── Modal ─────────────────────────────────────────────────────────────
-const showModal  = ref(false);
-const editId     = ref(null);
-const processing = ref(false);
+const showModal      = ref(false);
+const editId         = ref(null);
+const processing     = ref(false);
+const imageFile      = ref(null);
+const imagePreview   = ref(null);
+const currentImgUrl  = ref(null);
+const removeImage    = ref(false);
+const imageInputRef  = ref(null);
 
 const blankForm = () => ({
     label:      '',
@@ -49,15 +69,26 @@ const errors = reactive({});
 
 const clearErrors = () => Object.keys(errors).forEach(k => delete errors[k]);
 
+const resetImage = () => {
+    imageFile.value     = null;
+    imagePreview.value  = null;
+    removeImage.value   = false;
+    if (imageInputRef.value) imageInputRef.value.value = '';
+};
+
 const openCreate = () => {
-    editId.value = null;
+    editId.value      = null;
+    currentImgUrl.value = null;
+    resetImage();
     Object.assign(form, blankForm());
     clearErrors();
     showModal.value = true;
 };
 
 const openEdit = (s) => {
-    editId.value = s.id;
+    editId.value        = s.id;
+    currentImgUrl.value = s.image_url || null;
+    resetImage();
     Object.assign(form, {
         label:      s.label ?? '',
         type:       s.type,
@@ -73,6 +104,21 @@ const openEdit = (s) => {
 
 const closeModal = () => { showModal.value = false; };
 
+const onImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    imageFile.value    = file;
+    imagePreview.value = URL.createObjectURL(file);
+    removeImage.value  = false;
+};
+
+const clearSelectedImage = () => {
+    removeImage.value  = true;
+    imageFile.value    = null;
+    imagePreview.value = null;
+    if (imageInputRef.value) imageInputRef.value.value = '';
+};
+
 const submitForm = () => {
     processing.value = true;
     clearErrors();
@@ -82,11 +128,19 @@ const submitForm = () => {
         ? route('admin.woe.update', editId.value)
         : route('admin.woe.store');
 
-    router[isEdit ? 'put' : 'post'](url, { ...form }, {
+    const payload = {
+        ...form,
+        ...(imageFile.value    ? { image: imageFile.value } : {}),
+        ...(removeImage.value  ? { remove_image: true }     : {}),
+        ...(isEdit             ? { _method: 'put' }         : {}),
+    };
+
+    router.post(url, payload, {
+        forceFormData:  true,
         preserveScroll: true,
         onSuccess: () => { showModal.value = false; },
-        onError: (e) => { Object.assign(errors, e); },
-        onFinish: () => { processing.value = false; },
+        onError:   (e) => { Object.assign(errors, e); },
+        onFinish:  () => { processing.value = false; },
     });
 };
 
@@ -100,9 +154,11 @@ const confirmDelete = (s) => {
     router.delete(route('admin.woe.destroy', s.id), { preserveScroll: true });
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────
 const formatSlot = (s) =>
-    `${DAY_NAMES[s.start_day]} ${s.start_time} – ${DAY_NAMES[s.end_day]} ${s.end_time}`;
+    `${DAY_NAMES.value[s.start_day]} ${s.start_time} – ${DAY_NAMES.value[s.end_day]} ${s.end_time}`;
+
+// Preview URL mostrada en tabla
+const displayImg = (s) => s.image_url || null;
 </script>
 
 <template>
@@ -112,12 +168,26 @@ const formatSlot = (s) =>
             :description="schedules.length ? `${schedules.length} session(s) configured` : 'No sessions configured'"
             class="mb-6"
         >
-            <template #actions>
-                <button @click="openCreate"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-semibold hover:bg-rapanel-blue/90 transition">
-                    <PlusIcon class="w-4 h-4" />
-                    {{ __('New Session') }}
-                </button>
+            <template #default>
+                <div class="flex items-center gap-2">
+                    <button @click="togglePreview"
+                        :class="[
+                            'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition',
+                            previewActive
+                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
+                                : 'bg-white dark:bg-white/5 border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white'
+                        ]">
+                        <EyeSlashIcon v-if="previewActive" class="w-4 h-4" />
+                        <EyeIcon v-else class="w-4 h-4" />
+                        {{ previewActive ? __('Stop Preview') : __('Preview WOE') }}
+                    </button>
+
+                    <button @click="openCreate"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-rapanel-blue text-white text-sm font-semibold hover:bg-rapanel-blue/90 transition">
+                        <PlusIcon class="w-4 h-4" />
+                        {{ __('New Session') }}
+                    </button>
+                </div>
             </template>
         </PageHeader>
 
@@ -140,6 +210,7 @@ const formatSlot = (s) =>
             <table class="w-full text-sm">
                 <thead>
                     <tr class="bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-navy-900 dark:text-white text-xs uppercase tracking-wider">
+                        <th class="px-4 py-3 text-left w-10">{{ __('Image') }}</th>
                         <th class="px-4 py-3 text-left">{{ __('Label') }}</th>
                         <th class="px-4 py-3 text-left">{{ __('Type') }}</th>
                         <th class="px-4 py-3 text-left">{{ __('Schedule') }}</th>
@@ -150,6 +221,15 @@ const formatSlot = (s) =>
                 <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                     <tr v-for="s in schedules" :key="s.id"
                         class="hover:bg-rapanel-navy-50 dark:hover:bg-white/[0.02] transition-colors">
+
+                        <!-- Thumbnail -->
+                        <td class="px-4 py-3">
+                            <img v-if="displayImg(s)" :src="displayImg(s)"
+                                class="w-10 h-10 rounded-lg object-cover border border-rapanel-navy-100 dark:border-white/10" />
+                            <div v-else class="w-10 h-10 rounded-lg bg-rapanel-navy-100 dark:bg-white/10 flex items-center justify-center">
+                                <PhotoIcon class="w-5 h-5 text-rapanel-text-light dark:text-rapanel-text-dark" />
+                            </div>
+                        </td>
 
                         <!-- Label -->
                         <td class="px-4 py-3">
@@ -208,10 +288,10 @@ const formatSlot = (s) =>
         <Teleport to="body">
             <Transition enter-active-class="transition duration-150" enter-from-class="opacity-0" leave-active-class="transition duration-100" leave-to-class="opacity-0">
                 <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" @click.self="closeModal">
-                    <div class="w-full max-w-md bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-2xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden">
+                    <div class="w-full max-w-md bg-white dark:bg-rapanel-navy-900 rounded-2xl shadow-2xl border border-rapanel-navy-100 dark:border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto">
 
                         <!-- Header -->
-                        <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between">
+                        <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between sticky top-0 bg-white dark:bg-rapanel-navy-900 z-10">
                             <h2 class="text-base font-bold text-rapanel-navy-900 dark:text-white">
                                 {{ editId ? __('Edit Session') : __('New Session') }}
                             </h2>
@@ -228,6 +308,33 @@ const formatSlot = (s) =>
                                 </label>
                                 <input v-model="form.label" type="text" maxlength="100" placeholder="e.g. Ancient WOE, Friday Fight..."
                                     class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-white/[0.05] px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white placeholder:text-rapanel-text-light dark:placeholder:text-rapanel-text-dark focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                            </div>
+
+                            <!-- Image -->
+                            <div>
+                                <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1.5 uppercase tracking-wider">
+                                    {{ __('Image / GIF') }} <span class="text-rapanel-text-light dark:text-rapanel-text-dark font-normal normal-case">(optional)</span>
+                                </label>
+
+                                <!-- Preview -->
+                                <div v-if="imagePreview || (currentImgUrl && !removeImage)"
+                                    class="relative mb-2 rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
+                                    <img :src="imagePreview || currentImgUrl" class="w-full h-36 object-cover" />
+                                    <button type="button" @click="clearSelectedImage"
+                                        class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-rapanel-danger transition">
+                                        <XMarkIcon class="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+
+                                <!-- Upload area -->
+                                <label v-else
+                                    class="flex flex-col items-center justify-center gap-2 w-full h-24 rounded-xl border-2 border-dashed border-rapanel-navy-100 dark:border-white/10 cursor-pointer hover:border-rapanel-blue transition">
+                                    <PhotoIcon class="w-7 h-7 text-rapanel-text-light dark:text-rapanel-text-dark" />
+                                    <span class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark">PNG, JPG, GIF, WEBP · max 10 MB</span>
+                                    <input ref="imageInputRef" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="hidden" @change="onImageChange" />
+                                </label>
+
+                                <p v-if="errors.image" class="mt-1 text-xs text-rapanel-danger">{{ errors.image }}</p>
                             </div>
 
                             <!-- Type -->

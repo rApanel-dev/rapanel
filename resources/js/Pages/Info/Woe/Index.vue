@@ -11,7 +11,10 @@ const props = defineProps({
 const page = usePage();
 const __   = (key) => page.props.translations?.[key] || key;
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_NAMES = computed(() => [
+    __('Sunday'), __('Monday'), __('Tuesday'), __('Wednesday'),
+    __('Thursday'), __('Friday'), __('Saturday'),
+]);
 
 const TYPE_COLORS = {
     1: { bg: 'bg-amber-500/10 border-amber-500/20', text: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500' },
@@ -21,11 +24,11 @@ const TYPE_COLORS = {
 
 const TYPE_LABELS = { 1: 'WOE 1 (FE)', 2: 'WOE 2 (SE)', 3: 'WOE TE' };
 
-const TYPE_DESC = {
-    1: 'First Edition — Classic castles with multiple rooms and guardians.',
-    2: 'Second Edition — Barricade-based castles, strategy-focused GvG.',
-    3: 'Tournament Edition — Available to all class tiers.',
-};
+const TYPE_DESC = computed(() => ({
+    1: __('First Edition — Classic castles with multiple rooms and guardians.'),
+    2: __('Second Edition — Barricade-based castles, strategy-focused GvG.'),
+    3: __('Tournament Edition — Available to all class tiers.'),
+}));
 
 // ── Countdown ────────────────────────────────────────────────────────
 const now = ref(Math.floor(Date.now() / 1000));
@@ -37,9 +40,11 @@ onUnmounted(() => clearInterval(interval));
 const formatCountdown = (ts) => {
     const diff = ts - now.value;
     if (diff <= 0) return __('Starting now');
-    const h = Math.floor(diff / 3600);
+    const d = Math.floor(diff / 86400);
+    const h = Math.floor((diff % 86400) / 3600);
     const m = Math.floor((diff % 3600) / 60);
     const s = diff % 60;
+    if (d > 0) return `${d}d ${h}h ${String(m).padStart(2, '0')}m`;
     if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m`;
     return `${m}m ${String(s).padStart(2, '0')}s`;
 };
@@ -82,7 +87,6 @@ const activeCount = computed(() => props.schedules.filter(s => s.is_active).leng
                     </p>
                 </div>
 
-                <!-- Active banner -->
                 <div v-if="activeCount"
                     class="flex items-center gap-2 px-4 py-2 rounded-full bg-rapanel-success/10 border border-rapanel-success/20">
                     <span class="w-2 h-2 rounded-full bg-rapanel-success animate-pulse" />
@@ -131,48 +135,56 @@ const activeCount = computed(() => props.schedules.filter(s => s.is_active).leng
             <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div v-for="s in filteredSchedules" :key="s.id"
                     :class="[
-                        'relative rounded-2xl border p-5 flex flex-col gap-3 transition shadow-sm',
+                        'relative rounded-2xl border flex flex-col overflow-hidden shadow-sm',
                         s.is_active
                             ? 'bg-rapanel-success/5 border-rapanel-success/30'
                             : 'bg-white dark:bg-rapanel-navy-900 border-rapanel-navy-100 dark:border-white/10'
                     ]">
 
-                    <!-- Active pulse -->
-                    <span v-if="s.is_active"
-                        class="absolute top-4 right-4 flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rapanel-success opacity-75" />
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-rapanel-success" />
-                    </span>
+                    <!-- Session image -->
+                    <div v-if="s.image_url" class="w-full h-36 overflow-hidden shrink-0">
+                        <img :src="s.image_url" :alt="s.label || TYPE_LABELS[s.type]"
+                            class="w-full h-full object-cover" loading="lazy" />
+                    </div>
 
-                    <!-- Type badge + label -->
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border', TYPE_COLORS[s.type].bg, TYPE_COLORS[s.type].text]">
-                            <span :class="['w-1.5 h-1.5 rounded-full mr-1.5', TYPE_COLORS[s.type].dot]" />
-                            {{ TYPE_LABELS[s.type] }}
+                    <!-- Card body -->
+                    <div class="p-5 flex flex-col gap-3 flex-1">
+                        <!-- Active pulse dot -->
+                        <span v-if="s.is_active" class="absolute top-4 right-4 flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rapanel-success opacity-75" />
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-rapanel-success" />
                         </span>
-                        <span v-if="s.label" class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ s.label }}</span>
-                    </div>
 
-                    <!-- Description -->
-                    <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark leading-relaxed">
-                        {{ TYPE_DESC[s.type] }}
-                    </p>
+                        <!-- Type badge + label -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border', TYPE_COLORS[s.type].bg, TYPE_COLORS[s.type].text]">
+                                <span :class="['w-1.5 h-1.5 rounded-full mr-1.5', TYPE_COLORS[s.type].dot]" />
+                                {{ TYPE_LABELS[s.type] }}
+                            </span>
+                            <span v-if="s.label" class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ s.label }}</span>
+                        </div>
 
-                    <!-- Schedule -->
-                    <div class="flex items-center gap-2 text-sm font-mono font-semibold text-rapanel-navy-900 dark:text-white mt-auto">
-                        <ClockIcon class="w-4 h-4 text-rapanel-text-light dark:text-rapanel-text-dark shrink-0" />
-                        {{ DAY_NAMES[s.start_day] }} {{ s.start_time }} – {{ DAY_NAMES[s.end_day] }} {{ s.end_time }}
-                    </div>
+                        <!-- Description -->
+                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark leading-relaxed">
+                            {{ TYPE_DESC[s.type] }}
+                        </p>
 
-                    <!-- Status -->
-                    <div v-if="s.is_active"
-                        class="flex items-center gap-1.5 text-xs font-bold text-rapanel-success">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success" />
-                        {{ __('Active now') }}
-                    </div>
-                    <div v-else-if="s.next_ts"
-                        class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark">
-                        {{ __('Starts in') }}: <span class="font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ formatCountdown(s.next_ts) }}</span>
+                        <!-- Schedule -->
+                        <div class="flex items-center gap-2 text-sm font-mono font-semibold text-rapanel-navy-900 dark:text-white mt-auto">
+                            <ClockIcon class="w-4 h-4 text-rapanel-text-light dark:text-rapanel-text-dark shrink-0" />
+                            {{ DAY_NAMES[s.start_day] }} {{ s.start_time }} – {{ DAY_NAMES[s.end_day] }} {{ s.end_time }}
+                        </div>
+
+                        <!-- Status -->
+                        <div v-if="s.is_active"
+                            class="flex items-center gap-1.5 text-xs font-bold text-rapanel-success">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success" />
+                            {{ __('Active now') }}
+                        </div>
+                        <div v-else-if="s.next_ts"
+                            class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark">
+                            {{ __('Starts in') }}: <span class="font-bold text-rapanel-navy-900 dark:text-white tabular-nums">{{ formatCountdown(s.next_ts) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

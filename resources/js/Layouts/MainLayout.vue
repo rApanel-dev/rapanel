@@ -5,6 +5,7 @@ import Footer     from '@/Components/Footer.vue';
 import ItemDbModal from '@/Components/ItemDbModal.vue';
 import MobDbModal  from '@/Components/MobDbModal.vue';
 import InactivityWarning from '@/Components/InactivityWarning.vue';
+import WoeLiveBanner from '@/Components/WoeLiveBanner.vue';
 import { useInactivityTimer } from '@/Composables/useInactivityTimer';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -33,6 +34,7 @@ const doLogout = () => { import('@inertiajs/vue3').then(({ router }) => router.p
         <BgMain v-if="showBg" />
 
         <div class="sticky top-0 z-50">
+            <WoeLiveBanner />
             <Header />
         </div>
 

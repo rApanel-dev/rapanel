@@ -25,6 +25,7 @@ class WoeController extends Controller
                 'end_time'   => substr($s->end_time, 0, 5),
                 'is_active'  => $s->isActive(),
                 'next_ts'    => $s->isActive() ? null : $s->nextStart()->timestamp,
+                'image_url'  => $s->image ? asset('storage/' . $s->image) : null,
             ])
             ->toArray();
 

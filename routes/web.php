@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\WikiArticleController;
 use App\Http\Controllers\Admin\HealthCheckController;
 use App\Http\Controllers\Admin\WoeScheduleController;
 use App\Http\Controllers\WoeController;
+use App\Http\Controllers\WoeLiveController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -88,6 +89,7 @@ Route::prefix('info')->name('info.')->group(function() {
     Route::get('/item-db/{itemId}/monsters', [ItemDbController::class, 'monsters'])->name('item-db.monsters')->where('itemId', '[0-9]+');
     Route::get('/item-db/{itemId}/trade', [ItemDbController::class, 'trade'])->name('item-db.trade')->where('itemId', '[0-9]+');
     Route::get('/woe', [WoeController::class, 'index'])->name('woe');
+    Route::get('/woe/events', [WoeLiveController::class, 'events'])->name('woe.events')->middleware('throttle:60,1');
 });
 
 // Rutas de Ranking

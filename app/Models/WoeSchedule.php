@@ -10,7 +10,7 @@ class WoeSchedule extends Model
     protected $connection = 'mysql';
     protected $table      = 'woe_schedules';
 
-    protected $fillable = ['label', 'type', 'start_day', 'start_time', 'end_day', 'end_time', 'enabled'];
+    protected $fillable = ['label', 'type', 'start_day', 'start_time', 'end_day', 'end_time', 'enabled', 'image'];
 
     protected $casts = [
         'type'      => 'integer',

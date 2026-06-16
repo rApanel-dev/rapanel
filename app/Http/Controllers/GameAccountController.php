@@ -52,6 +52,7 @@ class GameAccountController extends Controller
                     ch.partner_id, ch.mother, ch.father, ch.child,
                     ch.party_id, ch.guild_id,
                     g.name AS guild_name,
+                    g.emblem_id AS guild_emblem_id,
                     g.guild_lv AS guild_level,
                     gp.name AS guild_position,
                     IFNULL(gp.exp_mode, 0) AS guild_tax,

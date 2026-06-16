@@ -9,46 +9,25 @@ class GuildController extends Controller
 {
     public function emblem(int $guildId)
     {
-        // Store as base64 in cache — the ra_cache.value column is utf8 and
-        // rejects raw binary (PNG bytes), so we encode/decode around it.
-        $b64 = Cache::remember("guild_emblem_b64_{$guildId}", 300, function () use ($guildId) {
-            $row = DB::connection('mysql_main')
-                ->table('guild')
-                ->select('emblem_data')
-                ->where('guild_id', $guildId)
-                ->first();
+        // emblem_id increments every time the guild changes its emblem —
+        // using it in the cache key means stale entries are auto-abandoned,
+        // no manual invalidation needed (same strategy FluxCP uses with filenames).
+        $emblemId = DB::connection('mysql_main')
+            ->table('guild')
+            ->where('guild_id', $guildId)
+            ->value('emblem_id') ?? 0;
 
-            if (!$row || empty($row->emblem_data)) {
-                return null;
-            }
+        $b64 = Cache::remember("guild_emblem_b64_{$guildId}_{$emblemId}", 3600, function () use ($guildId) {
+            // Renewal uses the rAthena web service (guild_emblems, GIF/PNG).
+            // Pre-renewal servers don't run the web service; emblems live in
+            // guild.emblem_data as hex-encoded zlib-compressed BMP.
+            $isRenewal = config('services.ra.game_mode') === 'renewal';
 
-            // emblem_data is stored as a hex string ("7801...") — convert to binary bytes
-            $binary = pack('H*', $row->emblem_data);
+            $png = $isRenewal
+                ? ($this->emblemFromWebDb($guildId)  ?? $this->emblemFromCharDb($guildId))
+                : ($this->emblemFromCharDb($guildId) ?? $this->emblemFromWebDb($guildId));
 
-            // binary is zlib-compressed (header 0x78xx) — decompress to get raw BMP
-            $bmp = @gzuncompress($binary);
-            if ($bmp === false) {
-                return null;
-            }
-
-            // GD 2.x reads BMP natively; convert to PNG for browser compatibility
-            $img = @imagecreatefromstring($bmp);
-            if ($img === false) {
-                $img = $this->parseBmp($bmp);
-            }
-            if ($img === false) {
-                return null;
-            }
-
-            // rAthena uses #ff00ff as the chroma-key transparency color — replace with alpha
-            $img = $this->applyMagentaTransparency($img);
-
-            ob_start();
-            imagepng($img);
-            $png = ob_get_clean();
-            imagedestroy($img);
-
-            return base64_encode($png);
+            return $png ? base64_encode($png) : null;
         });
 
         if ($b64 === null) {
@@ -57,107 +36,145 @@ class GuildController extends Controller
 
         return response(base64_decode($b64), 200)
             ->header('Content-Type', 'image/png')
-            ->header('Cache-Control', 'public, max-age=300');
+            ->header('Cache-Control', 'public, max-age=3600');
     }
 
-    /**
-     * Converts every #ff00ff pixel to fully transparent.
-     * rAthena guild emblems use magenta as their chroma-key transparency color.
-     */
-    private function applyMagentaTransparency(\GdImage $src): \GdImage
+    // ── Sources ───────────────────────────────────────────────────────────────
+
+    private function emblemFromWebDb(int $guildId): ?string
     {
-        $w = imagesx($src);
-        $h = imagesy($src);
+        try {
+            $row = DB::connection('mysql_web')
+                ->table('guild_emblems')
+                ->select('file_data')
+                ->where('guild_id', $guildId)
+                ->first();
 
-        // Work on a truecolor canvas so we can store alpha values
-        $dst = imagecreatetruecolor($w, $h);
-        imagealphablending($dst, false);
-        imagesavealpha($dst, true);
+            if (!$row || empty($row->file_data)) return null;
 
-        // Fill with full transparency before copying
-        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-        imagefill($dst, 0, 0, $transparent);
+            $img = @imagecreatefromstring($row->file_data);
+            if ($img === false) return null;
 
-        // Copy pixels, replacing magenta with transparency
-        for ($y = 0; $y < $h; $y++) {
-            for ($x = 0; $x < $w; $x++) {
-                $color = imagecolorat($src, $x, $y);
-                $r = ($color >> 16) & 0xFF;
-                $g = ($color >> 8)  & 0xFF;
-                $b =  $color        & 0xFF;
+            return $this->toPng($img);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
 
-                if ($r === 255 && $g === 0 && $b === 255) {
-                    imagesetpixel($dst, $x, $y, $transparent);
+    private function emblemFromCharDb(int $guildId): ?string
+    {
+        try {
+            $row = DB::connection('mysql_main')
+                ->table('guild')
+                ->select('emblem_data', 'emblem_len')
+                ->where('guild_id', $guildId)
+                ->first();
+
+            if (!$row || !$row->emblem_len || empty($row->emblem_data)) return null;
+
+            // emblem_data is hex-encoded zlib-compressed BMP
+            $bmp = @gzuncompress(pack('H*', $row->emblem_data));
+            if ($bmp === false) return null;
+
+            $img = $this->parseBmp($bmp);
+            if ($img === false) return null;
+
+            return $this->toPng($img);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    // ── BMP parser ────────────────────────────────────────────────────────────
+    // Ported from FluxCP's imagecreatefrombmpstring() with operator-precedence
+    // bug fixed (PHP: & binds looser than ==, so ($r & 0xf8 == 0xf8) is wrong).
+
+    private function parseBmp(string $im): \GdImage|false
+    {
+        if (strlen($im) < 54) return false;
+
+        $header = unpack('vtype/Vsize/v2reserved/Voffset', substr($im, 0, 14));
+        $info   = unpack('Vsize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vncolor/Vimportant',
+                         substr($im, 14, 40));
+
+        if ($header['type'] !== 0x4D42) return false;
+
+        $width        = (int) $info['width'];
+        $height       = (int) $info['height'];
+        $bits         = (int) $info['bits'];
+        $offset       = (int) $header['offset'];
+        $palette_size = $offset - 54;
+
+        $imres = imagecreatetruecolor($width, $height);
+        imagealphablending($imres, false);
+        imagesavealpha($imres, true);
+
+        // Build color palette from BMP header
+        $pal = [];
+        if ($palette_size > 0) {
+            $palette = substr($im, 54, $palette_size);
+            $j = 0;
+            $n = 0;
+            while ($j < $palette_size) {
+                $b = ord($palette[$j++]);
+                $g = ord($palette[$j++]);
+                $r = ord($palette[$j++]);
+                $a = ord($palette[$j++]); // 4th byte in BGRX palette entry
+
+                // rAthena uses #ff00ff (magenta) as chroma-key transparency.
+                // Palette entry alpha > 127 OR fuzzy-magenta → fully transparent.
+                if ($a > 127 || (($r & 0xf8) === 0xf8 && $g === 0 && ($b & 0xf8) === 0xf8)) {
+                    $a = 127; // GD: 127 = fully transparent
                 } else {
-                    $alpha = ($color >> 24) & 0x7F;
-                    imagesetpixel($dst, $x, $y, imagecolorallocatealpha($dst, $r, $g, $b, $alpha));
+                    $a = 0;   // GD:   0 = fully opaque
+                }
+                $pal[$n++] = imagecolorallocatealpha($imres, $r, $g, $b, $a);
+            }
+        }
+
+        $scan_line_size  = ((($bits * $width) + 7) >> 3);
+        $scan_line_align = ($scan_line_size & 0x03) ? 4 - ($scan_line_size & 0x03) : 0;
+        $stride          = $scan_line_size + $scan_line_align;
+
+        for ($i = 0, $l = $height - 1; $i < $height; $i++, $l--) {
+            $scan_line = substr($im, $offset + $stride * $l, $scan_line_size);
+
+            if ($bits === 24) {
+                $j = 0;
+                $n = 0;
+                while ($j < $scan_line_size) {
+                    $b = ord($scan_line[$j++]);
+                    $g = ord($scan_line[$j++]);
+                    $r = ord($scan_line[$j++]);
+                    $a = (($r & 0xf8) === 0xf8 && $g === 0 && ($b & 0xf8) === 0xf8) ? 127 : 0;
+                    imagesetpixel($imres, $n++, $i, imagecolorallocatealpha($imres, $r, $g, $b, $a));
+                }
+            } elseif ($bits === 8) {
+                for ($j = 0; $j < $scan_line_size; $j++) {
+                    imagesetpixel($imres, $j, $i, $pal[ord($scan_line[$j])]);
+                }
+            } elseif ($bits === 4) {
+                $j = 0;
+                $n = 0;
+                while ($j < $scan_line_size) {
+                    $byte = ord($scan_line[$j++]);
+                    imagesetpixel($imres, $n++, $i, $pal[$byte >> 4]);
+                    imagesetpixel($imres, $n++, $i, $pal[$byte & 0x0F]);
                 }
             }
         }
 
-        imagedestroy($src);
-        return $dst;
+        return $imres;
     }
 
-    /**
-     * Manual BMP parser for 8-bit palette and 24-bit BMPs.
-     * Used as fallback when GD's imagecreatefromstring() can't handle the file.
-     */
-    private function parseBmp(string $data)
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private function toPng(\GdImage $img): string
     {
-        if (strlen($data) < 54 || substr($data, 0, 2) !== 'BM') {
-            return false;
-        }
-
-        $fh = unpack('vtype/Vsize/v2reserved/Voffset', substr($data, 0, 14));
-        $ih = unpack('VdibSize/lwidth/lheight/vplanes/vbits/Vcompress/VimgSize/lxppm/lyppm/VclrUsed/VclrImp',
-                     substr($data, 14, 40));
-
-        $width   = $ih['width'];
-        $height  = $ih['height'];
-        $topDown = $height < 0;
-        $height  = abs($height);
-        $bits    = $ih['vbits'];
-        $offset  = $fh['offset'];
-
-        $img = imagecreatetruecolor($width, $height);
-        if ($img === false) {
-            return false;
-        }
-
-        if ($bits === 8) {
-            $palette = [];
-            for ($i = 0; $i < 256; $i++) {
-                $c = unpack('Cb/Cg/Cr', substr($data, 54 + $i * 4, 3));
-                $palette[$i] = imagecolorallocate($img, $c['r'], $c['g'], $c['b']);
-            }
-            $stride = (int)(ceil($width / 4) * 4);
-            for ($y = 0; $y < $height; $y++) {
-                $srcRow  = $topDown ? $y : ($height - 1 - $y);
-                $rowData = substr($data, $offset + $srcRow * $stride, $stride);
-                for ($x = 0; $x < $width; $x++) {
-                    imagesetpixel($img, $x, $y, $palette[ord($rowData[$x])]);
-                }
-            }
-        } elseif ($bits === 24) {
-            $stride = (int)(ceil($width * 3 / 4) * 4);
-            for ($y = 0; $y < $height; $y++) {
-                $srcRow  = $topDown ? $y : ($height - 1 - $y);
-                $rowData = substr($data, $offset + $srcRow * $stride, $stride);
-                for ($x = 0; $x < $width; $x++) {
-                    $col = imagecolorallocate($img,
-                        ord($rowData[$x * 3 + 2]),
-                        ord($rowData[$x * 3 + 1]),
-                        ord($rowData[$x * 3])
-                    );
-                    imagesetpixel($img, $x, $y, $col);
-                }
-            }
-        } else {
-            imagedestroy($img);
-            return false;
-        }
-
-        return $img;
+        ob_start();
+        imagepng($img);
+        $png = ob_get_clean();
+        imagedestroy($img);
+        return $png;
     }
 }

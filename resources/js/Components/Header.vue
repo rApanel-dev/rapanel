@@ -360,7 +360,7 @@ function playNow(event) {
 /* ─── Botón Play Now fijo en el top del viewport ─── */
 .ro-top-play-btn {
     position: fixed;
-    top: 5rem; /* mobile: debajo del header sticky (h-20 = 80px) */
+    top: calc(5rem + var(--woe-banner-h, 0px)); /* mobile: debajo del header + banner WOE */
     left: 50%;
     z-index: 9999;
     display: flex;
@@ -394,7 +394,7 @@ function playNow(event) {
 @media (min-width: 768px) {
     .ro-top-play-btn {
         display: flex;
-        top: 0; /* desktop: cuelga del top del viewport */
+        top: var(--woe-banner-h, 0px); /* desktop: cuelga debajo del banner WOE si está activo */
     }
 }
 

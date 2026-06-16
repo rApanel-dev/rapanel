@@ -458,7 +458,7 @@ const { openItemDb } = useItemDbModal();
                                 <td class="px-4 py-3 text-right font-mono text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(char.zeny) }} z</td>
                                 <td class="px-4 py-3 text-center text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
                                     <div class="flex items-center justify-center gap-1.5">
-                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="char.guild_name" />
+                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}?v=${char.guild_emblem_id ?? 0}`" @error="onImgError" class="w-5 h-5 object-contain shrink-0" :alt="char.guild_name" />
                                         <span>{{ char.guild_name || '—' }}</span>
                                     </div>
                                 </td>
@@ -523,7 +523,7 @@ const { openItemDb } = useItemDbModal();
                                 <div class="flex items-center gap-3 mt-1">
                                     <span class="text-xs font-mono text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(char.zeny) }} z</span>
                                     <span v-if="char.guild_name" class="flex items-center gap-1 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
-                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}`" @error="onImgError" class="w-4 h-4 object-contain shrink-0" />
+                                        <img v-if="char.guild_id" :src="`/guild-emblem/${char.guild_id}?v=${char.guild_emblem_id ?? 0}`" @error="onImgError" class="w-4 h-4 object-contain shrink-0" />
                                         {{ char.guild_name }}
                                     </span>
                                 </div>
