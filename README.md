@@ -33,21 +33,39 @@ A web-based control panel for **rAthena** Ragnarok Online emulator servers. Play
 
 ## Installation
 
-### 1. Clone the repository
+### Automatic installer (recommended)
+
+For Ubuntu 24.04 LTS with Nginx, run:
 
 ```bash
-git clone https://github.com/KhrizPlayCL/rapanel.git
+curl -o ~/install.sh https://rapanel-dev.github.io/install.sh && chmod +x ~/install.sh && sudo ~/install.sh
+```
+
+The installer sets up PHP 8.4, Nginx, Node.js, Redis, Supervisor, Composer and rApanel in a single step.
+
+To update after installation:
+
+```bash
+sudo bash /var/www/rapanel/update.sh
+```
+
+### Manual installation
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/rapanel-dev/rapanel.git
 cd rapanel
 ```
 
-### 2. Install dependencies
+#### 2. Install dependencies
 
 ```bash
 composer install
 npm install
 ```
 
-### 3. Configure the environment
+#### 3. Configure the environment
 
 ```bash
 cp .env.example .env
@@ -56,7 +74,7 @@ php artisan key:generate
 
 Open `.env` and fill in the sections below.
 
-### 4. Run migrations
+#### 4. Run migrations
 
 Migrations only touch the **panel database** (`ra_*` tables). They never modify the rAthena database.
 
@@ -64,7 +82,7 @@ Migrations only touch the **panel database** (`ra_*` tables). They never modify 
 php artisan migrate
 ```
 
-### 5. Build frontend assets
+#### 5. Build frontend assets
 
 ```bash
 # Production
@@ -74,7 +92,7 @@ npm run build
 npm run dev
 ```
 
-### 6. Create the first admin
+#### 6. Create the first admin
 
 Register normally through the panel, then promote the user directly in the database:
 
@@ -249,6 +267,7 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 - **rAthena only** — Hercules is not supported at this time. Support is planned for a future release.
 - **Game mode** — Renewal is the primary supported mode. Pre-renewal is functional but some logic is still being refined.
 - **Same host not required** — the panel DB and rAthena DB can be on different servers as long as the credentials are reachable.
+- **Timezone** — `APP_TIMEZONE` in `.env` must match the OS timezone and MariaDB/MySQL timezone. If you change it, also run `sudo timedatectl set-timezone <timezone>` on the server, otherwise timestamps will be stored in the wrong timezone.
 - **Never run `migrate:fresh` in production** — migrations only create panel tables, but it is good practice anyway.
 - **MD5 passwords** — `RA_USE_MD5_PASSWORDS=true` matches rAthena's default. If your server uses plain-text passwords, set it to `false`.
 - **Email verification** — disabled by default (`RA_REQUIRE_EMAIL_VERIFY=false`). Enable it and configure a mail driver in `.env` if you want verified accounts.

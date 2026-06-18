@@ -33,21 +33,39 @@ Panel de control web para servidores **rAthena** de Ragnarok Online. Los jugador
 
 ## Instalación
 
-### 1. Clonar el repositorio
+### Instalación automática (recomendada)
+
+Para Ubuntu 24.04 LTS con Nginx, ejecuta:
 
 ```bash
-git clone https://github.com/KhrizPlayCL/rapanel.git
+curl -o ~/install.sh https://rapanel-dev.github.io/install.sh && chmod +x ~/install.sh && sudo ~/install.sh
+```
+
+El instalador configura PHP 8.4, Nginx, Node.js, Redis, Supervisor, Composer y rApanel en un solo paso.
+
+Para actualizar después de instalado:
+
+```bash
+sudo bash /var/www/rapanel/update.sh
+```
+
+### Instalación manual
+
+#### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/rapanel-dev/rapanel.git
 cd rapanel
 ```
 
-### 2. Instalar dependencias
+#### 2. Instalar dependencias
 
 ```bash
 composer install
 npm install
 ```
 
-### 3. Configurar el entorno
+#### 3. Configurar el entorno
 
 ```bash
 cp .env.example .env
@@ -56,7 +74,7 @@ php artisan key:generate
 
 Abre `.env` y completa las secciones descritas más abajo.
 
-### 4. Ejecutar las migraciones
+#### 4. Ejecutar las migraciones
 
 Las migraciones solo tocan la **base de datos del panel** (tablas `ra_*`). Nunca modifican la base de datos de rAthena.
 
@@ -64,7 +82,7 @@ Las migraciones solo tocan la **base de datos del panel** (tablas `ra_*`). Nunca
 php artisan migrate
 ```
 
-### 5. Compilar los assets del frontend
+#### 5. Compilar los assets del frontend
 
 ```bash
 # Producción
@@ -74,7 +92,7 @@ npm run build
 npm run dev
 ```
 
-### 6. Crear el primer administrador
+#### 6. Crear el primer administrador
 
 Regístrate normalmente en el panel y luego promueve el usuario directamente en la base de datos:
 
@@ -249,6 +267,7 @@ Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de mo
 - **Solo rAthena** — Hercules no está soportado por el momento. El soporte está planificado para una versión futura.
 - **Modo de juego** — Renewal es el modo principal soportado. Pre-renewal es funcional pero la lógica sigue refinándose.
 - **No es necesario el mismo host** — la DB del panel y la de rAthena pueden estar en servidores distintos siempre que las credenciales sean accesibles.
+- **Zona horaria** — `APP_TIMEZONE` en `.env` debe coincidir con el timezone del sistema operativo y de MariaDB/MySQL. Si lo cambias, ejecuta también `sudo timedatectl set-timezone <timezone>` en el servidor; de lo contrario las fechas se guardarán en el timezone incorrecto.
 - **Nunca ejecutes `migrate:fresh` en producción** — las migraciones solo crean tablas del panel, pero es una buena práctica igualmente.
 - **Contraseñas MD5** — `RA_USE_MD5_PASSWORDS=true` coincide con el default de rAthena. Si tu servidor usa contraseñas en texto plano, ponlo en `false`.
 - **Verificación de email** — desactivada por defecto. Actívala y configura un driver de correo en `.env` si deseas cuentas verificadas.
