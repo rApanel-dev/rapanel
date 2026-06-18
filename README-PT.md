@@ -49,6 +49,8 @@ Para atualizar após a instalação:
 sudo bash /var/www/rapanel/update.sh
 ```
 
+O script de atualização coloca a aplicação em modo de manutenção, baixa o código mais recente, executa as migrations pendentes, recompila os assets do frontend, reinicia os workers de fila e o PHP-FPM, e coloca a aplicação de volta online automaticamente.
+
 ### Instalação manual
 
 #### 1. Clonar o repositório
@@ -127,6 +129,8 @@ DB_MAIN_USERNAME=seu_usuario
 DB_MAIN_PASSWORD=sua_senha
 # DB_MAIN_HOST e DB_MAIN_PORT herdam os valores acima por padrão
 ```
+
+> **Importante:** Se o rApanel e o banco de dados do rAthena estiverem em **servidores diferentes**, o banco do rAthena deve permitir conexões remotas a partir do IP do servidor rApanel — conceda os privilégios necessários no MySQL/MariaDB e certifique-se de que o `bind-address` não esteja restrito a `127.0.0.1`. No **mesmo servidor** nenhuma configuração adicional é necessária.
 
 ### Bancos de dados log e web do rAthena (opcionais)
 
