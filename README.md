@@ -142,13 +142,18 @@ RA_SERVER_NAME="My RO Server"
 
 # Emulator and game mode
 RA_EMULATOR=rathena           # only rathena is supported at this time
-RA_GAME_MODE=renewal          # renewal (stable) | pre-renewal (in progress)
+RA_GAME_MODE=renewal          # renewal | pre-renewal — both modes are fully supported
 
 # Account rules
 RA_MAX_GAME_ACCOUNTS=3        # max game accounts per master account
 RA_ACCOUNT_NOCASE=true        # case-insensitive userids (rAthena default)
 RA_USE_MD5_PASSWORDS=true     # MD5-hashed passwords (rAthena default)
 RA_REQUIRE_EMAIL_VERIFY=false # toggle email verification
+
+# EXP multipliers — same Note2 format as rAthena's battle/exp.conf (100 = ×1, 1000 = ×10)
+RA_BASE_EXP_RATE=1000
+RA_JOB_EXP_RATE=1000
+RA_MVP_EXP_RATE=300
 
 # Server IPs and ports (used for live status check)
 RA_LOGIN_IP=127.0.0.1
@@ -177,7 +182,43 @@ RA_WS_SECRET=                   # shared secret between rapanel and ws-server
 # Override auto-detected URLs only when needed:
 # RA_WS_INTERNAL_URL=http://127.0.0.1:3001   # Laravel → ws-server (server-side, always http://)
 # RA_WS_PUBLIC_URL=ws://ip:3001              # browser → ws-server (ws:// for HTTP, wss://domain/ws-proxy for HTTPS)
+
+# RoBrowser — if set, shows a "Play in Browser" banner on the dashboard and a Play Now button in the header
+RA_ROBROWSER_URL=
 ```
+
+### Security features (optional)
+
+```env
+# Two-factor authentication (TOTP / authenticator app)
+RA_2FA_ENABLED=false        # allow any user to enable 2FA voluntarily from their profile
+RA_2FA_FORCE_ADMINS=false   # require all admins to configure 2FA before accessing the admin panel
+
+# Auto-logout after inactivity (minutes; 0 = disabled)
+RA_INACTIVITY_TIMEOUT=30
+```
+
+### Discord integration (optional)
+
+Displays a Discord widget on the Home page with live member and online counts.
+
+```env
+DISCORD_BOT_TOKEN=      # bot token — create an app at discord.com/developers/applications
+DISCORD_SERVER_ID=      # right-click your server in Discord → Copy ID
+DISCORD_INVITE_URL=     # invite link shown as the "Join" button
+```
+
+### Geolocation (optional)
+
+Shows a world map with player distribution on the admin dashboard. Uses the free MaxMind GeoLite2 database.
+
+```env
+GEOLOCATION_DRIVER=maxmind_database
+MAXMIND_USER_ID=        # from your MaxMind account
+MAXMIND_LICENSE_KEY=    # from your MaxMind account
+```
+
+After adding the credentials, run `php artisan location:update` to download the local database.
 
 ---
 
@@ -246,7 +287,7 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 
 ### Public pages
 - **News** — with reactions and comments
-- **Downloads** — categorized file downloads
+- **Downloads** — categorized file downloads; admins can upload patch files for client auto-updaters
 - **Who Sell** — search the vending market
 - **Item DB** — searchable item database with a full-detail modal
 - **MVP Cards** — cards currently in the server with quantities and properties
@@ -254,18 +295,19 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 
 ### Admin panel
 - Manage master accounts and game accounts (ban, group, VIP)
-- Moderate news, comments, and downloads
+- Moderate news, comments, and downloads (including patch files for client updaters)
 - Import Item DB and Mob DB from rAthena YAML files
 - Configure MVP Card visibility per card
 - Manage wiki sections and articles (CRUD)
 - View action logs and a live server console
+- Player geolocation map (requires MaxMind GeoLite2)
 
 ---
 
 ## Considerations
 
 - **rAthena only** — Hercules is not supported at this time. Support is planned for a future release.
-- **Game mode** — Renewal is the primary supported mode. Pre-renewal is functional but some logic is still being refined.
+- **Game mode** — Both `renewal` and `pre-renewal` modes are fully supported. Set `RA_GAME_MODE` in `.env` to match your server.
 - **Same host not required** — the panel DB and rAthena DB can be on different servers as long as the credentials are reachable.
 - **Timezone** — `APP_TIMEZONE` in `.env` must match the OS timezone and MariaDB/MySQL timezone. If you change it, also run `sudo timedatectl set-timezone <timezone>` on the server, otherwise timestamps will be stored in the wrong timezone.
 - **Never run `migrate:fresh` in production** — migrations only create panel tables, but it is good practice anyway.

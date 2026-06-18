@@ -142,13 +142,18 @@ RA_SERVER_NAME="Mi Servidor RO"
 
 # Emulador y modo de juego
 RA_EMULATOR=rathena           # solo rathena está soportado por ahora
-RA_GAME_MODE=renewal          # renewal (estable) | pre-renewal (en desarrollo)
+RA_GAME_MODE=renewal          # renewal | pre-renewal — ambos modos están completamente soportados
 
 # Reglas de cuenta
 RA_MAX_GAME_ACCOUNTS=3        # máximo de cuentas de juego por cuenta maestra
 RA_ACCOUNT_NOCASE=true        # userids sin distinción de mayúsculas (defecto rAthena)
 RA_USE_MD5_PASSWORDS=true     # contraseñas con hash MD5 (defecto rAthena)
 RA_REQUIRE_EMAIL_VERIFY=false # activar verificación de email
+
+# Multiplicadores de EXP — formato Note2 igual que battle/exp.conf de rAthena (100 = ×1, 1000 = ×10)
+RA_BASE_EXP_RATE=1000
+RA_JOB_EXP_RATE=1000
+RA_MVP_EXP_RATE=300
 
 # IPs y puertos del servidor (para el chequeo de estado en vivo)
 RA_LOGIN_IP=127.0.0.1
@@ -177,7 +182,43 @@ RA_WS_SECRET=                   # secreto compartido entre rapanel y el ws-serve
 # Sobrescribir las URLs auto-detectadas solo cuando sea necesario:
 # RA_WS_INTERNAL_URL=http://127.0.0.1:3001   # Laravel → ws-server (server-side, siempre http://)
 # RA_WS_PUBLIC_URL=ws://ip:3001              # browser → ws-server (ws:// para HTTP, wss://dominio/ws-proxy para HTTPS)
+
+# RoBrowser — si está configurado, muestra el banner "Jugar en el Navegador" en el dashboard y el botón Play Now en el header
+RA_ROBROWSER_URL=
 ```
+
+### Seguridad (opcional)
+
+```env
+# Autenticación de dos factores (TOTP / app autenticadora)
+RA_2FA_ENABLED=false        # permitir que cualquier usuario active 2FA desde su perfil
+RA_2FA_FORCE_ADMINS=false   # obligar a todos los admins a configurar 2FA antes de acceder al panel de admin
+
+# Cierre de sesión automático por inactividad (minutos; 0 = desactivado)
+RA_INACTIVITY_TIMEOUT=30
+```
+
+### Integración con Discord (opcional)
+
+Muestra un widget de Discord en el Home con el conteo de miembros y usuarios en línea en tiempo real.
+
+```env
+DISCORD_BOT_TOKEN=      # token del bot — crea una app en discord.com/developers/applications
+DISCORD_SERVER_ID=      # clic derecho en tu servidor de Discord → Copiar ID
+DISCORD_INVITE_URL=     # enlace de invitación mostrado como botón "Unirse"
+```
+
+### Geolocalización (opcional)
+
+Muestra un mapa mundial con la distribución de jugadores en el dashboard del admin. Usa la base de datos gratuita MaxMind GeoLite2.
+
+```env
+GEOLOCATION_DRIVER=maxmind_database
+MAXMIND_USER_ID=        # desde tu cuenta MaxMind
+MAXMIND_LICENSE_KEY=    # desde tu cuenta MaxMind
+```
+
+Tras agregar las credenciales, ejecuta `php artisan location:update` para descargar la base de datos local.
 
 ---
 
@@ -246,7 +287,7 @@ Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de mo
 
 ### Páginas públicas
 - **Noticias** — con reacciones y comentarios
-- **Descargas** — archivos categorizados
+- **Descargas** — archivos categorizados; los admins pueden subir parches para los actualizadores del cliente
 - **Who Sell** — búsqueda en el mercado de vendings
 - **Item DB** — base de datos de ítems con modal de detalle completo
 - **MVP Cards** — cartas activas en el servidor con cantidades y propiedades
@@ -254,18 +295,19 @@ Una vez importados ambos, **Admin → MvP Cards** auto-descubre las cartas de mo
 
 ### Panel de administración
 - Gestionar cuentas maestras y de juego (baneo, grupo, VIP)
-- Moderar noticias, comentarios y descargas
+- Moderar noticias, comentarios y descargas (incluyendo archivos parche para actualizadores del cliente)
 - Importar Item DB y Mob DB desde archivos YAML/LUA de rAthena
 - Configurar visibilidad de MVP Cards por carta
 - Gestionar secciones y artículos de la Wiki (CRUD)
 - Ver logs de acciones y consola del servidor en vivo
+- Mapa de geolocalización de jugadores (requiere MaxMind GeoLite2)
 
 ---
 
 ## Consideraciones
 
 - **Solo rAthena** — Hercules no está soportado por el momento. El soporte está planificado para una versión futura.
-- **Modo de juego** — Renewal es el modo principal soportado. Pre-renewal es funcional pero la lógica sigue refinándose.
+- **Modo de juego** — Ambos modos `renewal` y `pre-renewal` están completamente soportados. Configura `RA_GAME_MODE` en `.env` según tu servidor.
 - **No es necesario el mismo host** — la DB del panel y la de rAthena pueden estar en servidores distintos siempre que las credenciales sean accesibles.
 - **Zona horaria** — `APP_TIMEZONE` en `.env` debe coincidir con el timezone del sistema operativo y de MariaDB/MySQL. Si lo cambias, ejecuta también `sudo timedatectl set-timezone <timezone>` en el servidor; de lo contrario las fechas se guardarán en el timezone incorrecto.
 - **Nunca ejecutes `migrate:fresh` en producción** — las migraciones solo crean tablas del panel, pero es una buena práctica igualmente.
