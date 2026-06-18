@@ -253,8 +253,6 @@ public/data/
 └── gameaccount/        # Feature icons (bank, VIP, cash points, etc.)
 ```
 
-These folders are git-ignored — you manage the files independently.
-
 ---
 
 ## Optional: Item DB & Mob DB Import

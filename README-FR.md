@@ -253,8 +253,6 @@ public/data/
 └── gameaccount/        # Icônes de fonctions (banque, VIP, cash points, etc.)
 ```
 
-Ces dossiers sont dans `.gitignore` — les fichiers sont gérés indépendamment.
-
 ---
 
 ## Optionnel : Importer Item DB et Mob DB
