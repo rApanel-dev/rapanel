@@ -295,6 +295,7 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 - **Who Sell** — search the vending market
 - **Item DB** — searchable item database with a full-detail modal
 - **MVP Cards** — cards currently in the server with quantities and properties
+- **WOE Schedule** — live banner on the home page showing active and upcoming War of Emperium events (WOE 1 FE / WOE 2 SE / WOE TE); full public schedule page
 - **Wiki** — docs-style knowledge base organized in sections and articles
 
 ### Admin panel
@@ -302,6 +303,7 @@ Once both are imported, **Admin → MvP Cards** auto-discovers MVP, Boss, and No
 - Moderate news, comments, and downloads (including patch files for client updaters)
 - Import Item DB and Mob DB from rAthena YAML files
 - Configure MVP Card visibility per card
+- Manage WOE schedules (WOE 1 FE / WOE 2 SE / WOE TE) with castle, timetable, image, and enable/disable toggle
 - Manage wiki sections and articles (CRUD)
 - View action logs and a live server console
 - Player geolocation map (requires MaxMind GeoLite2)
@@ -338,4 +340,4 @@ php artisan test                    # Run test suite
 
 ## License
 
-MIT
+This project is open source, released under the [MIT License](LICENSE).

@@ -295,6 +295,7 @@ Com ambos importados, **Admin → MvP Cards** descobre automaticamente as cartas
 - **Who Sell** — busca no mercado de vendings
 - **Item DB** — banco de dados de itens com modal de detalhes completo
 - **MVP Cards** — cartas ativas no servidor com quantidades e propriedades
+- **WOE Schedule** — banner ao vivo na página inicial com os eventos ativos e próximos de War of Emperium (WOE 1 FE / WOE 2 SE / WOE TE); página de calendário público completo
 - **Wiki** — base de conhecimento estilo docs, organizada em seções e artigos
 
 ### Painel de administração
@@ -302,6 +303,7 @@ Com ambos importados, **Admin → MvP Cards** descobre automaticamente as cartas
 - Moderar notícias, comentários e downloads (incluindo arquivos patch para atualizadores do cliente)
 - Importar Item DB e Mob DB de arquivos YAML/LUA do rAthena
 - Configurar visibilidade de MVP Cards por carta
+- Gerenciar calendários WOE (WOE 1 FE / WOE 2 SE / WOE TE) com castelo, horário, imagem e toggle de ativação
 - Gerenciar seções e artigos da Wiki (CRUD)
 - Visualizar logs de ações e console do servidor em tempo real
 - Mapa de geolocalização de jogadores (requer MaxMind GeoLite2)
@@ -338,4 +340,4 @@ php artisan test                    # Executar suite de testes
 
 ## Licença
 
-MIT
+Este projeto é open source, publicado sob a [Licença MIT](LICENSE).
