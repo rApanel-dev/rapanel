@@ -67,7 +67,11 @@ npm run build
 chown -R www-data:www-data "$install_dir"/
 chmod -R 775 storage bootstrap/cache/
 
-# 10. Optimizar y salir del modo mantenimiento
+# 10. Reiniciar workers y PHP-FPM para cargar el nuevo código
+supervisorctl restart rapanel-worker:* || true
+systemctl reload "$php_version-fpm" || true
+
+# 11. Optimizar y salir del modo mantenimiento
 $php_version artisan optimize
 $php_version artisan up
 

@@ -104,9 +104,10 @@ class WoeLiveController extends Controller
             ];
         });
 
-        // active se recalcula en cada respuesta (misma caché 60s que HandleInertiaRequests)
+        // active/current se recalculan en cada respuesta (misma caché 60s que HandleInertiaRequests)
         $woeStatus = Cache::remember('ra_woe_status', 60, fn () => WoeSchedule::buildStatus());
-        $result['active'] = $woeStatus['active'] ?? false;
+        $result['active']  = $woeStatus['active'] ?? false;
+        $result['current'] = $woeStatus['current'] ?? [];
 
         return response()->json($result);
     }

@@ -36,9 +36,12 @@ class WoeSchedule extends Model
     }
 
     /**
-     * Returns true if this schedule is currently active, based on server time.
+     * Resolves this schedule's start/end Carbon instances for the window
+     * (past or current week) closest to now.
+     *
+     * @return array{0: Carbon, 1: Carbon}
      */
-    public function isActive(): bool
+    private function resolveWindow(): array
     {
         $now = Carbon::now();
 
@@ -56,7 +59,28 @@ class WoeSchedule extends Model
             $endTime->addWeek();
         }
 
-        return $now->between($startTime, $endTime);
+        return [$startTime, $endTime];
+    }
+
+    /**
+     * Returns true if this schedule is currently active, based on server time.
+     */
+    public function isActive(): bool
+    {
+        [$startTime, $endTime] = $this->resolveWindow();
+
+        return Carbon::now()->between($startTime, $endTime);
+    }
+
+    /**
+     * Returns the end datetime (Carbon) of the window currently in progress.
+     * Only meaningful when isActive() is true.
+     */
+    public function currentEnd(): Carbon
+    {
+        [, $endTime] = $this->resolveWindow();
+
+        return $endTime;
     }
 
     /**
@@ -77,21 +101,28 @@ class WoeSchedule extends Model
 
     /**
      * Build the global WOE status from all enabled schedules.
-     * Returns: ['active' => bool, 'active_types' => int[], 'next' => [...]]
+     * Returns: ['active' => bool, 'active_types' => int[], 'current' => [...], 'next' => [...]]
      */
     public static function buildStatus(): array
     {
         $schedules = self::where('enabled', true)->orderBy('start_day')->orderBy('start_time')->get();
 
         $activeTypes = [];
+        $current     = [];
         $nextInfo    = null;
         $nextDiff    = PHP_INT_MAX;
 
         foreach ($schedules as $s) {
             if ($s->isActive()) {
                 $activeTypes[] = $s->type;
+                $current[] = [
+                    'label'      => $s->label ?: $s->getTypeLabel(),
+                    'type'       => $s->type,
+                    'type_label' => $s->getTypeLabel(),
+                    'end_ts'     => $s->currentEnd()->timestamp,
+                ];
             } else {
-                $diff = $s->nextStart()->diffInSeconds(Carbon::now());
+                $diff = $s->nextStart()->diffInSeconds(Carbon::now(), true);
                 if ($diff < $nextDiff) {
                     $nextDiff = $diff;
                     $nextInfo = [
@@ -106,9 +137,12 @@ class WoeSchedule extends Model
             }
         }
 
+        usort($current, fn ($a, $b) => $a['end_ts'] <=> $b['end_ts']);
+
         return [
             'active'       => count($activeTypes) > 0,
             'active_types' => array_unique($activeTypes),
+            'current'      => $current,
             'next'         => $nextInfo,
             'total'        => $schedules->count(),
         ];

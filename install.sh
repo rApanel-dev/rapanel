@@ -126,6 +126,13 @@ clone_and_setup() {
     sed -i "s#DB_LOG_USERNAME=.*#DB_LOG_USERNAME=$log_db_username#" .env
     sed -i "s#DB_LOG_PASSWORD=.*#DB_LOG_PASSWORD=$log_db_password#" .env
 
+    # Base de datos web
+    sed -i "s#DB_WEB_HOST=.*#DB_WEB_HOST=$web_db_host#" .env
+    sed -i "s#DB_WEB_PORT=.*#DB_WEB_PORT=$web_db_port#" .env
+    sed -i "s#DB_WEB_DATABASE=.*#DB_WEB_DATABASE=$web_db_database#" .env
+    sed -i "s#DB_WEB_USERNAME=.*#DB_WEB_USERNAME=$web_db_username#" .env
+    sed -i "s#DB_WEB_PASSWORD=.*#DB_WEB_PASSWORD=$web_db_password#" .env
+
     # IPs del servidor rAthena
     sed -i "s#RA_LOGIN_IP=.*#RA_LOGIN_IP=$ra_server_ip#" .env
     sed -i "s#RA_CHAR_IP=.*#RA_CHAR_IP=$ra_server_ip#" .env
@@ -233,7 +240,7 @@ collect_config() {
     # Base de datos de logs
     echo ""
     echo "--- BASE DE DATOS rAthena (logs) ---"
-    read -rp "[6/7] ¿Usar la misma BD para logs? (s/n, default: s): " same_logs
+    read -rp "[6/8] ¿Usar la misma BD para logs? (s/n, default: s): " same_logs
     if [[ "$same_logs" == "n" || "$same_logs" == "N" ]]; then
         read -rp "      Host logs (default: $db_host): " log_db_host
         log_db_host="${log_db_host:-$db_host}"
@@ -251,9 +258,30 @@ collect_config() {
         log_db_password="$db_password"
     fi
 
+    # Base de datos web
+    echo ""
+    echo "--- BASE DE DATOS rAthena (web) ---"
+    read -rp "[7/8] ¿Usar la misma BD para web? (s/n, default: s): " same_web
+    if [[ "$same_web" == "n" || "$same_web" == "N" ]]; then
+        read -rp "      Host web (default: $db_host): " web_db_host
+        web_db_host="${web_db_host:-$db_host}"
+        read -rp "      Puerto web (default: $db_port): " web_db_port
+        web_db_port="${web_db_port:-$db_port}"
+        read -rp "      Nombre BD web: " web_db_database
+        read -rp "      Usuario web: " web_db_username
+        read -srp "      Contraseña web: " web_db_password
+        echo ""
+    else
+        web_db_host="$db_host"
+        web_db_port="$db_port"
+        web_db_database="$db_database"
+        web_db_username="$db_username"
+        web_db_password="$db_password"
+    fi
+
     # IP del servidor rAthena (para estado online)
     echo ""
-    read -rp "[7/7] IP del servidor rAthena para estado online (default: 127.0.0.1): " ra_server_ip
+    read -rp "[8/8] IP del servidor rAthena para estado online (default: 127.0.0.1): " ra_server_ip
     ra_server_ip="${ra_server_ip:-127.0.0.1}"
 }
 
@@ -276,9 +304,6 @@ show_success() {
     echo ""
     echo -e "${Yellow} PASO 2 — Completar configuración en .env:${White}"
     echo "   Edita: $install_dir/.env"
-    echo ""
-    echo "   • DB_WEB_DATABASE / DB_WEB_USERNAME / DB_WEB_PASSWORD"
-    echo "     → Base de datos web de rAthena (si es diferente a la main)"
     echo ""
     echo "   • RA_LOGIN_PORT (def: 6900) / RA_CHAR_PORT (def: 6121)"
     echo "     RA_MAP_PORT (def: 5121) / RA_WEB_PORT (def: 8080)"
@@ -334,6 +359,10 @@ server {
 
     location / {
         try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ^~ /data/ {
+        try_files \$uri =404;
     }
 
     location = /favicon.ico { access_log off; log_not_found off; }

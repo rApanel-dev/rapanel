@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 
@@ -58,9 +58,10 @@ const fetchEvents = async () => {
         const res  = await fetch(route('info.woe.events'), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
         const data = await res.json();
         // active viene del servidor y es la fuente de verdad en tiempo real
-        if (typeof data.active === 'boolean') woeActivePolled.value = data.active;
-        if (data.events)  events.value  = data.events;
-        if (data.castles) castles.value = data.castles;
+        if (typeof data.active === 'boolean')    woeActivePolled.value = data.active;
+        if (data.events)                         events.value  = data.events;
+        if (data.castles)                        castles.value = data.castles;
+        if (Array.isArray(data.current))         currentSession.value = data.current[0] ?? null;
     } catch { /* silent */ }
 };
 
@@ -92,6 +93,9 @@ watch(() => events.value.length, (n, o) => {
         clearTimeout(flashTimer);
         tickerFlash.value = true;
         flashTimer = setTimeout(() => { tickerFlash.value = false; }, 1200);
+        // La captura nueva siempre queda en tickerItems[0] (events va más reciente primero) — mostrarla ya
+        currentIndex.value = 0;
+        startRotation();
     }
 });
 
@@ -102,20 +106,20 @@ const castleLabel = (name, city) => city ? `${name} (${city})` : name;
 const escHtml     = (s) => s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
 // Inline styles — scoped CSS no penetra en v-html
 const emblemHtml  = (guildId, emblemId = 0) => guildId > 0
-    ? `<img src="/guild-emblem/${guildId}?v=${emblemId}" style="display:inline-block;width:16px;height:16px;vertical-align:middle;border-radius:2px;margin:0 3px 0 1px;image-rendering:pixelated" onerror="this.style.display='none'">`
+    ? `<img src="/guild-emblem/${guildId}?v=${emblemId}" style="display:inline-block;width:20px;height:20px;vertical-align:middle;border-radius:2px;margin-right:4px;image-rendering:pixelated" onerror="this.style.display='none'">`
     : '';
 
 const tickerItems = computed(() => {
     if (events.value.length > 0) {
         return events.value.slice().reverse().map(e => {
-            const guild  = `${emblemHtml(e.guild_id, e.emblem_id)}${escHtml(e.guild_name)}`;
+            const guild  = `(${emblemHtml(e.guild_id, e.emblem_id)}${escHtml(e.guild_name)})`;
             const castle = escHtml(castleLabel(e.castle_name, e.castle_map));
             return `🏰 ${__('The :castle castle has been conquered by the :guild guild.', { castle, guild })}`;
         });
     }
     if (ownedCastles.value.length > 0) {
         return ownedCastles.value.map(c => {
-            const guild  = `${emblemHtml(c.guild_id, c.emblem_id)}${escHtml(c.guild_name)}`;
+            const guild  = `(${emblemHtml(c.guild_id, c.emblem_id)}${escHtml(c.guild_name)})`;
             const castle = escHtml(castleLabel(c.castle_name, c.castle_map));
             return `🏰 ${__('The :castle castle is held by the :guild guild.', { castle, guild })}`;
         });
@@ -123,37 +127,51 @@ const tickerItems = computed(() => {
     return [`🏰 ${escHtml(__('WOE in progress — monitoring castles…'))}`];
 });
 
-const tickerText = computed(() => tickerItems.value.join('&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;'));
+// ── Rotación vertical — un mensaje a la vez ──────────────────────────────
+const ROTATE_MS = 5000;
+const currentIndex = ref(0);
+let   rotateTimer  = null;
 
-// ── Ticker sizing ─────────────────────────────────────────────────────
-// Animación: translateX(--cw) → translateX(-100%)
-//   --cw  = ancho del wrapper: texto entra desde el borde derecho
-//   -100% = ancho propio del span (T): texto sale por el borde izquierdo
-// Un solo span → mensaje pasa UNA vez por loop (ticker de noticias estándar).
-const tickerWrapperRef = ref(null);
-const containerW = ref(800);
-let   tickerRO = null;
-
-const updateSizes = () => {
-    const wrapper = tickerWrapperRef.value;
-    if (!wrapper) return;
-    containerW.value = wrapper.offsetWidth;
+const startRotation = () => {
+    clearInterval(rotateTimer);
+    rotateTimer = setInterval(() => {
+        if (tickerItems.value.length > 1) {
+            currentIndex.value = (currentIndex.value + 1) % tickerItems.value.length;
+        }
+    }, ROTATE_MS);
 };
 
-// Duración: (C + T) / 70px/s
-// Stripear tags HTML antes de medir — v-html mete markup que infla el conteo
-const stripHtml = (s) => s.replace(/<[^>]*>/g, '');
-const tickerDuration = computed(() => {
-    const textLen = stripHtml(tickerText.value).length;
-    const approxT = textLen * 6 + tickerItems.value.length * 20; // +20px por emblema
-    const travel  = containerW.value + approxT;
-    return Math.max(20, Math.round(travel / 70)) + 's';
+const currentTickerItem = computed(() => tickerItems.value[currentIndex.value] ?? tickerItems.value[0] ?? '');
+
+// ── Sesión WOE activa — tipo + cuenta atrás ──────────────────────────────
+const currentSession = ref(page.props.woeStatus?.current?.[0] ?? null);
+const nowSeconds      = ref(Math.floor(Date.now() / 1000));
+let   clockTimer      = null;
+
+const countdownLabel = computed(() => {
+    if (!currentSession.value) return '';
+    const diff = Math.max(0, currentSession.value.end_ts - nowSeconds.value);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    return h > 0
+        ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+        : `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+});
+
+// ── Dark mode (bordes del banner = color del header) ────────────────────
+// :global(.dark) en <style scoped> no compila de forma confiable con selectores
+// descendientes — se resuelve en JS observando la clase del <html>.
+const isDarkMode = ref(typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+let themeObserver = null;
+
+const bannerBg = computed(() => {
+    const edge = isDarkMode.value ? '#0f172a' : '#ffffff';
+    return `linear-gradient(105deg, ${edge} 0%, #551414 18%, #7f1d1d 50%, #551414 82%, ${edge} 100%)`;
 });
 
 // ── Lifecycle ─────────────────────────────────────────────────────────
 const syncPreviewStorage = (e) => { if (e.key === 'woe_preview') syncPreview(); };
-
-watch(isWoeActive, (active) => { if (active) nextTick(updateSizes); });
 
 let inertiaUnsubscribe = null;
 
@@ -163,13 +181,12 @@ onMounted(() => {
     document.addEventListener('visibilitychange', syncOnVisible);
     // Re-sincronizar también en cada navegación Inertia (por si Inertia hizo reload)
     inertiaUnsubscribe = router.on('navigate', () => syncPreview());
-    nextTick(() => {
-        updateSizes();
-        if (tickerWrapperRef.value) {
-            tickerRO = new ResizeObserver(updateSizes);
-            tickerRO.observe(tickerWrapperRef.value);
-        }
+    themeObserver = new MutationObserver(() => {
+        isDarkMode.value = document.documentElement.classList.contains('dark');
     });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    startRotation();
+    clockTimer = setInterval(() => { nowSeconds.value = Math.floor(Date.now() / 1000); }, 1000);
 });
 
 onUnmounted(() => {
@@ -179,7 +196,9 @@ onUnmounted(() => {
     window.removeEventListener('storage', syncPreviewStorage);
     document.removeEventListener('visibilitychange', syncOnVisible);
     if (inertiaUnsubscribe) inertiaUnsubscribe();
-    if (tickerRO) tickerRO.disconnect();
+    if (themeObserver) themeObserver.disconnect();
+    clearInterval(rotateTimer);
+    clearInterval(clockTimer);
 });
 </script>
 
@@ -192,7 +211,8 @@ onUnmounted(() => {
 
         <div v-if="isWoeActive"
             class="woe-bar relative select-none overflow-hidden"
-            :class="minimized ? 'woe-bar--mini' : 'woe-bar--full'">
+            :class="minimized ? 'woe-bar--mini' : 'woe-bar--full'"
+            :style="{ background: bannerBg }">
 
             <!-- Gold bottom accent -->
             <div class="woe-gold-line" />
@@ -210,14 +230,24 @@ onUnmounted(() => {
                     <!-- Divider -->
                     <div class="woe-divider shrink-0" />
 
-                    <!-- Ticker -->
-                    <div ref="tickerWrapperRef" class="flex-1 overflow-hidden h-full relative min-w-0">
-                        <div class="ticker-track absolute inset-y-0 flex items-center whitespace-nowrap"
-                            :class="{ 'ticker-flash': tickerFlash }"
-                            :style="{ '--ticker-dur': tickerDuration }">
-                            <span class="ticker-text px-4" v-html="tickerText"></span>
-                        </div>
+                    <!-- Ticker — un mensaje a la vez, slide vertical -->
+                    <div class="flex-1 h-full relative min-w-0 overflow-hidden">
+                        <Transition name="woe-slide">
+                            <div :key="currentTickerItem"
+                                class="ticker-text absolute inset-0 flex items-center justify-center px-3 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                :class="{ 'ticker-flash': tickerFlash }"
+                                v-html="currentTickerItem"></div>
+                        </Transition>
                     </div>
+
+                    <!-- Tipo de WOE activo + cuenta atrás -->
+                    <template v-if="currentSession">
+                        <div class="woe-session flex items-center gap-2 px-3 h-full shrink-0">
+                            <span class="woe-session-type hidden sm:inline">{{ currentSession.type_label }}</span>
+                            <span class="woe-session-time tabular-nums">{{ countdownLabel }}</span>
+                        </div>
+                        <div class="woe-divider shrink-0" />
+                    </template>
 
                     <!-- Controls -->
                     <div class="flex items-center gap-0.5 pl-2 h-full shrink-0">
@@ -258,31 +288,12 @@ onUnmounted(() => {
 /* ── Background ───────────────────────────────────────────────────── */
 .woe-bar {
     width: 100%;
-    animation: woe-bg 6s ease-in-out infinite;
+    /* background viene de :style="bannerBg" — depende del modo oscuro, ver <script> */
     z-index: 1;
 }
 .woe-bar--full { height: 38px; }
 .woe-bar--mini { height: 4px; transition: height 0.2s ease; }
 .woe-bar--mini:hover { height: 18px; }
-
-@keyframes woe-bg {
-    0%, 100% {
-        background: linear-gradient(105deg,
-            #0d0101 0%,
-            #220505 25%,
-            #2e0707 50%,
-            #220505 75%,
-            #0d0101 100%);
-    }
-    50% {
-        background: linear-gradient(105deg,
-            #0d0101 0%,
-            #2e0606 25%,
-            #3d0909 50%,
-            #2e0606 75%,
-            #0d0101 100%);
-    }
-}
 
 /* ── Gold bottom accent line ──────────────────────────────────────── */
 .woe-gold-line {
@@ -306,8 +317,8 @@ onUnmounted(() => {
 /* ── Badge ────────────────────────────────────────────────────────── */
 .woe-badge {
     border-left: 2px solid rgba(241, 196, 15, 0.5);
-    border-right: 1px solid rgba(185, 28, 28, 0.3);
-    background: rgba(185, 28, 28, 0.12);
+    border-right: 1px solid rgba(241, 196, 15, 0.2);
+    background: rgba(0, 0, 0, 0.32);
 }
 
 .woe-badge-text {
@@ -328,19 +339,17 @@ onUnmounted(() => {
     margin: 0 2px;
 }
 
-/* ── Ticker ───────────────────────────────────────────────────────── */
-/* --ticker-dur se setea via :style y no reinicia la animación al cambiar */
-.ticker-track {
-    animation: ticker-scroll var(--ticker-dur, 30s) linear infinite;
+/* ── Ticker — slide vertical (un mensaje a la vez) ───────────────────── */
+.woe-slide-enter-active,
+.woe-slide-leave-active {
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
 }
-@keyframes ticker-scroll {
-    from { transform: translateX(100vw); }
-    to   { transform: translateX(-100%); }
-}
+.woe-slide-enter-from { transform: translateY(100%); opacity: 0; }
+.woe-slide-leave-to   { transform: translateY(-100%); opacity: 0; }
 
 .ticker-text {
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 600;
     letter-spacing: 0.01em;
     color: #F1C40F;
     text-shadow: 0 0 8px rgba(241, 196, 15, 0.3);
@@ -353,8 +362,30 @@ onUnmounted(() => {
     50%  { filter: brightness(1.4); }
     100% { filter: brightness(1); }
 }
-.ticker-flash .ticker-text {
+.ticker-text.ticker-flash {
     animation: capture-flash 1.0s ease-out;
+}
+
+/* ── Sesión WOE activa (tipo + cuenta atrás) ─────────────────────────── */
+.woe-session {
+    border-left: 1px solid rgba(241, 196, 15, 0.2);
+    border-right: 2px solid rgba(241, 196, 15, 0.5);
+    background: rgba(0, 0, 0, 0.32);
+}
+.woe-session-type {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(241, 196, 15, 0.75);
+    white-space: nowrap;
+}
+.woe-session-time {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #F1C40F;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: nowrap;
 }
 
 /* ── Controls ─────────────────────────────────────────────────────── */
@@ -404,9 +435,9 @@ onUnmounted(() => {
 
 /* ── Reduced motion ───────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-    .woe-bar                   { animation: none; background: #1a0404; }
-    .ticker-track              { animation: none; transform: translateX(0); }
+    .woe-slide-enter-active,
+    .woe-slide-leave-active    { transition: none; }
     .woe-dot                   { animation: none; }
-    .ticker-flash .ticker-text { animation: none; }
+    .ticker-text.ticker-flash  { animation: none; }
 }
 </style>
