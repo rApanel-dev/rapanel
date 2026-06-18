@@ -36,9 +36,13 @@ class HandleInertiaRequests extends Middleware
                 $map   = $this->checkPort($ra['map_ip'],   (int) $ra['map_port']);
                 $web   = $this->checkPort($ra['web_ip'],   (int) $ra['web_port']);
                 $ws    = $this->checkPort($ra['login_ip'], (int) $ra['ws_port']);
-                $peak = DB::table('onlinepeak')
-                    ->orderByDesc('users')
-                    ->value('users') ?? 0;
+                try {
+                    $peak = DB::connection('mysql_main')->table('ra_onlinepeak')
+                        ->orderByDesc('users')
+                        ->value('users') ?? 0;
+                } catch (\Throwable) {
+                    $peak = 0;
+                }
 
                 return [
                     'online'   => $login,
