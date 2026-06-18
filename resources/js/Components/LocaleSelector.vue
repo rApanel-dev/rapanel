@@ -9,11 +9,16 @@ defineProps({ compact: { type: Boolean, default: false } });
 const currentLocale = computed(() => usePage().props.locale || 'en');
 
 const languages = [
-    { code: 'en', name: 'English',   flag: 'us' },
-    { code: 'es', name: 'Español',   flag: 'es' },
-    { code: 'pt', name: 'Português', flag: 'pt' },
-    { code: 'fr', name: 'Français',  flag: 'fr' },
+    { code: 'en',    name: 'English',              flag: 'us' },
+    { code: 'es',    name: 'Español',              flag: 'es' },
+    { code: 'pt',    name: 'Português',            flag: 'pt' },
+    { code: 'pt-BR', name: 'Português (BR)',        flag: 'br' },
+    { code: 'fr',    name: 'Français',             flag: 'fr' },
+    { code: 'de',    name: 'Deutsch',              flag: 'de' },
+    { code: 'ru',    name: 'Русский',              flag: 'ru' },
 ];
+
+const currentFlag = computed(() => languages.find(l => l.code === currentLocale.value)?.flag ?? 'us');
 
 const changeLocale = (locale) => {
     router.get(route('setlang', locale), {}, {
@@ -30,7 +35,7 @@ const changeLocale = (locale) => {
             : 'flex items-center justify-center w-10 h-10 rounded-md hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-800 transition'">
             <div style="width:28px;height:21px;overflow:hidden;border-radius:3px;flex-shrink:0">
                 <CountryFlag
-                    :country="currentLocale === 'en' ? 'us' : currentLocale"
+                    :country="currentFlag"
                     size="big"
                     :style="{ margin: '0', transform: 'scale(0.538)', transformOrigin: 'top left', display: 'block' }"
                 />

@@ -276,7 +276,7 @@ Route::get('profile/delete-confirm/{id}/{hash}', [ProfileController::class, 'con
     ->name('profile.delete-confirm');
 
 Route::get('lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'es', 'pt', 'fr'])) {
+    if (in_array($locale, ['en', 'es', 'pt', 'pt-BR', 'fr', 'de', 'ru'])) {
         Session::put('locale', $locale);
         App::setLocale($locale);
         if (auth()->check()) {
