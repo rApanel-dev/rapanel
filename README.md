@@ -27,7 +27,9 @@ A web-based control panel for **rAthena** Ragnarok Online emulator servers. Play
 | MariaDB | 10.6+ (alternative to MySQL) |
 | rAthena | Any recent build |
 
-> The panel must have network access to both the rAthena database and the login/char/map server ports if you want the live server-status check to work.
+> **The panel must have network access to the rAthena database.** Without it, migrations will fail and the panel will not work. If both are on the same server, no extra configuration is needed. If they are on different servers, see the [DB access note](#rathena-main-database-required) in the configuration section.
+>
+> Network access to the login/char/map ports is optional — it is only needed for the live server-status indicator on the home page.
 
 ---
 

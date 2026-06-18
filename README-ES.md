@@ -27,7 +27,9 @@ Panel de control web para servidores **rAthena** de Ragnarok Online. Los jugador
 | MariaDB | 10.6+ (alternativa a MySQL) |
 | rAthena | Cualquier build reciente |
 
-> El panel debe tener acceso de red a la base de datos de rAthena y a los puertos login/char/map si deseas que el indicador de estado del servidor funcione en tiempo real.
+> **El panel debe tener acceso de red a la base de datos de rAthena.** Sin él, las migraciones fallarán y el panel no funcionará. Si ambos están en el mismo servidor, no se requiere configuración adicional. Si están en servidores distintos, consulta la [nota de acceso a la DB](#base-de-datos-principal-de-rathena-requerida) en la sección de configuración.
+>
+> El acceso a los puertos login/char/map es opcional — solo se necesita para el indicador de estado del servidor en la página de inicio.
 
 ---
 
