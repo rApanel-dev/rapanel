@@ -340,17 +340,17 @@ const openClaimModal = () => {
                 <form @submit.prevent="createAccount" class="space-y-5">
                     <div>
                         <InputLabel for="userid" :value="__('Username')" />
-                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required autofocus />
+                        <TextInput id="userid" v-model="form.userid" type="text" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-700 border-rapanel-navy-100 dark:border-white/10" required autofocus />
                         <InputError class="mt-2" :message="form.errors.userid" />
                     </div>
                     <div>
                         <InputLabel for="user_pass" :value="__('Password')" />
-                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-800 border-rapanel-navy-100 dark:border-gray-700" required />
+                        <TextInput id="user_pass" v-model="form.user_pass" type="password" class="mt-1 block w-full bg-white dark:bg-rapanel-navy-700 border-rapanel-navy-100 dark:border-white/10" required />
                         <InputError class="mt-2" :message="form.errors.user_pass" />
                     </div>
                     <div>
                         <InputLabel for="sex" :value="__('Gender')" />
-                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-gray-700 bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
+                        <select id="sex" v-model="form.sex" class="mt-1 block w-full border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-700 text-rapanel-text-light dark:text-rapanel-text-dark focus:border-rapanel-blue focus:ring-rapanel-blue rounded-md shadow-sm transition-colors">
                             <option value="M">{{ __('Male') }}</option>
                             <option value="F">{{ __('Female') }}</option>
                         </select>
