@@ -6,6 +6,12 @@
   <a href="README.md">English</a> · <a href="README-ES.md">Español</a> · <a href="README-PT.md">Português</a> · <a href="README-FR.md">Français</a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/rapanel-dev/rapanel/releases/latest"><img src="https://img.shields.io/github/v/release/rapanel-dev/rapanel?style=for-the-badge&logo=github&label=RELEASE&color=blue" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/rapanel-dev/rapanel?style=for-the-badge&logo=github&label=LICENSE" alt="License"></a>
+  <a href="https://discord.gg/rapanel"><img src="https://img.shields.io/discord/1293964987357990956?style=for-the-badge&logo=discord&label=DISCORD&color=5865F2" alt="Discord"></a>
+</p>
+
 ---
 
 # rApanel
