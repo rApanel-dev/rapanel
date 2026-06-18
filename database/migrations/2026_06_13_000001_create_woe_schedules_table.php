@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('end_day');
             $table->time('end_time');
             $table->boolean('enabled')->default(true);
+            $table->string('image', 255)->nullable();
             $table->timestamps();
         });
     }

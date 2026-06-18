@@ -38,6 +38,28 @@ return new class extends Migration
             'seo_og_image'    => null,
             'seo_theme_color' => '#3b82f6',
             'favicon'         => null,
+
+            // Home — toggles de secciones
+            'home_show_stats'    => '1',
+            'home_show_info'     => '1',
+            'home_show_news'     => '1',
+            'home_show_features' => '1',
+            'home_show_cta'      => '1',
+
+            // Home — bloques de info y cards destacadas
+            'home_info_blocks' => json_encode([
+                ['id' => 'rates',   'show' => true, 'icon_type' => 'icon', 'image' => null],
+                ['id' => 'level',   'show' => true, 'icon_type' => 'icon', 'image' => null],
+                ['id' => 'mode',    'show' => true, 'icon_type' => 'icon', 'image' => null],
+                ['id' => 'episode', 'show' => true, 'icon_type' => 'icon', 'image' => null],
+                ['id' => 'intl',    'show' => true, 'icon_type' => 'icon', 'image' => null],
+            ]),
+            'home_highlight_cards' => json_encode([
+                ['show' => true, 'image' => null, 'title' => 'New Battlegrounds', 'desc' => 'New Battleground modes designed to improve GvG and competitive gameplay, not found on other servers.', 'url' => '#'],
+                ['show' => true, 'image' => null, 'title' => 'Custom Events',     'desc' => 'Regular in-game events with exclusive prizes and unique rewards for all players.',                   'url' => '#'],
+                ['show' => true, 'image' => null, 'title' => 'Exclusive Quests',  'desc' => 'Unique quest lines with story-driven content and rare item rewards to discover.',                    'url' => '#'],
+                ['show' => true, 'image' => null, 'title' => 'Item Database',     'desc' => 'Full searchable database of every item imported directly from rAthena data files.',                  'url' => '#'],
+            ]),
         ];
 
         $now = now();

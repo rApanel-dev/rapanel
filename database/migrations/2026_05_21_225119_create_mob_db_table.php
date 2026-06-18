@@ -29,6 +29,7 @@ return new class extends Migration
             $table->json('race_groups')->nullable();
             $table->json('drops')->nullable();
             $table->json('mvp_drops')->nullable();
+            $table->json('skills')->nullable();
             $table->timestamps();
         });
     }
