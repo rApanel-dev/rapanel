@@ -79,6 +79,11 @@ class HandleInertiaRequests extends Middleware
             'twoFactorForceAdmins' => config('services.ra.2fa_force_admins', false),
             'inactivityTimeout'    => config('services.ra.inactivity_timeout', 30),
 
+            'donationsEnabled'      => config('services.ra.cashpoints_enabled', false),
+            'donationPaypalEnabled' => config('services.donations.paypal_enabled', false),
+            'donationStripeEnabled' => config('services.donations.stripe_enabled', false),
+            'donationPaypalClientId'=> config('services.donations.paypal_client_id'),
+
             'latestNews' => Cache::remember('home_latest_news', 120, function () {
                 return News::published()
                     ->orderByDesc('is_pinned')

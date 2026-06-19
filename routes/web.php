@@ -48,6 +48,10 @@ use App\Http\Controllers\WoeLiveController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\Admin\VoteSiteController as AdminVoteSiteController;
 use App\Http\Controllers\Admin\VoteSettingsController as AdminVoteSettingsController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\Admin\DonationAdminController;
+use App\Http\Controllers\Admin\DonationPackageController;
+use App\Http\Controllers\Admin\DonationSettingsController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -74,7 +78,21 @@ Route::get('/home-classic', function () {
 Route::get('/downloads', [DownloadController::class, 'index'])->name('downloads');
 Route::get('/downloads/{download:slug}', [DownloadController::class, 'show'])->name('downloads.show');
 Route::get('/downloads/{download:slug}/get', [DownloadController::class, 'download'])->name('downloads.get');
-Route::get('/donations', fn() => Inertia::render('ComingSoon', ['title' => 'Donations']))->name('donations');
+// Donations — webhooks sin CSRF (registrados antes del grupo auth)
+Route::post('/donations/paypal/webhook', [DonationController::class, 'paypalWebhook'])->name('donations.paypal.webhook');
+Route::post('/donations/stripe/webhook', [DonationController::class, 'stripeWebhook'])->name('donations.stripe.webhook');
+
+// Donations — páginas públicas
+Route::get('/donations', [DonationController::class, 'index'])->name('donations');
+Route::get('/donations/success', [DonationController::class, 'success'])->name('donations.success');
+Route::get('/donations/cancel', [DonationController::class, 'cancel'])->name('donations.cancel');
+
+// Donations — acciones requieren auth
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/donations/paypal/create', [DonationController::class, 'paypalCreate'])->name('donations.paypal.create');
+    Route::post('/donations/paypal/capture', [DonationController::class, 'paypalCapture'])->name('donations.paypal.capture');
+    Route::post('/donations/stripe/create', [DonationController::class, 'stripeCreate'])->name('donations.stripe.create');
+});
 
 // Rutas de Información
 Route::prefix('info')->name('info.')->group(function() {
@@ -243,6 +261,27 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::resource('sections', WikiSectionController::class)->except(['show']);
         Route::resource('articles', WikiArticleController::class)->except(['show']);
     });
+
+    // Donations admin
+    Route::get('donations/analytics', [DonationAdminController::class, 'analytics'])->name('donations.analytics');
+    Route::get('donations/create', [DonationAdminController::class, 'create'])->name('donations.create');
+    Route::post('donations', [DonationAdminController::class, 'store'])->name('donations.store');
+    Route::get('donations/{donation}', [DonationAdminController::class, 'show'])->name('donations.show');
+    Route::post('donations/{donation}/approve', [DonationAdminController::class, 'approve'])->name('donations.approve');
+    Route::post('donations/{donation}/reject', [DonationAdminController::class, 'reject'])->name('donations.reject');
+    Route::get('donations', [DonationAdminController::class, 'index'])->name('donations.index');
+
+    Route::get('donation-packages/create', [DonationPackageController::class, 'create'])->name('donation-packages.create');
+    Route::post('donation-packages', [DonationPackageController::class, 'store'])->name('donation-packages.store');
+    Route::get('donation-packages/{donationPackage}/edit', [DonationPackageController::class, 'edit'])->name('donation-packages.edit');
+    Route::put('donation-packages/{donationPackage}', [DonationPackageController::class, 'update'])->name('donation-packages.update');
+    Route::delete('donation-packages/{donationPackage}', [DonationPackageController::class, 'destroy'])->name('donation-packages.destroy');
+    Route::patch('donation-packages/{donationPackage}/toggle', [DonationPackageController::class, 'toggle'])->name('donation-packages.toggle');
+    Route::patch('donation-packages/{donationPackage}/toggle-featured', [DonationPackageController::class, 'toggleFeatured'])->name('donation-packages.toggle-featured');
+    Route::get('donation-packages', [DonationPackageController::class, 'index'])->name('donation-packages.index');
+
+    Route::get('donation-settings', [DonationSettingsController::class, 'index'])->name('donation-settings.index');
+    Route::put('donation-settings', [DonationSettingsController::class, 'update'])->name('donation-settings.update');
 
     // Vote sites admin
     Route::resource('vote-sites', AdminVoteSiteController::class)->except(['show', 'create', 'edit']);

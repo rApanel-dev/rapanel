@@ -24,7 +24,6 @@ use Illuminate\Notifications\Notifiable;
     'donation_points',
     'vote_points',
     'role',
-    'status',
     'api_token'
 ])]
 #[Hidden([

@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'donations/paypal/webhook',
+            'donations/stripe/webhook',
+        ]);
+
         $middleware->alias([
             'admin'      => \App\Http\Middleware\AdminMiddleware::class,
             'require2fa' => \App\Http\Middleware\RequireTwoFactor::class,

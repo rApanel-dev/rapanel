@@ -77,4 +77,15 @@ return [
         'mvp_exp_rate'   => (int) env('RA_MVP_EXP_RATE', 100),
     ],
 
+    'donations' => [
+        'paypal_enabled'        => env('DONATION_PAYPAL_ENABLED', false),
+        'paypal_client_id'      => env('DONATION_PAYPAL_CLIENT_ID'),
+        'paypal_secret'         => env('DONATION_PAYPAL_SECRET'),
+        'paypal_sandbox'        => env('DONATION_PAYPAL_SANDBOX', true),
+        'stripe_enabled'        => env('DONATION_STRIPE_ENABLED', false),
+        'stripe_public_key'     => env('DONATION_STRIPE_PUBLIC_KEY'),
+        'stripe_secret_key'     => env('DONATION_STRIPE_SECRET_KEY'),
+        'stripe_webhook_secret' => env('DONATION_STRIPE_WEBHOOK_SECRET'),
+    ],
+
 ];

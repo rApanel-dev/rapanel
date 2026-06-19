@@ -218,8 +218,8 @@ class UserController extends Controller
         ]);
 
         return back()->with('success', $newStatus
-            ? 'Account activated (game accounts re-enabled).'
-            : 'Account banned (game accounts blocked).'
+            ? __('Account activated (game accounts re-enabled).')
+            : __('Account banned (game accounts blocked).')
         );
     }
 }
