@@ -20,6 +20,11 @@
 /public/data/items/collection/*.png
 /public/data/items/cards/*.png
 /public/data/monsters/*.gif
+/public/images/*.gif
+/public/images/*.png
+/public/images/*.jpg
+/public/images/*.jpeg
+/public/images/*.webp
 /public/data/maps/*.png
 !**/.gitkeep
 /public/downloads/patch/*
