@@ -4,7 +4,6 @@ import {
   ArrowDownTrayIcon,
   TrophyIcon,
   HeartIcon,
-  ArrowsRightLeftIcon,
   StarIcon
 } from '@heroicons/vue/24/outline'
 
@@ -57,11 +56,6 @@ export const visitorMenuItems = [
 
 // NUEVO: Menú exclusivo para usuarios con sesión iniciada
 export const authMenuItems = [
-  {
-    name: 'Transfer',
-    route: 'account.transfer',
-    icon: ArrowsRightLeftIcon,
-  },
   {
     name: 'Vote 4 Points',
     route: 'vote',

@@ -30,6 +30,7 @@ import {
     Squares2X2Icon,
     ChevronRightIcon,
     ShieldExclamationIcon,
+    StarIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -95,6 +96,14 @@ const groups = [
             { name: 'Map DB',           route: 'admin.map-db.index',        icon: MapPinIcon            },
             { name: 'Drop Rates',       route: 'admin.drop-rates.index',    icon: ChartBarIcon          },
             { name: 'MvP Cards',        route: 'admin.mvp-cards.index',     icon: TrophyIcon            },
+        ],
+    },
+    {
+        label: 'Voting',
+        icon: StarIcon,
+        items: [
+            { name: 'Vote Sites',    route: 'admin.vote-sites.index',    icon: StarIcon      },
+            { name: 'Vote Settings', route: 'admin.vote-settings.index', icon: Cog6ToothIcon },
         ],
     },
     {

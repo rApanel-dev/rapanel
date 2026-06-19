@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\AccountLink;
 use Illuminate\Support\Str;
@@ -34,17 +35,30 @@ class DashboardController extends Controller
             }
         }
 
+        $gameAccounts = $user->gameAccounts()
+            ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state', 'created_at')
+            ->get();
+
+        $cashPoints = 0;
+        if (config('services.ra.cashpoints_enabled') && $gameAccounts->isNotEmpty()) {
+            $cashPoints = (int) DB::connection('mysql_main')
+                ->table('acc_reg_num')
+                ->whereIn('account_id', $gameAccounts->pluck('account_id'))
+                ->where('key', '#CASHPOINTS')
+                ->sum('value');
+        }
+
         return Inertia::render('Dashboard', [
-            'gameAccountsCount' => $user->gameAccounts()->count(),
-            'gameAccounts' => $user->gameAccounts()
-                ->select('account_id', 'userid', 'sex', 'logincount', 'lastlogin', 'last_ip', 'state', 'created_at')
-                ->get(),
+            'gameAccountsCount' => $gameAccounts->count(),
+            'gameAccounts' => $gameAccounts,
             'maxAccounts' => (int) config('services.ra.max_accounts', 3),
             'viewedUser'  => [
                 'id'     => $user->id,
                 'name'   => $user->name,
                 'status' => $user->status,
             ],
+            'votePoints' => (int) $user->vote_points,
+            'cashPoints' => $cashPoints,
         ]);
     }
 

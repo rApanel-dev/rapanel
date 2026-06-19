@@ -499,6 +499,16 @@ class GameAccountController extends Controller
             return back()->withErrors(['error' => __('You do not have permission to manage this account.')]);
         }
 
+        $onlineCount = DB::connection('mysql_main')
+            ->table('char')
+            ->where('account_id', $account_id)
+            ->where('online', '>', 0)
+            ->count();
+
+        if ($onlineCount > 0) {
+            return back()->withErrors(['error' => __('All characters must be offline to change password.')]);
+        }
+
         // 4. Preparar y actualizar contraseña de rAthena (MD5 o Texto Plano)
         $useMd5 = config('services.ra.use_md5');
         $newPassword = $request->password;

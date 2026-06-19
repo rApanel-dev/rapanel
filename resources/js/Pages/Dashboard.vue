@@ -24,6 +24,8 @@ const props = defineProps({
     gameAccounts:      { type: Array,  default: () => [] },
     maxAccounts:       Number,
     viewedUser:        { type: Object, default: null },
+    votePoints:        { type: Number, default: 0 },
+    cashPoints:        { type: Number, default: 0 },
 });
 
 // Lógica de validación
@@ -171,8 +173,8 @@ const openClaimModal = () => {
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <StatsCard :label="__('Game Accounts')" :value="`${gameAccountsCount} / ${maxAccounts}`" muted />
-                    <StatsCard :label="__('Vote Points')" value="0" value-class="text-rapanel-gold" muted />
-                    <StatsCard :label="__('Cash Points')" value="0" value-class="text-rapanel-success" muted />
+                    <StatsCard :label="__('Vote Points')" :value="votePoints" value-class="text-rapanel-gold" muted />
+                    <StatsCard :label="__('Cash Points')" :value="cashPoints" value-class="text-rapanel-success" muted />
                 </div>
                 
             </div>

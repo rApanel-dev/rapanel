@@ -45,6 +45,9 @@ use App\Http\Controllers\Admin\HealthCheckController;
 use App\Http\Controllers\Admin\WoeScheduleController;
 use App\Http\Controllers\WoeController;
 use App\Http\Controllers\WoeLiveController;
+use App\Http\Controllers\VoteController;
+use App\Http\Controllers\Admin\VoteSiteController as AdminVoteSiteController;
+use App\Http\Controllers\Admin\VoteSettingsController as AdminVoteSettingsController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -116,9 +119,9 @@ Route::middleware(['auth', 'require2fa'])->group(function () {
         ->middleware(['verified'])
         ->name('dashboard');
 
-    // NUEVAS RUTAS DEL MENÚ DE USUARIO
-    Route::get('/transfer', fn() => Inertia::render('ComingSoon', ['title' => 'Transfer']))->name('account.transfer');
-    Route::get('/vote', fn() => Inertia::render('ComingSoon', ['title' => 'Vote']))->name('vote');
+    Route::get('/vote', [VoteController::class, 'index'])->name('vote');
+    Route::post('/vote/convert', [VoteController::class, 'convert'])->name('vote.convert');
+    Route::post('/vote/click/{site}', [VoteController::class, 'click'])->name('vote.click');
 
     // PERFIL DE USUARIO
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -241,6 +244,12 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::resource('articles', WikiArticleController::class)->except(['show']);
     });
 
+    // Vote sites admin
+    Route::resource('vote-sites', AdminVoteSiteController::class)->except(['show', 'create', 'edit']);
+    Route::patch('vote-sites/{voteSite}/toggle', [AdminVoteSiteController::class, 'toggleActive'])->name('vote-sites.toggle');
+    Route::get('vote-settings', [AdminVoteSettingsController::class, 'index'])->name('vote-settings.index');
+    Route::put('vote-settings', [AdminVoteSettingsController::class, 'update'])->name('vote-settings.update');
+
     // Site Settings admin
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/',                       [SiteSettingsController::class, 'index'])->name('index');
@@ -285,5 +294,13 @@ Route::get('lang/{locale}', function ($locale) {
     }
     return back();
 })->name('setlang');
+
+// Vote callbacks — sin auth, sin CSRF (llamados por sitios externos)
+Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->middleware('throttle:60,1')
+    ->group(function () {
+        Route::match(['get', 'post'], '/vote/callback/{site}', [VoteController::class, 'callback'])
+            ->name('vote.callback');
+    });
 
 require __DIR__.'/auth.php';
