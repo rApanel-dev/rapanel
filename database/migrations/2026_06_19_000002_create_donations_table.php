@@ -14,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('package_id')->nullable()->constrained('donation_packages')->nullOnDelete();
-            $table->enum('platform', ['paypal', 'stripe', 'manual']);
+            $table->enum('platform', ['paypal', 'stripe', 'manual', 'mercadopago']);
             $table->string('transaction_id', 255)->nullable()->unique();
             $table->decimal('amount_usd', 8, 2);
             $table->unsignedInteger('cashpoints_awarded');

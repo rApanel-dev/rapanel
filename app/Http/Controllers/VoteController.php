@@ -81,6 +81,7 @@ class VoteController extends Controller
                 'callback_type'   => $s->callback_type,
                 'points_per_vote' => $s->points_per_vote,
                 'cooldown_hours'  => $s->cooldown_hours,
+                'border_hex'      => VoteSite::colorHex($s->border_color ?? 'blue'),
             ]),
             'userVotes'         => $userVotes,
             'votePoints'        => (int) $user->vote_points,

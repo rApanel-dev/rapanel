@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedInteger('cooldown_hours')->default(12);
             $table->boolean('is_active')->default(true);
             $table->unsignedSmallInteger('sort_order')->default(0);
+            $table->string('border_color', 20)->default('blue');
             $table->timestamps();
         });
     }

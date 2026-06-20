@@ -31,6 +31,7 @@ class VoteSiteController extends Controller
             'cooldown_hours'  => 'required|integer|min:1|max:168',
             'is_active'       => 'boolean',
             'sort_order'      => 'integer|min:0',
+            'border_color'    => 'nullable|in:blue,gold,success,purple,danger,navy',
         ]);
 
         VoteSite::create($data);
@@ -51,6 +52,7 @@ class VoteSiteController extends Controller
             'cooldown_hours'  => 'required|integer|min:1|max:168',
             'is_active'       => 'boolean',
             'sort_order'      => 'integer|min:0',
+            'border_color'    => 'nullable|in:blue,gold,success,purple,danger,navy',
         ]);
 
         $voteSite->update($data);

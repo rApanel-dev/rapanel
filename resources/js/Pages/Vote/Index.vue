@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, reactive, watch } from 'vue';
+import { ref, computed, reactive, watch, onMounted } from 'vue';
 import { Head, useForm, usePage, router } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
@@ -116,6 +116,21 @@ function submitConvert() {
         onSuccess: () => { showConvert.value = false; convertForm.reset(); },
     });
 }
+
+// ── 3D card tilt ──────────────────────────────────────────────────────────
+onMounted(() => {
+    document.querySelectorAll('.vote-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const r = card.getBoundingClientRect();
+            const x = ((e.clientX - r.left) / r.width  - 0.5) * 14;
+            const y = ((e.clientY - r.top)  / r.height - 0.5) * 14;
+            card.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${-y}deg) translateZ(6px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) translateZ(0)';
+        });
+    });
+});
 </script>
 
 <template>
@@ -176,7 +191,8 @@ function submitConvert() {
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div
                     v-for="site in sites" :key="site.id"
-                    class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-black/30 p-6 flex flex-col gap-4"
+                    class="vote-card bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-black/30 p-6 flex flex-col gap-4"
+                    :style="`--c: ${site.border_hex}`"
                 >
                     <!-- Site header -->
                     <div class="flex items-center gap-3">
@@ -208,21 +224,21 @@ function submitConvert() {
                                 v-if="HONOR_TYPES.includes(site.callback_type)"
                                 @click="honorVote(site)"
                                 :disabled="clickingIds[site.id]"
-                                class="block w-full text-center px-4 py-2.5 bg-rapanel-blue hover:opacity-90 text-white font-semibold rounded-lg transition text-sm disabled:opacity-60"
+                                class="vote-btn block w-full text-center px-4 py-2.5 text-rapanel-navy-900 font-bold rounded-xl transition-all text-sm disabled:opacity-60 uppercase tracking-wide font-display"
                             >
                                 {{ __('Vote Now') }}
                             </button>
                             <a
                                 v-else
                                 :href="site.vote_url" target="_blank" rel="noopener noreferrer"
-                                class="block w-full text-center px-4 py-2.5 bg-rapanel-blue hover:opacity-90 text-white font-semibold rounded-lg transition text-sm"
+                                class="vote-btn block w-full text-center px-4 py-2.5 text-rapanel-navy-900 font-bold rounded-xl transition-all text-sm uppercase tracking-wide font-display"
                             >
                                 {{ __('Vote Now') }}
                             </a>
                         </template>
 
                         <!-- Cooldown -->
-                        <div v-else class="w-full text-center px-4 py-2.5 bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 font-mono text-sm rounded-lg cursor-not-allowed">
+                        <div v-else class="w-full text-center px-4 py-2.5 bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 font-mono text-sm rounded-xl cursor-not-allowed">
                             {{ remainingTime(localVotes[site.id]?.next_vote_at) ?? __('Available soon') }}
                         </div>
                     </div>
@@ -303,3 +319,29 @@ function submitConvert() {
         </Modal>
     </MainLayout>
 </template>
+
+<style scoped>
+.vote-card {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+    will-change: transform;
+}
+
+.vote-card:hover {
+    border-color: var(--c) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12),
+                0 0 32px color-mix(in srgb, var(--c) 22%, transparent);
+}
+
+.dark .vote-card:hover {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5),
+                0 0 36px color-mix(in srgb, var(--c) 28%, transparent);
+}
+
+.vote-btn {
+    background: var(--c);
+}
+.vote-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--c) 45%, transparent);
+}
+</style>

@@ -19,7 +19,9 @@ return new class extends Migration
             $table->unsignedInteger('cashpoints');
             $table->unsignedTinyInteger('bonus_percent')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_featured')->default(false);
             $table->unsignedSmallInteger('sort_order')->default(0);
+            $table->string('border_color', 20)->default('blue');
             $table->timestamps();
         });
     }

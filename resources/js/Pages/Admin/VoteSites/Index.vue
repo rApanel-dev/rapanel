@@ -24,6 +24,15 @@ const showModal  = ref(false);
 const editId     = ref(null);
 const processing = ref(false);
 
+const COLORS = [
+    { key: 'blue',    hex: '#4A90E2', label: 'Blue'    },
+    { key: 'gold',    hex: '#F1C40F', label: 'Gold'    },
+    { key: 'success', hex: '#2ECC71', label: 'Green'   },
+    { key: 'purple',  hex: '#a855f7', label: 'Purple'  },
+    { key: 'danger',  hex: '#E74C3C', label: 'Red'     },
+    { key: 'navy',    hex: '#334155', label: 'Navy'    },
+];
+
 const blankForm = () => ({
     name:             '',
     icon_url:         '',
@@ -35,6 +44,7 @@ const blankForm = () => ({
     cooldown_hours:   12,
     is_active:        true,
     sort_order:       0,
+    border_color:     'blue',
 });
 
 const form   = reactive(blankForm());
@@ -59,6 +69,7 @@ function openEdit(site) {
         cooldown_hours:  site.cooldown_hours,
         is_active:       site.is_active,
         sort_order:      site.sort_order,
+        border_color:    site.border_color ?? 'blue',
     });
     editId.value  = site.id;
     errors.value  = {};
@@ -275,6 +286,19 @@ const callbackHint = computed(() => ({
                         <div>
                             <label class="block text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark mb-1 uppercase tracking-wider">{{ __('Order') }}</label>
                             <input v-model.number="form.sort_order" type="number" min="0" class="w-full rounded-md border border-rapanel-navy-200 dark:border-white/10 bg-white dark:bg-rapanel-navy-800 text-rapanel-navy-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                        </div>
+                    </div>
+
+                    <!-- Card border color -->
+                    <div>
+                        <label class="block text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark mb-2 uppercase tracking-wider">{{ __('Card border color') }}</label>
+                        <div class="flex gap-2">
+                            <button v-for="c in COLORS" :key="c.key" type="button"
+                                @click="form.border_color = c.key"
+                                :title="c.label"
+                                class="w-7 h-7 rounded-full border-2 transition-transform"
+                                :class="form.border_color === c.key ? 'border-white dark:border-white scale-110 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'"
+                                :style="`background: ${c.hex}; box-shadow: ${form.border_color === c.key ? '0 0 0 2px ' + c.hex : 'none'}`" />
                         </div>
                     </div>
 
