@@ -49,7 +49,7 @@ const submit = () => {
                 </Link>
                 <div>
                     <h1 class="text-2xl font-display font-bold tracking-wide text-rapanel-text-light dark:text-white">{{ __('Add manual donation') }}</h1>
-                    <p class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 mt-0.5">{{ __('CashPoints are assigned immediately.') }}</p>
+                    <p class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 mt-0.5">{{ __('Donation Points are assigned immediately.') }}</p>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@ const submit = () => {
                     <select v-model="form.package_id"
                         class="w-full rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50">
                         <option value="">{{ __('Custom (no package)') }}</option>
-                        <option v-for="p in packages" :key="p.id" :value="p.id">{{ p.title }} — ${{ p.price_usd.toFixed(2) }} / {{ p.total_cashpoints.toLocaleString() }} CP</option>
+                        <option v-for="p in packages" :key="p.id" :value="p.id">{{ p.title }} — ${{ p.price_usd.toFixed(2) }} / {{ p.total_cashpoints.toLocaleString() }} DP</option>
                     </select>
                 </div>
 
@@ -89,7 +89,7 @@ const submit = () => {
                         <p v-if="form.errors.amount_usd" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.amount_usd }}</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('CashPoints awarded') }}</label>
+                        <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Donation Points awarded') }}</label>
                         <input v-model.number="form.cashpoints" type="number" min="1" required
                             class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
                         <p v-if="form.errors.cashpoints" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.cashpoints }}</p>

@@ -81,17 +81,23 @@ Route::get('/downloads/{download:slug}/get', [DownloadController::class, 'downlo
 // Donations — webhooks sin CSRF (registrados antes del grupo auth)
 Route::post('/donations/paypal/webhook', [DonationController::class, 'paypalWebhook'])->name('donations.paypal.webhook');
 Route::post('/donations/stripe/webhook', [DonationController::class, 'stripeWebhook'])->name('donations.stripe.webhook');
+Route::post('/donations/mp/webhook', [DonationController::class, 'mpWebhook'])->name('donations.mp.webhook');
 
 // Donations — páginas públicas
 Route::get('/donations', [DonationController::class, 'index'])->name('donations');
 Route::get('/donations/success', [DonationController::class, 'success'])->name('donations.success');
 Route::get('/donations/cancel', [DonationController::class, 'cancel'])->name('donations.cancel');
+Route::get('/donations/mp/success', [DonationController::class, 'mpSuccess'])->name('donations.mp.success');
+Route::get('/donations/mp/failure', [DonationController::class, 'mpFailure'])->name('donations.mp.failure');
+Route::get('/donations/mp/pending', [DonationController::class, 'mpPending'])->name('donations.mp.pending');
 
 // Donations — acciones requieren auth
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/donations/paypal/create', [DonationController::class, 'paypalCreate'])->name('donations.paypal.create');
     Route::post('/donations/paypal/capture', [DonationController::class, 'paypalCapture'])->name('donations.paypal.capture');
     Route::post('/donations/stripe/create', [DonationController::class, 'stripeCreate'])->name('donations.stripe.create');
+    Route::post('/donations/mp/create', [DonationController::class, 'mpCreate'])->name('donations.mp.create');
+    Route::post('/donations/convert', [DonationController::class, 'convert'])->name('donations.convert');
 });
 
 // Rutas de Información

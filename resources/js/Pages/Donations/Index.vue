@@ -1,14 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import { HeartIcon, XMarkIcon, SparklesIcon, StarIcon } from '@heroicons/vue/24/outline';
+import FlashMessages from '@/Components/FlashMessages.vue';
+import Modal from '@/Components/Modal.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@/Components/InputError.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import { HeartIcon, XMarkIcon, SparklesIcon, StarIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
-    packages:       { type: Array, default: () => [] },
-    paypalEnabled:  { type: Boolean, default: false },
-    stripeEnabled:  { type: Boolean, default: false },
-    paypalClientId: { type: String, default: null },
+    packages:          { type: Array,   default: () => [] },
+    paypalEnabled:     { type: Boolean, default: false },
+    stripeEnabled:     { type: Boolean, default: false },
+    mpEnabled:         { type: Boolean, default: false },
+    paypalClientId:    { type: String,  default: null },
+    donationPoints:    { type: Number,  default: null },
+    cashPointsEnabled: { type: Boolean, default: false },
+    gameAccounts:      { type: Array,   default: () => [] },
+    onlineAccountIds:  { type: Array,   default: () => [] },
+    conversionRate:    { type: Object,  default: () => ({ from: 10, to: 100 }) },
 });
 
 const page = usePage();
@@ -19,6 +31,54 @@ const __ = (key, rep = {}) => {
 };
 
 const isAuth = !!page.props.auth?.user;
+
+const flashSuccess = computed(() => page.props.flash?.success);
+const flashError   = computed(() => page.props.flash?.error);
+
+// ── Donation Points local state ────────────────────────────────────────────
+const localDonationPoints = ref(props.donationPoints ?? 0);
+watch(() => props.donationPoints, (v) => { if (v !== null) localDonationPoints.value = v; });
+
+// ── Convert modal ──────────────────────────────────────────────────────────
+const showConvert = ref(false);
+const convertForm = useForm({ donation_points: props.conversionRate.from, account_id: '' });
+
+function openConvertModal() {
+    showConvert.value = true;
+    router.reload({ only: ['onlineAccountIds', 'gameAccounts', 'donationPoints'] });
+}
+
+watch(() => convertForm.account_id, (id) => {
+    if (showConvert.value && id) {
+        router.reload({ only: ['onlineAccountIds', 'gameAccounts'] });
+    }
+});
+
+const selectedAccountOnline = computed(() =>
+    convertForm.account_id !== '' && props.onlineAccountIds.includes(Number(convertForm.account_id))
+);
+
+const selectedAccountCp = computed(() => {
+    if (!convertForm.account_id) return null;
+    const acc = props.gameAccounts.find(a => a.account_id === Number(convertForm.account_id));
+    return acc ? acc.cash_points : null;
+});
+
+const cashResult = computed(() => {
+    const units = Math.floor(convertForm.donation_points / props.conversionRate.from);
+    return units > 0 ? units * props.conversionRate.to : 0;
+});
+
+const maxConvertable = computed(() =>
+    Math.floor(localDonationPoints.value / props.conversionRate.from) * props.conversionRate.from
+);
+
+function submitConvert() {
+    convertForm.post(route('donations.convert'), {
+        preserveScroll: true,
+        onSuccess: () => { showConvert.value = false; convertForm.reset(); },
+    });
+}
 
 // ── 3D card tilt ──────────────────────────────────────────────────────────
 onMounted(() => {
@@ -41,9 +101,10 @@ const showModal       = ref(false);
 const paypalLoading   = ref(false);
 const stripeLoading   = ref(false);
 const paypalReady     = ref(false);
+const paypalError     = ref(null);
 let paypalButtonsInstance = null;
 
-function openDonate(pkg) {
+async function openDonate(pkg) {
     if (!isAuth) {
         router.visit(route('login'));
         return;
@@ -52,6 +113,7 @@ function openDonate(pkg) {
     showModal.value = true;
 
     if (props.paypalEnabled && props.paypalClientId) {
+        await nextTick();
         loadPayPalButtons(pkg);
     }
 }
@@ -75,7 +137,7 @@ async function loadPayPalButtons(pkg) {
 
     if (!window.paypal) {
         const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${props.paypalClientId}&currency=USD`;
+        script.src = `https://www.paypal.com/sdk/js?client-id=${props.paypalClientId}&currency=USD&disable-funding=card,credit,paylater,venmo`;
         script.onload = () => renderPayPalButtons(pkg);
         document.head.appendChild(script);
     } else {
@@ -83,10 +145,24 @@ async function loadPayPalButtons(pkg) {
     }
 }
 
+function resetPayPalButtons(pkg) {
+    paypalLoading.value = false;
+    paypalReady.value = false;
+    if (paypalButtonsInstance) {
+        paypalButtonsInstance.close?.();
+        paypalButtonsInstance = null;
+    }
+    const container = document.getElementById('paypal-button-container');
+    if (container) container.innerHTML = '';
+    renderPayPalButtons(pkg);
+}
+
 function renderPayPalButtons(pkg) {
     paypalReady.value = true;
+    paypalError.value = null;
     paypalButtonsInstance = window.paypal.Buttons({
         createOrder: async () => {
+            paypalError.value = null;
             const res = await fetch(route('donations.paypal.create'), {
                 method: 'POST',
                 headers: {
@@ -112,16 +188,44 @@ function renderPayPalButtons(pkg) {
             const result = await res.json();
             paypalLoading.value = false;
             if (result.success) {
-                closeModal();
-                router.visit(route('donations.success'));
+                window.location.href = route('donations.success');
             }
         },
+        onCancel: () => {
+            resetPayPalButtons(pkg);
+        },
         onError: (err) => {
-            paypalLoading.value = false;
             console.error('PayPal error', err);
+            paypalError.value = __('Payment failed. Please try again.');
+            resetPayPalButtons(pkg);
         },
     });
     paypalButtonsInstance.render('#paypal-button-container');
+}
+
+const mpLoading = ref(false);
+
+async function donateWithMP() {
+    if (!selectedPackage.value) return;
+    mpLoading.value = true;
+    try {
+        const res = await fetch(route('donations.mp.create'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+            },
+            body: JSON.stringify({ package_id: selectedPackage.value.id }),
+        });
+        const data = await res.json();
+        if (data.checkout_url) {
+            window.location.href = data.checkout_url;
+        } else {
+            mpLoading.value = false;
+        }
+    } catch (e) {
+        mpLoading.value = false;
+    }
 }
 
 async function donateWithStripe() {
@@ -155,16 +259,51 @@ async function donateWithStripe() {
         <!-- Header -->
         <div class="bg-white dark:bg-rapanel-navy-900 border-b border-rapanel-navy-100 dark:border-white/10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <div class="flex items-center gap-3 mb-2">
-                    <HeartIcon class="w-7 h-7 text-rapanel-danger" />
-                    <h1 class="text-3xl font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
-                        {{ __('Donations') }}
-                    </h1>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <HeartIcon class="w-7 h-7 text-rapanel-danger" />
+                            <h1 class="text-3xl font-display font-bold text-rapanel-navy-900 dark:text-white tracking-wide uppercase">
+                                {{ __('Donations') }}
+                            </h1>
+                        </div>
+                        <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm max-w-xl">
+                            {{ __('Support the server and receive Donation Points instantly.') }}
+                        </p>
+                        <div v-if="isAuth" class="mt-2 text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                            {{ __('Exchange rate:') }}
+                            <span class="font-semibold text-rapanel-gold">{{ conversionRate.from }} {{ __('Donation Points') }}</span>
+                            <span class="mx-1">→</span>
+                            <span class="font-semibold text-rapanel-success">{{ conversionRate.to }} {{ __('Cash Points') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Balance + botón convertir (solo logueado) -->
+                    <div v-if="isAuth" class="flex items-center gap-3 flex-shrink-0">
+                        <button
+                            v-if="localDonationPoints > 0 && gameAccounts.length"
+                            @click="openConvertModal"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm text-white bg-rapanel-danger dark:bg-rapanel-gold dark:text-rapanel-navy-900"
+                        >
+                            <ArrowPathIcon class="w-4 h-4" />
+                            {{ __('Convert to Cash Points') }}
+                        </button>
+                        <div class="bg-rapanel-gold/10 border border-rapanel-gold/30 rounded-xl px-5 py-3 text-center min-w-[96px]">
+                            <div class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 uppercase tracking-widest mb-0.5">
+                                {{ __('Donation Points') }}
+                            </div>
+                            <div class="text-2xl font-bold font-display text-rapanel-gold leading-none">
+                                {{ localDonationPoints.toLocaleString() }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm max-w-xl">
-                    {{ __('Support the server and receive CashPoints instantly.') }}
-                </p>
             </div>
+        </div>
+
+        <!-- Flash messages -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <FlashMessages :success="flashSuccess" :error="flashError" />
         </div>
 
         <!-- Packages grid -->
@@ -204,7 +343,7 @@ async function donateWithStripe() {
 
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-sm font-semibold text-rapanel-navy-700 dark:text-white/80">
-                                    {{ pkg.cashpoints.toLocaleString() }} CashPoints
+                                    {{ pkg.cashpoints.toLocaleString() }} {{ __('Donation Points') }}
                                 </span>
                                 <template v-if="pkg.bonus_percent > 0">
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-rapanel-success/10 text-rapanel-success border border-rapanel-success/20">
@@ -213,7 +352,7 @@ async function donateWithStripe() {
                                     </span>
                                     <span class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">=</span>
                                     <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">
-                                        {{ pkg.total_cashpoints.toLocaleString() }} CashPoints {{ __('total') }}
+                                        {{ pkg.total_cashpoints.toLocaleString() }} {{ __('Donation Points') }} {{ __('total') }}
                                     </span>
                                 </template>
                             </div>
@@ -234,6 +373,87 @@ async function donateWithStripe() {
             </div>
         </div>
 
+        <!-- Convert Modal -->
+        <Modal :show="showConvert" @close="showConvert = false">
+            <div class="p-6">
+                <h2 class="text-lg font-display font-bold text-rapanel-navy-900 dark:text-white mb-4 uppercase tracking-wide">
+                    {{ __('Convert to Cash Points') }}
+                </h2>
+
+                <form @submit.prevent="submitConvert" class="space-y-4">
+                    <!-- Cuenta de juego -->
+                    <div>
+                        <InputLabel :value="__('Game Account')" />
+                        <select
+                            v-model="convertForm.account_id"
+                            class="mt-1 block w-full rounded-md border border-rapanel-navy-200 dark:border-white/10 bg-white dark:bg-rapanel-navy-800 text-rapanel-navy-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue"
+                        >
+                            <option value="" disabled>{{ __('Select account...') }}</option>
+                            <option v-for="acc in gameAccounts" :key="acc.account_id" :value="acc.account_id">
+                                {{ acc.userid }}
+                            </option>
+                        </select>
+
+                        <!-- Balance CP de la cuenta (solo si cashpoints habilitado) -->
+                        <div v-if="cashPointsEnabled && selectedAccountCp !== null && !selectedAccountOnline"
+                            class="mt-2 flex items-center justify-between px-3 py-1.5 rounded-lg bg-rapanel-blue/10 border border-rapanel-blue/20 text-xs">
+                            <span class="text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Current Cash Points:') }}</span>
+                            <span class="font-bold text-rapanel-blue">{{ selectedAccountCp.toLocaleString() }} CP</span>
+                        </div>
+
+                        <InputError :message="convertForm.errors.account_id" class="mt-1" />
+
+                        <!-- Personaje online bloqueado -->
+                        <div v-if="selectedAccountOnline"
+                            class="mt-2 flex items-start gap-2 rounded-lg bg-rapanel-danger border border-rapanel-danger px-3 py-2 text-xs text-white">
+                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                            </svg>
+                            <span>{{ __('You must log out all characters before converting donation points.') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Aviso general -->
+                    <div class="flex items-start gap-2 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 dark:bg-rapanel-gold/10 dark:border-rapanel-gold/30 dark:text-rapanel-gold px-3 py-2 text-xs">
+                        <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+                        </svg>
+                        <span>{{ __('vote_convert_offline_warning') }}</span>
+                    </div>
+
+                    <!-- Puntos a gastar -->
+                    <div>
+                        <InputLabel :value="__('Donation Points to spend')" />
+                        <input
+                            v-model.number="convertForm.donation_points"
+                            type="number"
+                            :min="conversionRate.from"
+                            :max="maxConvertable"
+                            :step="conversionRate.from"
+                            class="mt-1 block w-full rounded-md border border-rapanel-navy-200 dark:border-white/10 bg-white dark:bg-rapanel-navy-800 text-rapanel-navy-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue"
+                        />
+                        <InputError :message="convertForm.errors.donation_points" class="mt-1" />
+                    </div>
+
+                    <!-- Preview resultado -->
+                    <div class="rounded-lg border border-rapanel-navy-200 dark:border-white/10 bg-rapanel-navy-100 dark:bg-rapanel-navy-800 px-4 py-3 text-sm flex justify-between">
+                        <span class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('You will receive:') }}</span>
+                        <span class="font-bold text-rapanel-success">{{ cashResult.toLocaleString() }} {{ __('Cash Points') }}</span>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <SecondaryButton @click="showConvert = false">{{ __('Cancel') }}</SecondaryButton>
+                        <PrimaryButton
+                            type="submit"
+                            :disabled="convertForm.processing || cashResult === 0 || !convertForm.account_id || selectedAccountOnline"
+                        >
+                            {{ __('Convert') }}
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
         <!-- Payment Modal -->
         <Teleport to="body">
             <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
@@ -241,7 +461,7 @@ async function donateWithStripe() {
                     <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between">
                         <div>
                             <h2 class="font-display font-bold text-rapanel-navy-900 dark:text-white">{{ selectedPackage?.title }}</h2>
-                            <p class="text-xs text-rapanel-gold font-bold">${{ selectedPackage?.price_usd.toFixed(2) }} → {{ selectedPackage?.total_cashpoints.toLocaleString() }} CashPoints</p>
+                            <p class="text-xs text-rapanel-gold font-bold">${{ selectedPackage?.price_usd.toFixed(2) }} → {{ selectedPackage?.total_cashpoints.toLocaleString() }} {{ __('Donation Points') }}</p>
                         </div>
                         <button @click="closeModal" class="p-1 rounded hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition text-rapanel-text-light/50 dark:text-white/50">
                             <XMarkIcon class="w-5 h-5" />
@@ -257,6 +477,7 @@ async function donateWithStripe() {
                                     <span class="text-[#003087] font-bold text-sm">PayPal</span>
                                 </div>
                             </div>
+                            <p v-if="paypalError" class="mt-2 text-xs text-center text-rapanel-danger">{{ paypalError }}</p>
                         </div>
 
                         <button v-if="stripeEnabled" @click="donateWithStripe" :disabled="stripeLoading"
@@ -265,7 +486,13 @@ async function donateWithStripe() {
                             {{ stripeLoading ? __('Redirecting…') : 'Stripe' }}
                         </button>
 
-                        <p v-if="!paypalEnabled && !stripeEnabled" class="text-center text-sm text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 py-4">
+                        <button v-if="mpEnabled" @click="donateWithMP" :disabled="mpLoading"
+                            class="w-full py-3 rounded-xl bg-[#009EE3] text-white font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition disabled:opacity-50">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 0C5.149 0 0 5.149 0 11.5S5.149 23 11.5 23 23 17.851 23 11.5 17.851 0 11.5 0zm4.712 8.337c.244 1.314-.17 2.6-1.04 3.513-.87.914-2.13 1.438-3.564 1.438H9.86l-.63 3.375H7.046l1.87-9.863h3.672c1.303 0 2.37.456 3.017 1.285.3.39.503.846.607 1.252z"/></svg>
+                            {{ mpLoading ? __('Redirecting…') : 'Mercado Pago' }}
+                        </button>
+
+                        <p v-if="!paypalEnabled && !stripeEnabled && !mpEnabled" class="text-center text-sm text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 py-4">
                             {{ __('No payment methods configured.') }}
                         </p>
                     </div>

@@ -125,7 +125,7 @@ const submit = () => {
                             <p v-if="form.errors.price_usd" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.price_usd }}</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Base CP') }}</label>
+                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Base DP') }}</label>
                             <input v-model.number="form.cashpoints" type="number" min="1" required
                                 class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
                             <p v-if="form.errors.cashpoints" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.cashpoints }}</p>
@@ -144,12 +144,12 @@ const submit = () => {
                     <!-- Preview CP breakdown -->
                     <div v-if="form.cashpoints" class="flex items-center gap-2 p-3 rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 text-sm">
                         <span class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Player receives:') }}</span>
-                        <span class="font-mono text-rapanel-navy-700 dark:text-white">{{ (parseInt(form.cashpoints)||0).toLocaleString() }} CP</span>
+                        <span class="font-mono text-rapanel-navy-700 dark:text-white">{{ (parseInt(form.cashpoints)||0).toLocaleString() }} DP</span>
                         <template v-if="bonusAmount > 0">
                             <span class="text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">+</span>
                             <span class="font-mono text-rapanel-success">{{ bonusAmount.toLocaleString() }} {{ __('bonus') }}</span>
                             <span class="text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">=</span>
-                            <span class="font-mono font-bold text-rapanel-navy-900 dark:text-white">{{ totalCp.toLocaleString() }} CP {{ __('total') }}</span>
+                            <span class="font-mono font-bold text-rapanel-navy-900 dark:text-white">{{ totalCp.toLocaleString() }} DP {{ __('total') }}</span>
                         </template>
                     </div>
                 </div>

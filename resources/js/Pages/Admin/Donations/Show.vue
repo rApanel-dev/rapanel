@@ -58,7 +58,7 @@ function reject() {
                         [__('Platform')]:       donation.platform,
                         [__('Transaction ID')]: donation.transaction_id ?? '—',
                         [__('Amount (USD)')]:   `$${donation.amount_usd.toFixed(2)}`,
-                        [__('CashPoints awarded')]: donation.cashpoints_awarded.toLocaleString() + ' CP',
+                        [__('Donation Points awarded')]: donation.cashpoints_awarded.toLocaleString() + ' DP',
                         [__('Approved by')]:    donation.approved_by_name ?? '—',
                         [__('Approved at')]:    donation.approved_at ?? '—',
                         [__('Date')]:           donation.created_at,

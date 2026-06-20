@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'donations/paypal/webhook',
             'donations/stripe/webhook',
+            'donations/mp/webhook',
         ]);
 
         $middleware->alias([

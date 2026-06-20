@@ -2,7 +2,7 @@
 import { useForm, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
-import { InformationCircleIcon } from '@heroicons/vue/24/outline';
+import { InformationCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -16,14 +16,13 @@ const __ = (key, rep = {}) => {
 };
 
 const form = useForm({
-    paypal_enabled:        props.settings.paypal_enabled,
-    paypal_client_id:      '',
-    paypal_secret:         '',
-    paypal_sandbox:        props.settings.paypal_sandbox,
-    stripe_enabled:        props.settings.stripe_enabled,
-    stripe_public_key:     props.settings.stripe_public_key || '',
-    stripe_secret_key:     '',
-    stripe_webhook_secret: '',
+    paypal_enabled:     props.settings.paypal_enabled,
+    stripe_enabled:     props.settings.stripe_enabled,
+    mp_enabled:         props.settings.mp_enabled,
+    donation_cash_from: props.settings.donation_cash_from,
+    donation_cash_to:   props.settings.donation_cash_to,
+    monthly_cost:       props.settings.monthly_cost,
+    monthly_goal:       props.settings.monthly_goal,
 });
 
 const submit = () => {
@@ -36,21 +35,24 @@ const submit = () => {
         <div class="max-w-2xl space-y-6">
             <PageHeader :title="__('Donation Settings')" />
 
-            <!-- Security notice -->
-            <div class="flex gap-3 p-4 rounded-xl bg-rapanel-gold/5 border border-rapanel-gold/20">
-                <InformationCircleIcon class="w-5 h-5 text-rapanel-gold flex-shrink-0 mt-0.5" />
-                <p class="text-sm text-rapanel-text-light/80 dark:text-rapanel-text-dark/80">
-                    {{ __('API keys are stored in .env for security.') }}
-                    {{ __('Leave a key field empty to keep the current value.') }}
-                </p>
-            </div>
-
             <form @submit.prevent="submit" class="space-y-5">
 
                 <!-- PayPal -->
                 <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">{{ __('PayPal Settings') }}</h2>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">PayPal</h2>
+                            <span v-if="settings.paypal_configured"
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-success">
+                                <CheckCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Configured') }}
+                            </span>
+                            <span v-else
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">
+                                <XCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Not configured') }}
+                            </span>
+                        </div>
                         <label class="flex items-center gap-2 cursor-pointer select-none">
                             <button type="button" @click="form.paypal_enabled = !form.paypal_enabled"
                                 :class="['relative w-10 h-5 rounded-full transition-colors duration-200', form.paypal_enabled ? 'bg-rapanel-blue' : 'bg-rapanel-navy-100 dark:bg-white/20']">
@@ -59,37 +61,29 @@ const submit = () => {
                             <span class="text-sm text-rapanel-text-light dark:text-white">{{ __('Enabled') }}</span>
                         </label>
                     </div>
-
-                    <div class="grid grid-cols-1 gap-4" :class="{ 'opacity-50 pointer-events-none': !form.paypal_enabled }">
-                        <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Client ID') }}</label>
-                            <input v-model="form.paypal_client_id" type="text"
-                                :placeholder="settings.paypal_client_id ? '••••••••' : __('Enter PayPal Client ID')"
-                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
-                            <p v-if="form.errors.paypal_client_id" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.paypal_client_id }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Secret Key') }}</label>
-                            <input v-model="form.paypal_secret" type="password"
-                                :placeholder="settings.paypal_secret ? '••••••••' : __('Enter PayPal Secret')"
-                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
-                            <p v-if="form.errors.paypal_secret" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.paypal_secret }}</p>
-                        </div>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <button type="button" @click="form.paypal_sandbox = !form.paypal_sandbox"
-                                :class="['relative w-10 h-5 rounded-full transition-colors duration-200', form.paypal_sandbox ? 'bg-rapanel-gold' : 'bg-rapanel-navy-100 dark:bg-white/20']">
-                                <span :class="['absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200', form.paypal_sandbox ? 'translate-x-5' : 'translate-x-0']" />
-                            </button>
-                            <span class="text-sm text-rapanel-text-light dark:text-white">{{ __('Sandbox mode') }}</span>
-                            <span class="text-xs text-rapanel-gold/70">({{ __('Disable for production') }})</span>
-                        </label>
+                    <!-- Nota .env -->
+                    <div class="flex gap-2 p-3 rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                        <InformationCircleIcon class="w-4 h-4 flex-shrink-0 mt-0.5 text-rapanel-gold" />
+                        <span>{{ __('API keys must be set in .env:') }} <code class="font-mono text-rapanel-blue">DONATION_PAYPAL_CLIENT_ID</code>, <code class="font-mono text-rapanel-blue">DONATION_PAYPAL_SECRET</code>, <code class="font-mono text-rapanel-blue">DONATION_PAYPAL_SANDBOX</code></span>
                     </div>
                 </div>
 
                 <!-- Stripe -->
                 <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">{{ __('Stripe Settings') }}</h2>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">Stripe</h2>
+                            <span v-if="settings.stripe_configured"
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-success">
+                                <CheckCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Configured') }}
+                            </span>
+                            <span v-else
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">
+                                <XCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Not configured') }}
+                            </span>
+                        </div>
                         <label class="flex items-center gap-2 cursor-pointer select-none">
                             <button type="button" @click="form.stripe_enabled = !form.stripe_enabled"
                                 :class="['relative w-10 h-5 rounded-full transition-colors duration-200', form.stripe_enabled ? 'bg-rapanel-blue' : 'bg-rapanel-navy-100 dark:bg-white/20']">
@@ -98,33 +92,113 @@ const submit = () => {
                             <span class="text-sm text-rapanel-text-light dark:text-white">{{ __('Enabled') }}</span>
                         </label>
                     </div>
+                    <!-- Nota .env -->
+                    <div class="flex gap-2 p-3 rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                        <InformationCircleIcon class="w-4 h-4 flex-shrink-0 mt-0.5 text-rapanel-gold" />
+                        <span>{{ __('API keys must be set in .env:') }} <code class="font-mono text-rapanel-blue">DONATION_STRIPE_PUBLIC_KEY</code>, <code class="font-mono text-rapanel-blue">DONATION_STRIPE_SECRET_KEY</code>, <code class="font-mono text-rapanel-blue">DONATION_STRIPE_WEBHOOK_SECRET</code></span>
+                    </div>
+                    <!-- Webhook URL -->
+                    <div class="rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mb-1">{{ __('Webhook URL') }}</p>
+                        <code class="text-xs text-rapanel-blue break-all select-all">{{ settings.stripe_webhook_url }}</code>
+                    </div>
+                </div>
 
-                    <div class="grid grid-cols-1 gap-4" :class="{ 'opacity-50 pointer-events-none': !form.stripe_enabled }">
+                <!-- Mercado Pago -->
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">Mercado Pago</h2>
+                            <span v-if="settings.mp_configured"
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-success">
+                                <CheckCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Configured') }}
+                            </span>
+                            <span v-else
+                                class="inline-flex items-center gap-1 text-xs font-semibold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">
+                                <XCircleIcon class="w-3.5 h-3.5" />
+                                {{ __('Not configured') }}
+                            </span>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <button type="button" @click="form.mp_enabled = !form.mp_enabled"
+                                :class="['relative w-10 h-5 rounded-full transition-colors duration-200', form.mp_enabled ? 'bg-rapanel-blue' : 'bg-rapanel-navy-100 dark:bg-white/20']">
+                                <span :class="['absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200', form.mp_enabled ? 'translate-x-5' : 'translate-x-0']" />
+                            </button>
+                            <span class="text-sm text-rapanel-text-light dark:text-white">{{ __('Enabled') }}</span>
+                        </label>
+                    </div>
+                    <div class="flex gap-2 p-3 rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                        <InformationCircleIcon class="w-4 h-4 flex-shrink-0 mt-0.5 text-rapanel-gold" />
+                        <span>{{ __('API keys must be set in .env:') }} <code class="font-mono text-rapanel-blue">DONATION_MP_ACCESS_TOKEN</code>, <code class="font-mono text-rapanel-blue">DONATION_MP_PUBLIC_KEY</code></span>
+                    </div>
+                    <div class="rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mb-1">{{ __('Webhook URL') }}</p>
+                        <code class="text-xs text-rapanel-blue break-all select-all">{{ settings.mp_webhook_url }}</code>
+                    </div>
+                </div>
+
+                <!-- Conversion Rate -->
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">{{ __('Donation Points Conversion Rate') }}</h2>
+                    <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('How many Donation Points are needed and how many Cash Points are awarded per conversion unit.') }}</p>
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Public Key') }}</label>
-                            <input v-model="form.stripe_public_key" type="text"
-                                :placeholder="settings.stripe_public_key ? settings.stripe_public_key : 'pk_live_...'"
-                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
-                            <p v-if="form.errors.stripe_public_key" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.stripe_public_key }}</p>
+                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Donation Points (cost)') }}</label>
+                            <input v-model.number="form.donation_cash_from" type="number" min="1"
+                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
+                            <p v-if="form.errors.donation_cash_from" class="text-rapanel-danger text-xs mt-1">{{ form.errors.donation_cash_from }}</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Secret Key') }}</label>
-                            <input v-model="form.stripe_secret_key" type="password"
-                                :placeholder="settings.stripe_secret_key ? '••••••••' : 'sk_live_...'"
-                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
-                            <p v-if="form.errors.stripe_secret_key" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.stripe_secret_key }}</p>
+                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Cash Points (reward)') }}</label>
+                            <input v-model.number="form.donation_cash_to" type="number" min="1"
+                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
+                            <p v-if="form.errors.donation_cash_to" class="text-rapanel-danger text-xs mt-1">{{ form.errors.donation_cash_to }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
+                        <span>{{ __('Exchange rate:') }}</span>
+                        <span class="font-semibold text-rapanel-gold">{{ form.donation_cash_from }} {{ __('Donation Points') }}</span>
+                        <span>→</span>
+                        <span class="font-semibold text-rapanel-success">{{ form.donation_cash_to }} {{ __('Cash Points') }}</span>
+                    </div>
+                </div>
+
+                <!-- Server Costs & Financial Goals -->
+                <div class="bg-white dark:bg-rapanel-surface rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-5 shadow-sm space-y-4">
+                    <div>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-rapanel-navy-700 dark:text-white">{{ __('Server Costs & Financial Goals') }}</h2>
+                        <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mt-1">{{ __('Leave at 0 to disable financial tracking') }}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Monthly Server Cost (USD)') }}</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-sm text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 select-none">$</span>
+                                <input v-model.number="form.monthly_cost" type="number" min="0" step="0.01"
+                                    class="w-full pl-6 pr-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
+                            </div>
+                            <p v-if="form.errors.monthly_cost" class="text-rapanel-danger text-xs mt-1">{{ form.errors.monthly_cost }}</p>
+                            <p class="text-xs text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mt-1">VPS, hosting, dominio, etc.</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Webhook Secret') }}</label>
-                            <input v-model="form.stripe_webhook_secret" type="password"
-                                :placeholder="settings.stripe_webhook_secret ? '••••••••' : 'whsec_...'"
-                                class="w-full px-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
-                            <p v-if="form.errors.stripe_webhook_secret" class="mt-1 text-xs text-rapanel-danger">{{ form.errors.stripe_webhook_secret }}</p>
+                            <label class="block text-xs font-semibold text-rapanel-text-light/70 dark:text-rapanel-text-dark mb-1.5">{{ __('Monthly Donation Goal (USD)') }}</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-sm text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 select-none">$</span>
+                                <input v-model.number="form.monthly_goal" type="number" min="0" step="0.01"
+                                    class="w-full pl-6 pr-3 py-2.5 rounded-lg bg-rapanel-navy-50 dark:bg-white/5 border border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rapanel-blue/50" />
+                            </div>
+                            <p v-if="form.errors.monthly_goal" class="text-rapanel-danger text-xs mt-1">{{ form.errors.monthly_goal }}</p>
+                            <p class="text-xs text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 mt-1">Puede ser igual o mayor al costo</p>
                         </div>
-                        <div class="rounded-lg bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-4 py-3">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-rapanel-text-light/60 dark:text-rapanel-text-dark/60 mb-1">{{ __('Webhook URL') }}</p>
-                            <code class="text-xs text-rapanel-blue break-all select-all">{{ $page.props.ziggy?.url ?? '' }}/donations/stripe/webhook</code>
-                        </div>
+                    </div>
+                    <div v-if="form.monthly_cost > 0"
+                        class="flex gap-2 p-3 rounded-lg bg-rapanel-blue/5 dark:bg-rapanel-blue/10 border border-rapanel-blue/20">
+                        <InformationCircleIcon class="w-4 h-4 flex-shrink-0 mt-0.5 text-rapanel-blue" />
+                        <span class="text-xs text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
+                            {{ __('Financial tracking will be enabled in the analytics dashboard.') }}
+                            Meta efectiva: <strong class="text-rapanel-blue">${{ (form.monthly_goal > 0 ? form.monthly_goal : form.monthly_cost).toFixed(2) }}/mes</strong>
+                        </span>
                     </div>
                 </div>
 

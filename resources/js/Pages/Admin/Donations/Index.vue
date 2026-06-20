@@ -118,7 +118,7 @@ function reject(id) {
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Package') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Platform') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Amount (USD)') }}</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">CP</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">DP</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Status') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Actions') }}</th>
                         </tr>
@@ -179,7 +179,7 @@ function reject(id) {
                     <div class="flex items-center gap-3 text-sm mb-3">
                         <span class="font-bold text-rapanel-gold">${{ d.amount_usd.toFixed(2) }}</span>
                         <span class="text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">·</span>
-                        <span class="text-rapanel-navy-700 dark:text-white font-semibold">{{ d.cashpoints_awarded.toLocaleString() }} CP</span>
+                        <span class="text-rapanel-navy-700 dark:text-white font-semibold">{{ d.cashpoints_awarded.toLocaleString() }} DP</span>
                         <span class="text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">·</span>
                         <span class="text-xs text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 capitalize">{{ d.platform }}</span>
                     </div>

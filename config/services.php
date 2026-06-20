@@ -86,6 +86,9 @@ return [
         'stripe_public_key'     => env('DONATION_STRIPE_PUBLIC_KEY'),
         'stripe_secret_key'     => env('DONATION_STRIPE_SECRET_KEY'),
         'stripe_webhook_secret' => env('DONATION_STRIPE_WEBHOOK_SECRET'),
+        'mp_enabled'            => env('DONATION_MP_ENABLED', false),
+        'mp_access_token'       => env('DONATION_MP_ACCESS_TOKEN'),
+        'mp_public_key'         => env('DONATION_MP_PUBLIC_KEY'),
     ],
 
 ];

@@ -43,9 +43,9 @@ function destroy(pkg) {
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Package') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Price') }}</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Base CP') }}</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Base DP') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Bonus') }}</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Total CP') }}</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Total DP') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Order') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Status') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-rapanel-navy-700 dark:text-rapanel-text-dark">{{ __('Actions') }}</th>
@@ -131,7 +131,7 @@ function destroy(pkg) {
                             <p class="font-bold text-rapanel-navy-900 dark:text-white truncate">{{ pkg.title }}</p>
                             <div class="flex flex-wrap gap-2 mt-1">
                                 <span class="text-xs font-bold text-rapanel-gold">${{ Number(pkg.price_usd).toFixed(2) }}</span>
-                                <span class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ pkg.total_cashpoints.toLocaleString() }} CP</span>
+                                <span class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ pkg.total_cashpoints.toLocaleString() }} DP</span>
                                 <span v-if="pkg.bonus_percent > 0" class="text-xs font-bold text-rapanel-success">+{{ pkg.bonus_percent }}%</span>
                             </div>
                         </div>
