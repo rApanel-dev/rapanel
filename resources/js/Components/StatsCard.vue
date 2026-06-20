@@ -1,9 +1,10 @@
 <script setup>
 defineProps({
-    label: String,
-    value: [String, Number],
-    muted: { type: Boolean, default: false },
-    accent: { type: String, default: 'blue' },
+    label:      String,
+    value:      [String, Number],
+    muted:      { type: Boolean, default: false },
+    accent:     { type: String,  default: 'blue' },
+    valueClass: { type: String,  default: '' },
 });
 
 const accentStrip = {
@@ -12,6 +13,14 @@ const accentStrip = {
     purple: 'from-rapanel-purple/70 via-rapanel-purple/30 to-transparent',
     green:  'from-rapanel-success/70 via-rapanel-success/30 to-transparent',
     red:    'from-rapanel-danger/70 via-rapanel-danger/30 to-transparent',
+};
+
+const accentValue = {
+    blue:   'text-rapanel-blue',
+    gold:   'text-rapanel-gold',
+    purple: 'text-rapanel-purple',
+    green:  'text-rapanel-success',
+    red:    'text-rapanel-danger',
 };
 </script>
 
@@ -32,7 +41,9 @@ const accentStrip = {
                     <slot name="icon" />
                 </div>
             </div>
-            <div class="text-3xl font-bold text-rapanel-text-light dark:text-white tabular-nums">{{ value }}</div>
+            <div :class="['text-3xl font-bold tabular-nums', valueClass || accentValue[accent] || 'text-rapanel-text-light dark:text-white']">
+                {{ value }}
+            </div>
             <div v-if="$slots.footer" class="mt-2.5">
                 <slot name="footer" />
             </div>

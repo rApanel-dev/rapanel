@@ -12,7 +12,6 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ClaimAccountModal from '@/Components/ClaimAccountModal.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import StatsCard from '@/Components/StatsCard.vue';
-import { ShieldExclamationIcon, ClockIcon } from '@heroicons/vue/24/outline';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import EmptyState from '@/Components/EmptyState.vue';
 import BgMain from '@/Components/BgMain.vue';
@@ -23,6 +22,7 @@ const props = defineProps({
     gameAccountsCount: { type: Number, default: 0 },
     gameAccounts:      { type: Array,  default: () => [] },
     maxAccounts:       Number,
+    donationPoints:    { type: Number, default: null },
     viewedUser:        { type: Object, default: null },
     votePoints:        { type: Number, default: 0 },
     cashPoints:        { type: Number, default: 0 },
@@ -171,10 +171,11 @@ const openClaimModal = () => {
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <StatsCard :label="__('Game Accounts')" :value="`${gameAccountsCount} / ${maxAccounts}`" muted />
-                    <StatsCard :label="__('Vote Points')" :value="votePoints" value-class="text-rapanel-gold" muted />
-                    <StatsCard :label="__('Cash Points')" :value="cashPoints" value-class="text-rapanel-success" muted />
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <StatsCard :label="__('Game Accounts')" :value="`${gameAccountsCount} / ${maxAccounts}`" accent="blue" muted />
+                    <StatsCard v-if="donationPoints !== null" :label="__('Donation Points')" :value="donationPoints" accent="gold" muted />
+                    <StatsCard :label="__('Vote Points')" :value="votePoints" accent="green" muted />
+                    <StatsCard :label="__('Total Cash Points')" :value="cashPoints" accent="purple" muted />
                 </div>
                 
             </div>
@@ -285,49 +286,6 @@ const openClaimModal = () => {
                                 {{ __('View') }}
                             </Link>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── WOE Widget ───────────────────────────────────────────────── -->
-            <div v-if="$page.props.woeStatus?.total > 0"
-                class="mt-6 bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-rapanel-navy-100 dark:border-white/10 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <ShieldExclamationIcon class="w-5 h-5 text-rapanel-text-light dark:text-rapanel-text-dark" />
-                        <h3 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">
-                            {{ __('War of Emperium') }}
-                        </h3>
-                        <span v-if="$page.props.woeStatus.active"
-                            class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rapanel-success/10 border border-rapanel-success/20 text-xs font-bold text-rapanel-success">
-                            <span class="w-1.5 h-1.5 rounded-full bg-rapanel-success animate-pulse" />
-                            {{ __('Active') }}
-                        </span>
-                    </div>
-                    <Link :href="route('info.woe')"
-                        class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue transition">
-                        {{ __('View schedule') }} →
-                    </Link>
-                </div>
-                <div class="px-6 py-4">
-                    <div v-if="$page.props.woeStatus.active" class="text-sm text-rapanel-navy-900 dark:text-white">
-                        {{ __('WOE is currently active!') }}
-                        <span v-if="$page.props.woeStatus.active_types?.length" class="text-rapanel-text-light dark:text-rapanel-text-dark ml-2">
-                            ({{ $page.props.woeStatus.active_types.map(t => ({ 1: 'WOE 1', 2: 'WOE 2', 3: 'WOE TE' })[t]).join(', ') }})
-                        </span>
-                    </div>
-                    <div v-else-if="$page.props.woeStatus.next" class="flex items-center gap-2 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                        <ClockIcon class="w-4 h-4 shrink-0" />
-                        {{ __('Next WOE') }}:
-                        <span class="font-semibold text-rapanel-navy-900 dark:text-white">
-                            {{ $page.props.woeStatus.next.label }}
-                        </span>
-                        <span class="text-xs">
-                            — {{ $page.props.woeStatus.next.day }} {{ $page.props.woeStatus.next.start_time }}
-                        </span>
-                    </div>
-                    <div v-else class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                        {{ __('No upcoming WOE sessions.') }}
                     </div>
                 </div>
             </div>
