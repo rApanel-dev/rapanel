@@ -16,8 +16,10 @@ return new class extends Migration
         Schema::create('action_logs', function (Blueprint $table) {
             $table->id();
 
-            // Relación con el usuario maestro del panel
+            // Relación con el usuario maestro del panel.
+            // nullable: un login fallido (login_failed) se registra sin usuario asociado.
             $table->foreignId('user_id')
+                  ->nullable()
                   ->constrained('users') // Referencia a la tabla 'users' (ra_users)
                   ->onDelete('cascade'); // Si se borra el usuario, se borran sus logs
 
