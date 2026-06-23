@@ -112,6 +112,70 @@ UPDATE ra_users SET role = 'admin' WHERE email = 'your@email.com';
 
 ---
 
+## SSL / HTTPS (recommended)
+
+The installer leaves the site on **HTTP (port 80)**. Serving rApanel over HTTPS is strongly recommended — and **required** for the admin **Live Console**, whose browser WebSocket must use `wss://` on HTTPS pages (mixed-content policy). Certificates are free via [Let's Encrypt](https://letsencrypt.org/) using Certbot.
+
+### Prerequisites
+- The domain's DNS **A record** points to this server's public IP (both `your_domain.com` and `www.your_domain.com`).
+- Ports **80** and **443** are open to the internet (Certbot validates over HTTP).
+- rApanel is already installed and reachable over HTTP.
+
+### 1. Install Certbot
+
+```bash
+# Nginx
+sudo apt install -y certbot python3-certbot-nginx
+
+# Apache2
+sudo apt install -y certbot python3-certbot-apache
+```
+
+### 2. Issue the certificate
+
+Use the same domain you set as `server_name` / `ServerName` during install:
+
+```bash
+# Nginx
+sudo certbot --nginx -d your_domain.com -d www.your_domain.com
+
+# Apache2
+sudo certbot --apache -d your_domain.com -d www.your_domain.com
+```
+
+When prompted to redirect HTTP to HTTPS, choose **Redirect** (option 2). Certbot edits your vhost automatically, adding the `443 ssl` block and the HTTP→HTTPS redirect.
+
+### 3. Point rApanel to HTTPS
+
+Edit the `.env` in your install directory (e.g. `/var/www/rapanel`):
+
+```env
+APP_URL=https://your_domain.com
+```
+
+If you use the admin **Live Console**, also switch the ws-server URL to `wss://` through the web-server proxy (browsers block `ws://` from HTTPS pages), and add the `/ws-proxy` WebSocket block to your vhost (see the ws-server `INSTALL.txt`):
+
+```env
+RA_WS_PUBLIC_URL=wss://your_domain.com/ws-proxy
+```
+
+Then clear the cached config:
+
+```bash
+php artisan config:clear && php artisan cache:clear
+```
+
+### 4. Verify auto-renewal
+
+Certbot installs a timer that renews certificates automatically (checks twice daily, renews within 30 days of expiry):
+
+```bash
+sudo systemctl status certbot.timer
+sudo certbot renew --dry-run
+```
+
+---
+
 ## Environment Configuration
 
 ### Panel database (required)
@@ -346,4 +410,4 @@ php artisan test                    # Run test suite
 
 ## License
 
-This project is open source, released under the [MIT License](LICENSE).
+Released under the **GNU AGPL v3.0 with the Commons Clause** — see [LICENSE](LICENSE). In short: you may use, self-host and modify rApanel freely, but **selling** it (or offering paid hosting/support whose value derives substantially from it) is **not** permitted.

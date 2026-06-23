@@ -112,6 +112,70 @@ UPDATE ra_users SET role = 'admin' WHERE email = 'seu@email.com';
 
 ---
 
+## SSL / HTTPS (recomendado)
+
+O instalador deixa o site em **HTTP (porta 80)**. Servir o rApanel por HTTPS é fortemente recomendado — e **obrigatório** para a **Consola ao Vivo** do admin, cujo WebSocket do navegador precisa usar `wss://` em páginas HTTPS (política de conteúdo misto). Os certificados são gratuitos via [Let's Encrypt](https://letsencrypt.org/) usando o Certbot.
+
+### Pré-requisitos
+- O registro **A** do DNS do seu domínio aponta para o IP público deste servidor (tanto `seu_dominio.com` quanto `www.seu_dominio.com`).
+- As portas **80** e **443** estão abertas para a internet (o Certbot valida via HTTP).
+- O rApanel já está instalado e acessível por HTTP.
+
+### 1. Instalar o Certbot
+
+```bash
+# Nginx
+sudo apt install -y certbot python3-certbot-nginx
+
+# Apache2
+sudo apt install -y certbot python3-certbot-apache
+```
+
+### 2. Emitir o certificado
+
+Use o mesmo domínio que você definiu como `server_name` / `ServerName` durante a instalação:
+
+```bash
+# Nginx
+sudo certbot --nginx -d seu_dominio.com -d www.seu_dominio.com
+
+# Apache2
+sudo certbot --apache -d seu_dominio.com -d www.seu_dominio.com
+```
+
+Quando perguntar se deseja redirecionar HTTP para HTTPS, escolha **Redirect** (opção 2). O Certbot edita seu vhost automaticamente, adicionando o bloco `443 ssl` e o redirect HTTP→HTTPS.
+
+### 3. Apontar o rApanel para HTTPS
+
+Edite o `.env` no seu diretório de instalação (ex. `/var/www/rapanel`):
+
+```env
+APP_URL=https://seu_dominio.com
+```
+
+Se você usa a **Consola ao Vivo** do admin, troque também a URL do ws-server para `wss://` através do proxy do servidor web (os navegadores bloqueiam `ws://` em páginas HTTPS), e adicione o bloco WebSocket `/ws-proxy` ao seu vhost (veja o `INSTALL.txt` do ws-server):
+
+```env
+RA_WS_PUBLIC_URL=wss://seu_dominio.com/ws-proxy
+```
+
+Depois limpe a config em cache:
+
+```bash
+php artisan config:clear && php artisan cache:clear
+```
+
+### 4. Verificar a renovação automática
+
+O Certbot instala um timer que renova os certificados automaticamente (verifica duas vezes ao dia, renova dentro de 30 dias antes do vencimento):
+
+```bash
+sudo systemctl status certbot.timer
+sudo certbot renew --dry-run
+```
+
+---
+
 ## Configuração do ambiente
 
 ### Banco de dados do painel (obrigatório)
@@ -346,4 +410,4 @@ php artisan test                    # Executar suite de testes
 
 ## Licença
 
-Este projeto é open source, publicado sob a [Licença MIT](LICENSE).
+Publicado sob a **GNU AGPL v3.0 com a Commons Clause** — veja [LICENSE](LICENSE). Em resumo: você pode usar, auto-hospedar e modificar o rApanel livremente, mas **vender** o software (ou oferecer hospedagem/suporte pago cujo valor derive substancialmente dele) **não** é permitido.
