@@ -74,9 +74,10 @@ const charPosClass = computed(() => ({
     center: 'bottom-0 left-1/2 -translate-x-1/2',
     right:  'bottom-0 right-0',
 }[st.value.home_char_position] || 'bottom-0 right-0'))
+// Tamaño relativo al viewport como el original (.ha-char-img = 72vh). "Grande" = original.
 const charSizeStyle = computed(() => {
     const s = st.value.home_char_size
-    return s ? { height: ({ sm: '200px', md: '300px', lg: '420px' })[s] ?? '' } : {}
+    return s ? { height: ({ sm: '46vh', md: '58vh', lg: '72vh' })[s] ?? '' } : {}
 })
 
 // ── Canvas starfield ─────────────────────────────────────────────────────────

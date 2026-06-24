@@ -63,7 +63,7 @@ const charForm = useForm({
     enabled:  props.character.enabled,
     mobile:   props.character.mobile,
     position: props.character.position || 'right',
-    size:     props.character.size || '',
+    size:     props.character.size || 'lg',
     frame1: null, frame2: null, frame3: null, frame4: null,
     remove_frame1: false, remove_frame2: false, remove_frame3: false, remove_frame4: false,
 });
