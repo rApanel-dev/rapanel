@@ -22,7 +22,7 @@ const props = defineProps({
     gameAccountsCount: { type: Number, default: 0 },
     gameAccounts:      { type: Array,  default: () => [] },
     maxAccounts:       Number,
-    donationPoints:    { type: Number, default: null },
+    donationPoints:    { type: Number, default: 0 },
     viewedUser:        { type: Object, default: null },
     votePoints:        { type: Number, default: 0 },
     cashPoints:        { type: Number, default: 0 },
@@ -173,7 +173,7 @@ const openClaimModal = () => {
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                     <StatsCard :label="__('Game Accounts')" :value="`${gameAccountsCount} / ${maxAccounts}`" accent="blue" muted />
-                    <StatsCard v-if="donationPoints !== null" :label="__('Donation Points')" :value="donationPoints" accent="gold" muted />
+                    <StatsCard :label="__('Donation Points')" :value="donationPoints" accent="gold" muted />
                     <StatsCard :label="__('Vote Points')" :value="votePoints" accent="green" muted />
                     <StatsCard :label="__('Total Cash Points')" :value="cashPoints" accent="purple" muted />
                 </div>

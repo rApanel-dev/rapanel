@@ -48,10 +48,6 @@ class DashboardController extends Controller
                 ->sum('value');
         }
 
-        $donationsEnabled = config('services.donations.paypal_enabled')
-            || config('services.donations.stripe_enabled')
-            || config('services.donations.mp_enabled');
-
         return Inertia::render('Dashboard', [
             'gameAccountsCount' => $gameAccounts->count(),
             'gameAccounts' => $gameAccounts,
@@ -63,7 +59,7 @@ class DashboardController extends Controller
             ],
             'votePoints'       => (int) $user->vote_points,
             'cashPoints'       => $cashPoints,
-            'donationPoints'   => $donationsEnabled ? (int) $user->donation_points : null,
+            'donationPoints'   => (int) $user->donation_points,
         ]);
     }
 
