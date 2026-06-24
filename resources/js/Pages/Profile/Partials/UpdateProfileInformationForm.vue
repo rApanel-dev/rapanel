@@ -21,10 +21,13 @@ const hasTwoFactor = computed(() => !!user?.two_factor_confirmed_at);
 
 // ── Formulario principal (nombre + birthdate) ──────────────────────────────
 const LANGUAGES = [
-    { code: 'es', label: 'Español',    flag: '🇪🇸' },
-    { code: 'en', label: 'English',    flag: '🇬🇧' },
-    { code: 'pt', label: 'Português',  flag: '🇧🇷' },
-    { code: 'fr', label: 'Français',   flag: '🇫🇷' },
+    { code: 'es',    label: 'Español',        flag: '🇪🇸' },
+    { code: 'en',    label: 'English',        flag: '🇬🇧' },
+    { code: 'pt',    label: 'Português',      flag: '🇵🇹' },
+    { code: 'pt-BR', label: 'Português (BR)', flag: '🇧🇷' },
+    { code: 'fr',    label: 'Français',       flag: '🇫🇷' },
+    { code: 'de',    label: 'Deutsch',        flag: '🇩🇪' },
+    { code: 'ru',    label: 'Русский',        flag: '🇷🇺' },
 ];
 
 const form = useForm({

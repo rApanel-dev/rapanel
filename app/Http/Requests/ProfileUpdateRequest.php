@@ -12,7 +12,7 @@ class ProfileUpdateRequest extends FormRequest
             'name'      => ['required', 'string', 'max:255'],
             'birthdate' => ['nullable', 'date', 'before:today'],
             'country'   => ['nullable', 'string', 'size:2'],
-            'locale'    => ['nullable', 'string', 'in:en,es,pt,fr'],
+            'locale'    => ['nullable', 'string', 'in:en,es,pt,pt-BR,fr,de,ru'],
         ];
     }
 }
