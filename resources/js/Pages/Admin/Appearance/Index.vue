@@ -7,7 +7,7 @@ import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
-import { Bars3BottomLeftIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
@@ -37,9 +37,8 @@ const form = useForm({
 // --- Tabs / secciones ---
 const tabs = [
     { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
+    { key: 'home',          label: 'Home',            icon: HomeIcon },
     { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
-    { key: 'background',    label: 'Background', icon: PhotoIcon },
-    { key: 'character',     label: 'Home character', icon: UserIcon },
 ];
 const activeTab = ref('header-footer');
 
@@ -225,8 +224,8 @@ const buttonFields = [
                 </div>
             </div>
 
-            <!-- ════════ FONDO DE PÁGINA + IMAGEN ════════ -->
-            <div v-show="activeTab === 'background'" class="space-y-6">
+            <!-- ════════ HOME (fondo + imagen + personaje) ════════ -->
+            <div v-show="activeTab === 'home'" class="space-y-6">
 
                 <!-- Color de fondo de página (claro/oscuro) -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
@@ -269,15 +268,17 @@ const buttonFields = [
                     </div>
                 </div>
             </div>
-            </div>
 
-            <!-- ════════ PERSONAJE DE LA HOME ════════ -->
-            <div v-show="activeTab === 'character'" class="space-y-6">
-                <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
-                    {{ __('Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.') }}
-                </p>
-
+                <!-- ── Personaje de la home ── -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-6">
+                    <div class="flex items-center gap-2">
+                        <UserIcon class="w-5 h-5 text-rapanel-purple" />
+                        <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Home character') }}</h2>
+                    </div>
+                    <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
+                        {{ __('Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.') }}
+                    </p>
+
                     <!-- Toggles -->
                     <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
                         <label class="flex items-center gap-2 cursor-pointer">
@@ -334,22 +335,21 @@ const buttonFields = [
                         </div>
                         <p class="mt-3 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">PNG (transparente) o WEBP · max 4MB</p>
                     </div>
+
+                    <div class="flex justify-end pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
+                        <PrimaryButton :class="{ 'opacity-50': charForm.processing }" :disabled="charForm.processing" @click="saveChar">{{ __('Save character') }}</PrimaryButton>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Barra de acciones: tema (colores) -->
-        <div v-if="activeTab !== 'character'" class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
+        <div class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>
             <ActionButton variant="navy" class="ml-auto" :disabled="!form.isDirty" @click="discard">{{ __('Discard') }}</ActionButton>
             <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">{{ __('Save') }}</PrimaryButton>
-        </div>
-
-        <!-- Barra de acciones: personaje -->
-        <div v-else class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
-            <PrimaryButton class="ml-auto" :class="{ 'opacity-50': charForm.processing }" :disabled="charForm.processing" @click="saveChar">{{ __('Save') }}</PrimaryButton>
         </div>
 
         <ConfirmModal

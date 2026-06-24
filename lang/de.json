@@ -1495,5 +1495,6 @@
     "Hover": "Hover",
     "Default": "Standard",
     "Character settings saved.": "Charakter gespeichert.",
-    "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Animierter Charakter im Home-Hero. Bilder 1-3 wechseln als Bewegung; Bild 4 erscheint beim Hover."
+    "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Animierter Charakter im Home-Hero. Bilder 1-3 wechseln als Bewegung; Bild 4 erscheint beim Hover.",
+    "Save character": "Charakter speichern"
 }

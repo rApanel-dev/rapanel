@@ -1496,5 +1496,6 @@
     "Hover": "Survol",
     "Default": "Défaut",
     "Character settings saved.": "Personnage enregistré.",
-    "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Personnage animé sur le hero de l'accueil. Les images 1-3 défilent comme un mouvement ; la 4 s'affiche au survol."
+    "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Personnage animé sur le hero de l'accueil. Les images 1-3 défilent comme un mouvement ; la 4 s'affiche au survol.",
+    "Save character": "Enregistrer le personnage"
 }
