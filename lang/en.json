@@ -1477,5 +1477,8 @@
     "Header & Footer": "Header & Footer",
     "Link color": "Link color",
     "Page content": "Page content",
-    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme."
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.",
+    "Background": "Background",
+    "Page background": "Page background",
+    "Shown where there is no background image. The home hero has its own video/image.": "Shown where there is no background image. The home hero has its own video/image."
 }

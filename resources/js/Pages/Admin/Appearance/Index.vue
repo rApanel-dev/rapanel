@@ -37,7 +37,7 @@ const form = useForm({
 const tabs = [
     { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
     { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
-    { key: 'background',    label: 'Background image', icon: PhotoIcon },
+    { key: 'background',    label: 'Background', icon: PhotoIcon },
 ];
 const activeTab = ref('header-footer');
 
@@ -147,7 +147,7 @@ const buttonFields = [
                             <span class="text-rapanel-header-text">{{ __('Profile') }}</span>
                         </div>
                     </div>
-                    <div class="bg-rapanel-navy-50 dark:bg-rapanel-base-dark px-5 py-10 text-center text-xs text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 uppercase tracking-widest">
+                    <div class="bg-rapanel-page px-5 py-10 text-center text-xs text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 uppercase tracking-widest">
                         {{ __('Page content') }}
                     </div>
                     <div class="bg-rapanel-footer px-5 py-3.5 flex items-center justify-between text-sm">
@@ -193,9 +193,33 @@ const buttonFields = [
                 </div>
             </div>
 
-            <!-- ════════ IMAGEN DE FONDO ════════ -->
-            <div v-show="activeTab === 'background'"
-                class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+            <!-- ════════ FONDO DE PÁGINA + IMAGEN ════════ -->
+            <div v-show="activeTab === 'background'" class="space-y-6">
+
+                <!-- Color de fondo de página (claro/oscuro) -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-5">
+                        {{ __('Page background') }}
+                    </h2>
+                    <div class="grid sm:grid-cols-2 gap-x-10 gap-y-5">
+                        <div v-for="mode in [{ key: 'light', label: 'Light theme' }, { key: 'dark', label: 'Dark theme' }]" :key="mode.key">
+                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __(mode.label) }}</p>
+                            <div class="flex items-center gap-3">
+                                <input type="color" v-model="form[mode.key].bg"
+                                    class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                                <input type="text" v-model="form[mode.key].bg" maxlength="7"
+                                    class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                                <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Background color') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">
+                        {{ __('Shown where there is no background image. The home hero has its own video/image.') }}
+                    </p>
+                </div>
+
+                <!-- Imagen de fondo -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
                 <div class="flex flex-col sm:flex-row gap-5 items-start">
                     <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
                         <img v-if="bgPreview" :src="bgPreview" alt="" class="w-full h-full object-cover" />
@@ -212,6 +236,7 @@ const buttonFields = [
                         <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">JPG, PNG, WEBP · max 10MB</p>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
 

@@ -1477,5 +1477,8 @@
     "Header & Footer": "Шапка и подвал",
     "Link color": "Цвет ссылок",
     "Page content": "Содержимое страницы",
-    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Применяется к публичным страницам и области авторизованного пользователя (не к админ-панели). Переключите светлый/тёмный режим, чтобы посмотреть другую тему."
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Применяется к публичным страницам и области авторизованного пользователя (не к админ-панели). Переключите светлый/тёмный режим, чтобы посмотреть другую тему.",
+    "Background": "Фон",
+    "Page background": "Фон страницы",
+    "Shown where there is no background image. The home hero has its own video/image.": "Отображается там, где нет фонового изображения. У главного баннера своя видео/картинка."
 }

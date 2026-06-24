@@ -29,7 +29,7 @@ const doLogout = () => { import('@inertiajs/vue3').then(({ router }) => router.p
 <template>
     <div :class="[
         'min-h-screen flex flex-col text-rapanel-text-light dark:text-rapanel-text-dark transition-colors duration-300',
-        showBg ? '' : 'bg-rapanel-navy-50 dark:bg-rapanel-navy-900',
+        showBg ? '' : 'bg-rapanel-page',
     ]">
         <BgMain v-if="showBg" />
 

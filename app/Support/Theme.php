@@ -71,7 +71,7 @@ class Theme
 
         return [
             // Globales claro
-            '--rapanel-navy-50-rgb'     => $t['light']['bg'],
+            '--rapanel-page-bg-rgb'     => $t['light']['bg'],   // fondo de página claro
             '--rapanel-text-light-rgb'  => $t['light']['text'],
             // Acentos de botones (compartidos claro/oscuro → solo en :root)
             '--rapanel-blue-rgb'        => $t['buttons']['blue'],
@@ -100,7 +100,7 @@ class Theme
 
         return [
             // Globales oscuro
-            '--rapanel-base-dark-rgb'   => $t['dark']['bg'],
+            '--rapanel-page-bg-rgb'     => $t['dark']['bg'],   // fondo de página oscuro
             '--rapanel-surface-rgb'     => $t['dark']['surface'],
             '--rapanel-text-dark-rgb'   => $t['dark']['text'],
             // Header / Footer — oscuro

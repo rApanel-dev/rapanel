@@ -15,7 +15,7 @@ const STYLE_ID = 'theme-preview';
 // :root (claro) — globales claro + acentos compartidos + header/footer claro
 function lightMap(t) {
     return {
-        '--rapanel-navy-50-rgb':     t.light.bg,
+        '--rapanel-page-bg-rgb':     t.light.bg,
         '--rapanel-text-light-rgb':  t.light.text,
         '--rapanel-blue-rgb':        t.buttons.blue,
         '--rapanel-gold-rgb':        t.buttons.gold,
@@ -35,7 +35,7 @@ function lightMap(t) {
 // :root.dark (oscuro) — globales oscuro + header/footer oscuro
 function darkMap(t) {
     return {
-        '--rapanel-base-dark-rgb':   t.dark.bg,
+        '--rapanel-page-bg-rgb':     t.dark.bg,
         '--rapanel-surface-rgb':     t.dark.surface,
         '--rapanel-text-dark-rgb':   t.dark.text,
         '--rapanel-header-bg-rgb':   t.header.dark.bg,

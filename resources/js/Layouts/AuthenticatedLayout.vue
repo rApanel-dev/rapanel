@@ -12,7 +12,7 @@ const showingNavigationDropdown = ref(false);
 
 <template>
     <div>
-        <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 transition-colors duration-300">
+        <div class="min-h-screen bg-rapanel-page transition-colors duration-300">
             <nav
                 class="border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-800"
             >

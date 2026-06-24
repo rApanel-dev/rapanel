@@ -1477,5 +1477,8 @@
     "Header & Footer": "Kopf- und Fußzeile",
     "Link color": "Linkfarbe",
     "Page content": "Seiteninhalt",
-    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Gilt für öffentliche Seiten und den Bereich des angemeldeten Benutzers (nicht für das Admin-Panel). Wechsle zwischen Hell-/Dunkelmodus, um das andere Design vorzuschauen."
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Gilt für öffentliche Seiten und den Bereich des angemeldeten Benutzers (nicht für das Admin-Panel). Wechsle zwischen Hell-/Dunkelmodus, um das andere Design vorzuschauen.",
+    "Background": "Hintergrund",
+    "Page background": "Seitenhintergrund",
+    "Shown where there is no background image. The home hero has its own video/image.": "Wird angezeigt, wo es kein Hintergrundbild gibt. Der Home-Hero hat sein eigenes Video/Bild."
 }

@@ -1477,5 +1477,8 @@
     "Header & Footer": "Cabeçalho e rodapé",
     "Link color": "Cor dos links",
     "Page content": "Conteúdo da página",
-    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Aplica-se às páginas públicas e à área do usuário conectado (não ao painel de administração). Alterne entre o modo claro/escuro para visualizar o outro tema."
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Aplica-se às páginas públicas e à área do usuário conectado (não ao painel de administração). Alterne entre o modo claro/escuro para visualizar o outro tema.",
+    "Background": "Fundo",
+    "Page background": "Fundo da página",
+    "Shown where there is no background image. The home hero has its own video/image.": "Exibido onde não há imagem de fundo. O hero da home tem seu próprio vídeo/imagem."
 }

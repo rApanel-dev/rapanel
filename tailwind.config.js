@@ -69,6 +69,7 @@ export default {
                 // Distintos por modo claro/oscuro vía :root{}/:root.dark{} inyectados
                 // (App\Support\Theme). Fallback = valor del modo CLARO (red de seguridad).
                 // Usados SOLO en Header.vue/Footer.vue (público + área usuario, NO admin).
+                'rapanel-page':        'rgb(var(--rapanel-page-bg-rgb,     248 250 252) / <alpha-value>)', // fondo de página (claro/oscuro)
                 'rapanel-header':      'rgb(var(--rapanel-header-bg-rgb,   255 255 255) / <alpha-value>)', // fondo header
                 'rapanel-header-text': 'rgb(var(--rapanel-header-text-rgb,  29  40  58) / <alpha-value>)', // texto header
                 'rapanel-header-link': 'rgb(var(--rapanel-header-link-rgb,  74 144 226) / <alpha-value>)', // enlaces header (hover/activo)

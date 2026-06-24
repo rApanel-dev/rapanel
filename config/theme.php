@@ -45,13 +45,13 @@ return [
 
         // Tema claro
         'light' => [
-            'bg'   => '#f8fafc', // rapanel-navy-50  (fondo página claro)
+            'bg'   => '#f8fafc', // fondo de página claro (→ rapanel-page)
             'text' => '#1d283a', // rapanel-text-light
         ],
 
         // Tema oscuro
         'dark' => [
-            'bg'      => '#080d14', // rapanel-base-dark (fondo página oscuro)
+            'bg'      => '#0f172a', // fondo de página oscuro (→ rapanel-page; navy-900 real)
             'surface' => '#0f1829', // rapanel-surface   (cards/paneles oscuro)
             'text'    => '#E2E8F0', // rapanel-text-dark
         ],
