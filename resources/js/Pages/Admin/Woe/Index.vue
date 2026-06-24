@@ -174,7 +174,7 @@ const displayImg = (s) => s.image_url || null;
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition',
                             previewActive
-                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
+                                ? 'bg-rapanel-gold/10 border-rapanel-gold/30 text-rapanel-gold hover:bg-rapanel-gold/20'
                                 : 'bg-white dark:bg-white/5 border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-navy-900 dark:hover:text-white'
                         ]">
                         <EyeSlashIcon v-if="previewActive" class="w-4 h-4" />

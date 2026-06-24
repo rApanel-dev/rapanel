@@ -125,9 +125,9 @@ const { openItemDb } = useItemDbModal();
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border"
                                                 :class="char.online > 0
                                                     ? 'bg-rapanel-success/10 text-rapanel-success border-rapanel-success/20'
-                                                    : 'bg-gray-400/10 text-gray-400 border-gray-400/20'"
+                                                    : 'bg-rapanel-text-light/10 text-rapanel-text-light/60 border-rapanel-text-light/20 dark:bg-rapanel-text-dark/10 dark:text-rapanel-text-dark/50 dark:border-rapanel-text-dark/20'"
                                             >
-                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="char.online > 0 ? 'bg-rapanel-success animate-pulse' : 'bg-gray-400'"></span>
+                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="char.online > 0 ? 'bg-rapanel-success animate-pulse' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'"></span>
                                                 {{ char.online > 0 ? __('Online') : __('Offline') }}
                                             </span>
                                         </div>
@@ -357,7 +357,7 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ m.base_level }}</td>
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ m.job_level }}</td>
                                                 <td class="px-3 py-2 text-center">
-                                                    <span :class="m.online > 0 ? 'text-rapanel-success' : 'text-gray-400'" class="font-bold text-[10px]">{{ m.online > 0 ? __('Online') : __('Offline') }}</span>
+                                                    <span :class="m.online > 0 ? 'text-rapanel-success' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'" class="font-bold text-[10px]">{{ m.online > 0 ? __('Online') : __('Offline') }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -365,7 +365,7 @@ const { openItemDb } = useItemDbModal();
                                     <!-- Cards: móvil -->
                                     <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="m in char.party_members" :key="m.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
-                                            <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <div class="relative shrink-0">
                                                 <img :src="`/data/icon_jobs/icon_jobs_${m.class}.png`" @error="onImgError" class="w-6 h-6 object-contain" />
                                                 <img v-if="m.name === char.party_leader_name" src="/data/icon_jobs/ico_partycrown.png" class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 object-contain" alt="Leader" />
@@ -412,7 +412,7 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ f.base_level }}</td>
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ f.job_level }}</td>
                                                 <td class="px-3 py-2 text-center">
-                                                    <span :class="f.online > 0 ? 'text-rapanel-success' : 'text-gray-400'" class="font-bold text-[10px]">{{ f.online > 0 ? __('Online') : __('Offline') }}</span>
+                                                    <span :class="f.online > 0 ? 'text-rapanel-success' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'" class="font-bold text-[10px]">{{ f.online > 0 ? __('Online') : __('Offline') }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -420,7 +420,7 @@ const { openItemDb } = useItemDbModal();
                                     <!-- Cards: móvil -->
                                     <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="f in char.friends" :key="f.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
-                                            <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <img :src="`/data/icon_jobs/icon_jobs_${f.class}.png`" @error="onImgError" class="w-6 h-6 object-contain shrink-0" />
                                             <div class="min-w-0 flex-1">
                                                 <p class="text-xs font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ f.name }}</p>
