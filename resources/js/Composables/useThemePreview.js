@@ -56,8 +56,21 @@ function body(map) {
     return out;
 }
 
+// Vars de estilo de la home (degradado hex + acento RGB). No varían por modo → :root.
+function homeBody(t) {
+    const h = t.home || {};
+    const g = h.title_gradient || {};
+    let out = '';
+    if (g.from) out += `--ha-grad-from:${g.from};`;
+    if (g.mid)  out += `--ha-grad-mid:${g.mid};`;
+    if (g.to)   out += `--ha-grad-to:${g.to};`;
+    const accent = hexToRgb(h.accent);
+    if (accent) out += `--ha-accent-rgb:${accent};`;
+    return out;
+}
+
 function buildCss(t) {
-    return `:root{${body(lightMap(t))}}:root.dark{${body(darkMap(t))}}`;
+    return `:root{${body(lightMap(t))}${homeBody(t)}}:root.dark{${body(darkMap(t))}}`;
 }
 
 function valid(t) {

@@ -12,7 +12,9 @@ import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPa
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
     defaults: { type: Object, default: () => ({}) },
-    bgImage:  { type: String, default: null },
+    bgImage:     { type: String, default: null },
+    infoBgImage: { type: String, default: null },
+    heroBgImage: { type: String, default: null },
     character:{ type: Object, default: () => ({ enabled: true, mobile: false, position: 'right', size: '', frames: [null, null, null, null] }) },
 });
 
@@ -30,8 +32,15 @@ const form = useForm({
     buttons:         { ...props.theme.buttons },
     light:           { ...props.theme.light },
     dark:            { ...props.theme.dark },
-    bg_image:        null,
-    remove_bg_image: false,
+    home:            {
+        title_gradient: { ...props.theme.home.title_gradient },
+        accent:         props.theme.home.accent,
+        palette:        [...props.theme.home.palette],
+    },
+    bg_image:             null,
+    remove_bg_image:      false,
+    info_bg_image:        null,
+    remove_info_bg_image: false,
 });
 
 // --- Tabs / secciones ---
@@ -51,6 +60,21 @@ const onBgImage = (e) => {
     form.remove_bg_image = false;
     bgPreview.value = URL.createObjectURL(file);
 };
+// --- Imagen de la sección Info de la home ---
+const infoPreview = ref(props.infoBgImage ? '/storage/' + props.infoBgImage : null);
+const onInfoImage = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    form.info_bg_image = file;
+    form.remove_info_bg_image = false;
+    infoPreview.value = URL.createObjectURL(file);
+};
+const clearInfoImage = () => {
+    form.info_bg_image = null;
+    form.remove_info_bg_image = true;
+    infoPreview.value = null;
+};
+
 const clearBgImage = () => {
     form.bg_image = null;
     form.remove_bg_image = true;
@@ -102,18 +126,19 @@ const themeFromForm = () => ({
     buttons: { ...form.buttons },
     light:   { ...form.light },
     dark:    { ...form.dark },
+    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, palette: [...form.home.palette] },
 });
 
 onMounted(() => applyThemePreview(themeFromForm()));
 watch(
-    () => [form.header, form.footer, form.buttons, form.light, form.dark],
+    () => [form.header, form.footer, form.buttons, form.light, form.dark, form.home],
     () => applyThemePreview(themeFromForm()),
     { deep: true },
 );
 onBeforeUnmount(() => clearThemePreview());
 
 const discard = () => {
-    form.reset('header', 'footer', 'buttons', 'light', 'dark');
+    form.reset('header', 'footer', 'buttons', 'light', 'dark', 'home');
     applyThemePreview(themeFromForm());
 };
 
@@ -265,8 +290,67 @@ const buttonFields = [
                     </p>
                 </div>
 
-                <!-- Imagen de fondo -->
+                <!-- Estilo de la home: degradado de títulos + acento + paleta -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-6">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Home style') }}</h2>
+
+                    <!-- Degradado de títulos -->
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __('Title gradient') }}</p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <input v-for="k in ['from', 'mid', 'to']" :key="k" type="color" v-model="form.home.title_gradient[k]"
+                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                            <span class="ml-2 text-3xl font-display font-black"
+                                  :style="{ background: `linear-gradient(120deg, ${form.home.title_gradient.from} 0%, ${form.home.title_gradient.mid} 45%, ${form.home.title_gradient.to} 100%)`, '-webkit-background-clip': 'text', 'background-clip': 'text', '-webkit-text-fill-color': 'transparent' }">
+                                {{ $page.props.serverName }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Acento decorativo -->
+                    <div class="flex items-center gap-3">
+                        <input type="color" v-model="form.home.accent"
+                            class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                        <input type="text" v-model="form.home.accent" maxlength="7"
+                            class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                        <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Accent color') }}</span>
+                    </div>
+
+                    <!-- Paleta de tarjetas -->
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __('Card palette') }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            <input v-for="(c, i) in form.home.palette" :key="i" type="color" v-model="form.home.palette[i]"
+                                class="h-9 w-9 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                        </div>
+                        <p class="mt-2 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">{{ __('Applied after saving.') }}</p>
+                    </div>
+                </div>
+
+                <!-- Imagen de la sección "Server Info" -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-4">{{ __('Info section image') }}</h2>
+                    <div class="flex flex-col sm:flex-row gap-5 items-start">
+                        <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
+                            <img v-if="infoPreview" :src="infoPreview" alt="" class="w-full h-full object-cover" />
+                            <span v-else class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 px-3 text-center">{{ __('Use default background') }}</span>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <label class="inline-flex">
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" class="hidden" @change="onInfoImage" />
+                                <span class="cursor-pointer inline-flex items-center gap-1.5 font-display font-bold text-xs px-3 py-1.5 rounded-lg border bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all">
+                                    <PhotoIcon class="w-4 h-4" /> {{ __('Change') }}
+                                </span>
+                            </label>
+                            <ActionButton v-if="infoPreview" variant="danger" size="sm" @click="clearInfoImage">{{ __('Remove image') }}</ActionButton>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagen de fondo (otras páginas) -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-1">{{ __('Background image') }}</h2>
+                <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 mb-4">{{ __('Used on inner pages. The home page background (hero) is set in Settings → Home.') }}</p>
                 <div class="flex flex-col sm:flex-row gap-5 items-start">
                     <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
                         <img v-if="bgPreview" :src="bgPreview" alt="" class="w-full h-full object-cover" />

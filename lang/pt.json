@@ -1496,5 +1496,12 @@
     "Default": "Padrão",
     "Character settings saved.": "Personagem salvo.",
     "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Personagem animado no hero da home. Os quadros 1-3 alternam como movimento; o 4 aparece ao passar o mouse.",
-    "Save character": "Salvar personagem"
+    "Save character": "Salvar personagem",
+    "Home style": "Estilo da home",
+    "Title gradient": "Gradiente dos títulos",
+    "Accent color": "Cor de destaque",
+    "Card palette": "Paleta de cartões",
+    "Applied after saving.": "Aplicado ao salvar.",
+    "Info section image": "Imagem da seção Info",
+    "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Usado nas páginas internas. O fundo da página inicial (hero) é configurado em Settings → Home."
 }

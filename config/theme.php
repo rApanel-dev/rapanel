@@ -33,6 +33,14 @@ return [
             'dark'  => ['bg' => '#0f172a', 'text' => '#E2E8F0', 'link' => '#E2E8F0'],
         ],
 
+        // Estilo de la home pública (HomeAlt): degradado de los títulos, color de
+        // acento decorativo (rejillas/glows) y paleta de tarjetas. No varía por modo.
+        'home' => [
+            'title_gradient' => ['from' => '#4A90E2', 'mid' => '#F1C40F', 'to' => '#a855f7'],
+            'accent'  => '#4A90E2',
+            'palette' => ['#4A90E2', '#F1C40F', '#2ECC71', '#a855f7', '#E74C3C', '#e2e8f0'],
+        ],
+
         // Colores de botones (ActionButton: blue/gold/purple/navy/success/danger)
         'buttons' => [
             'blue'    => '#4A90E2', // rapanel-blue

@@ -58,7 +58,26 @@ class Theme
             'buttons' => array_merge($d['buttons'], $theme['buttons'] ?? []),
             'light'   => array_merge($d['light'],   $theme['light']   ?? []),
             'dark'    => array_merge($d['dark'],    $theme['dark']    ?? []),
+            'home'    => [
+                'title_gradient' => array_merge($d['home']['title_gradient'], $theme['home']['title_gradient'] ?? []),
+                'accent'  => $theme['home']['accent']  ?? $d['home']['accent'],
+                'palette' => $theme['home']['palette'] ?? $d['home']['palette'],
+            ],
         ];
+    }
+
+    /**
+     * Vars de estilo de la home (no varían por modo → van en :root). El degradado
+     * se emite como hex (se usa en gradients, sin alpha de Tailwind); el acento
+     * como tripleta RGB para poder usar rgb(var() / alpha) en rejillas/glows.
+     */
+    public static function homeVarsBody(?array $theme): string
+    {
+        $t = self::merged($theme)['home'];
+        $g = $t['title_gradient'];
+
+        return "--ha-grad-from:{$g['from']};--ha-grad-mid:{$g['mid']};--ha-grad-to:{$g['to']};"
+             . '--ha-accent-rgb:'.self::rgb($t['accent']).';';
     }
 
     /**
@@ -130,7 +149,7 @@ class Theme
      */
     public static function cssVars(?array $theme): string
     {
-        return ':root{'.self::body(self::lightVarMap($theme)).'}'
+        return ':root{'.self::body(self::lightVarMap($theme)).self::homeVarsBody($theme).'}'
              . ':root.dark{'.self::body(self::darkVarMap($theme)).'}';
     }
 }

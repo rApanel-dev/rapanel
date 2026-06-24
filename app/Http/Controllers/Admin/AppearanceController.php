@@ -31,6 +31,8 @@ class AppearanceController extends Controller
             'theme'    => Theme::merged(json_decode(SiteSetting::getValue('theme') ?? 'null', true)),
             'defaults' => Theme::defaults(),
             'bgImage'  => SiteSetting::getValue('theme_bg_image'),
+            'infoBgImage' => SiteSetting::getValue('home_info_bg_image'),
+            'heroBgImage' => SiteSetting::getValue('home_hero_bg_image'),
             'character' => [
                 'enabled'  => SiteSetting::getValue('home_char_enabled', '1') !== '0',
                 'mobile'   => SiteSetting::getValue('home_char_mobile', '0') === '1',
@@ -121,8 +123,17 @@ class AppearanceController extends Controller
             'dark.bg'         => $hex,
             'dark.surface'    => $hex,
             'dark.text'       => $hex,
+            // Estilo de la home: degradado de títulos, acento decorativo, paleta de tarjetas
+            'home.title_gradient.from' => $hex,
+            'home.title_gradient.mid'  => $hex,
+            'home.title_gradient.to'   => $hex,
+            'home.accent'     => $hex,
+            'home.palette'    => 'array|size:6',
+            'home.palette.*'  => $hex,
             'bg_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
             'remove_bg_image' => 'nullable|boolean',
+            'info_bg_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:10240',
+            'remove_info_bg_image' => 'nullable|boolean',
         ]);
 
         // Normaliza sobre defaults para garantizar un tema completo y válido.
@@ -132,6 +143,7 @@ class AppearanceController extends Controller
             'buttons' => $request->input('buttons'),
             'light'   => $request->input('light'),
             'dark'    => $request->input('dark'),
+            'home'    => $request->input('home'),
         ]);
 
         // Guardar dentro de ra_site_settings → setValue ya invalida su cache.
@@ -146,6 +158,18 @@ class AppearanceController extends Controller
             SiteSetting::setValue(
                 'theme_bg_image',
                 $request->file('bg_image')->store('settings/theme', 'public')
+            );
+        }
+
+        // Imagen de fondo de la sección "Server Info" de la home
+        if ($request->boolean('remove_info_bg_image')) {
+            $this->deleteSetting('home_info_bg_image');
+            SiteSetting::setValue('home_info_bg_image', null);
+        } elseif ($request->hasFile('info_bg_image')) {
+            $this->deleteSetting('home_info_bg_image');
+            SiteSetting::setValue(
+                'home_info_bg_image',
+                $request->file('info_bg_image')->store('settings/home', 'public')
             );
         }
 

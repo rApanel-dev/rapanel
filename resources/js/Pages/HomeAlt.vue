@@ -27,15 +27,15 @@ const charOpacity    = ref(1)
 let rafId     = null
 let charTimer = null
 
-// Paleta de colores para tarjetas (feat + info) — 6 colores en orden fijo
-const cardPalette = [
-    '#4A90E2', // rapanel-blue
-    '#F1C40F', // rapanel-gold
-    '#2ECC71', // rapanel-success
-    '#a855f7', // rapanel-purple
-    '#E74C3C', // rapanel-danger
-    '#e2e8f0', // rapanel-navy-100
-]
+// Paleta de tarjetas (feat + info) — configurable en Admin → Appearance → Home.
+// Lee del tema guardado (siteSettings.theme.home.palette); fallback = colores actuales.
+const DEFAULT_PALETTE = ['#4A90E2', '#F1C40F', '#2ECC71', '#a855f7', '#E74C3C', '#e2e8f0']
+const cardPalette = computed(() => {
+    try {
+        const p = JSON.parse(st.value.theme || 'null')?.home?.palette
+        return Array.isArray(p) && p.length === 6 ? p : DEFAULT_PALETTE
+    } catch { return DEFAULT_PALETTE }
+})
 
 const handleScroll = () => {
     charOpacity.value = Math.max(0, 1 - window.scrollY / 280)
@@ -106,12 +106,12 @@ const initCanvas = () => {
     }))
 
     const nebulasDark = [
-        { x: 0.15, y: 0.3,  r: 180, c: 'rgba(74,144,226,0.06)' },
+        { x: 0.15, y: 0.3,  r: 180, c: 'rgb(var(--ha-accent-rgb,74 144 226) / 0.06)' },
         { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.05)' },
         { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.04)'  },
     ]
     const nebulasLight = [
-        { x: 0.15, y: 0.3,  r: 180, c: 'rgba(74,144,226,0.18)' },
+        { x: 0.15, y: 0.3,  r: 180, c: 'rgb(var(--ha-accent-rgb,74 144 226) / 0.18)' },
         { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.14)' },
         { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.12)'  },
     ]
@@ -292,7 +292,7 @@ const infoBlocks = computed(() => {
 
 // Color por bloque: usa el guardado en BD o el color de la paleta por índice
 const infoColors = computed(() =>
-    infoBlocks.value.map((b, i) => b.color || cardPalette[i])
+    infoBlocks.value.map((b, i) => b.color || cardPalette.value[i])
 )
 
 const highlightCards = computed(() => {
@@ -507,7 +507,7 @@ onUnmounted(() => {
 
             <!-- ══════════ SERVER INFO ══════════ -->
             <section v-if="st.home_show_info !== '0'" ref="infoRef" class="py-24 px-6 ha-info-section relative overflow-hidden">
-                <img src="/images/bg-main-rapanel.svg"
+                <img :src="st.home_info_bg_image ? '/storage/' + st.home_info_bg_image : '/images/bg-main-rapanel.svg'"
                      aria-hidden="true"
                      class="absolute inset-0 w-full h-full object-cover scale-105 blur-md pointer-events-none select-none" />
                 <div class="absolute inset-0 ha-hero-overlay pointer-events-none" />
@@ -744,10 +744,10 @@ onUnmounted(() => {
 
 /* ── Central glow ───────────────────────────────────────────── */
 .ha-central-glow {
-    background: radial-gradient(circle, rgba(74,144,226,0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(var(--ha-accent-rgb,74 144 226) / 0.18) 0%, transparent 70%);
 }
 .dark .ha-central-glow {
-    background: radial-gradient(circle, rgba(74,144,226,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(var(--ha-accent-rgb,74 144 226) / 0.12) 0%, transparent 70%);
 }
 
 /* ── Info section ───────────────────────────────────────────── */
@@ -760,7 +760,7 @@ onUnmounted(() => {
 
 /* ── Gradient text ──────────────────────────────────────────── */
 .ha-gradient-text {
-    background: linear-gradient(120deg, #4A90E2 0%, #F1C40F 45%, #a855f7 100%);
+    background: linear-gradient(120deg, var(--ha-grad-from,#4A90E2) 0%, var(--ha-grad-mid,#F1C40F) 45%, var(--ha-grad-to,#a855f7) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -769,8 +769,8 @@ onUnmounted(() => {
 /* ── Grid glow ──────────────────────────────────────────────── */
 .ha-grid-glow {
     background-image:
-        linear-gradient(rgba(74,144,226,0.6) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,144,226,0.6) 1px, transparent 1px);
+        linear-gradient(rgb(var(--ha-accent-rgb,74 144 226) / 0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--ha-accent-rgb,74 144 226) / 0.6) 1px, transparent 1px);
     background-size: 64px 64px;
     -webkit-mask-image: radial-gradient(circle 96px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 100%);
     mask-image: radial-gradient(circle 96px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 100%);
@@ -788,14 +788,14 @@ onUnmounted(() => {
 }
 .ha-grid {
     background-image:
-        linear-gradient(rgba(74,144,226,0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,144,226,0.07) 1px, transparent 1px);
+        linear-gradient(rgb(var(--ha-accent-rgb,74 144 226) / 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--ha-accent-rgb,74 144 226) / 0.07) 1px, transparent 1px);
     background-size: 64px 64px;
 }
 .dark .ha-grid {
     background-image:
-        linear-gradient(rgba(74,144,226,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,144,226,0.04) 1px, transparent 1px);
+        linear-gradient(rgb(var(--ha-accent-rgb,74 144 226) / 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--ha-accent-rgb,74 144 226) / 0.04) 1px, transparent 1px);
 }
 
 /* ── Float ──────────────────────────────────────────────────── */
@@ -824,11 +824,11 @@ onUnmounted(() => {
     border-color: rgba(255,255,255,0.07);
 }
 .ha-glass:hover {
-    border-color: rgba(74,144,226,0.3);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 40px rgba(74,144,226,0.08);
+    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 40px rgb(var(--ha-accent-rgb,74 144 226) / 0.08);
 }
 .dark .ha-glass:hover {
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(74,144,226,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgb(var(--ha-accent-rgb,74 144 226) / 0.08);
 }
 
 /* ── Feature card ───────────────────────────────────────────── */
@@ -847,13 +847,13 @@ onUnmounted(() => {
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .ha-btn-primary {
-    background: linear-gradient(135deg, #4A90E2 0%, #2563eb 100%);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, #2563eb 100%);
     color: #fff;
-    box-shadow: 0 0 32px rgba(74,144,226,0.45);
+    box-shadow: 0 0 32px rgb(var(--ha-accent-rgb,74 144 226) / 0.45);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 .ha-btn-primary:hover {
-    box-shadow: 0 0 60px rgba(74,144,226,0.7);
+    box-shadow: 0 0 60px rgb(var(--ha-accent-rgb,74 144 226) / 0.7);
     transform: translateY(-3px);
 }
 .ha-btn-ghost {
@@ -895,7 +895,7 @@ onUnmounted(() => {
 /* ── Mesh CTA bg ────────────────────────────────────────────── */
 .ha-mesh-bg {
     background:
-        radial-gradient(ellipse 70% 70% at 20% 60%, rgba(74,144,226,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse 70% 70% at 20% 60%, rgb(var(--ha-accent-rgb,74 144 226) / 0.18) 0%, transparent 65%),
         radial-gradient(ellipse 55% 55% at 80% 40%, rgba(168,85,247,0.14) 0%, transparent 65%),
         radial-gradient(ellipse 40% 40% at 50% 90%, rgba(241,196,15,0.08) 0%, transparent 55%);
     animation: ha-mesh-shift 12s ease-in-out infinite alternate;
@@ -932,11 +932,11 @@ onUnmounted(() => {
 }
 .ha-hcard:hover {
     transform: translateY(-5px);
-    border-color: rgba(74,144,226,0.3);
-    box-shadow: 0 20px 30px rgba(0,0,0,0.12), 0 0 30px rgba(74,144,226,0.08);
+    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.3);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.12), 0 0 30px rgb(var(--ha-accent-rgb,74 144 226) / 0.08);
 }
 .dark .ha-hcard:hover {
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(74,144,226,0.08);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgb(var(--ha-accent-rgb,74 144 226) / 0.08);
 }
 
 /* Imagen */
@@ -953,7 +953,7 @@ onUnmounted(() => {
 .ha-hcard-placeholder {
     background:
         radial-gradient(ellipse at 30% 40%,
-            rgba(74,144,226,calc(0.15 - var(--ci) * 0.02)) 0%,
+            rgb(var(--ha-accent-rgb,74 144 226) / calc(0.15 - var(--ci) * 0.02)) 0%,
             transparent 65%),
         radial-gradient(ellipse at 70% 60%,
             rgba(168,85,247,calc(0.1 - var(--ci) * 0.01)) 0%,
@@ -963,7 +963,7 @@ onUnmounted(() => {
 .dark .ha-hcard-placeholder {
     background:
         radial-gradient(ellipse at 30% 40%,
-            rgba(74,144,226,calc(0.25 - var(--ci) * 0.03)) 0%,
+            rgb(var(--ha-accent-rgb,74 144 226) / calc(0.25 - var(--ci) * 0.03)) 0%,
             transparent 65%),
         radial-gradient(ellipse at 70% 60%,
             rgba(168,85,247,calc(0.2 - var(--ci) * 0.02)) 0%,
@@ -1006,26 +1006,26 @@ onUnmounted(() => {
     font-size: 0.9rem;
     letter-spacing: 0.05em;
     color: #fff;
-    background: linear-gradient(135deg, #4A90E2 0%, #2563eb 100%);
-    box-shadow: 0 0 18px rgba(74,144,226,0.35);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, #2563eb 100%);
+    box-shadow: 0 0 18px rgb(var(--ha-accent-rgb,74 144 226) / 0.35);
     transition: box-shadow 0.25s ease, transform 0.2s ease;
     text-decoration: none;
 }
 .ha-hcard-btn:hover {
-    box-shadow: 0 0 32px rgba(74,144,226,0.6);
+    box-shadow: 0 0 32px rgb(var(--ha-accent-rgb,74 144 226) / 0.6);
     transform: translateY(-2px);
 }
 
 /* ── Char shadow (light mode: sin sombra negra tan dura) ────── */
 .ha-char-img {
-    filter: drop-shadow(-6px 0 30px rgba(74,144,226,0.35))
-            drop-shadow(0 0 50px rgba(74,144,226,0.18))
+    filter: drop-shadow(-6px 0 30px rgb(var(--ha-accent-rgb,74 144 226) / 0.35))
+            drop-shadow(0 0 50px rgb(var(--ha-accent-rgb,74 144 226) / 0.18))
             drop-shadow(0 20px 25px rgba(0,0,0,0.18));
     transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
 }
 .dark .ha-char-img {
     filter: drop-shadow(-6px 0 30px rgba(241,196,15,0.45))
-            drop-shadow(0 0 50px rgba(74,144,226,0.25))
+            drop-shadow(0 0 50px rgb(var(--ha-accent-rgb,74 144 226) / 0.25))
             drop-shadow(0 24px 30px rgba(0,0,0,0.55));
 }
 
@@ -1040,7 +1040,7 @@ onUnmounted(() => {
     bottom: 0;
     left: 0; right: 0;
     height: 48px;
-    background: radial-gradient(ellipse 55% 100% at 50% 100%, rgba(74,144,226,0.55) 0%, transparent 100%);
+    background: radial-gradient(ellipse 55% 100% at 50% 100%, rgb(var(--ha-accent-rgb,74 144 226) / 0.55) 0%, transparent 100%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -1054,12 +1054,12 @@ onUnmounted(() => {
 .ha-char-wrap:hover .ha-char-img {
     transform: scale(1.05) translateY(-10px);
     filter: drop-shadow(-6px 0 55px rgba(241,196,15,0.75))
-            drop-shadow(0 0 90px rgba(74,144,226,0.55))
+            drop-shadow(0 0 90px rgb(var(--ha-accent-rgb,74 144 226) / 0.55))
             drop-shadow(0 30px 40px rgba(0,0,0,0.6));
 }
 .dark .ha-char-wrap:hover .ha-char-img {
     filter: drop-shadow(-6px 0 55px rgba(241,196,15,0.75))
-            drop-shadow(0 0 90px rgba(74,144,226,0.55))
+            drop-shadow(0 0 90px rgb(var(--ha-accent-rgb,74 144 226) / 0.55))
             drop-shadow(0 30px 40px rgba(0,0,0,0.6));
 }
 @keyframes ha-char-enter {
