@@ -19,31 +19,51 @@ export default {
                 display: ['Rajdhani',  ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                // Identidad Visual rApanel
+                // Identidad Visual rApanel — tokens como CSS custom properties (theming en runtime).
+                // Formato: rgb(var(--token-rgb, <fallback R G B>) / <alpha-value>).
+                //   · El fallback = valor hex original (en tripleta RGB) → si no hay variable
+                //     inyectada (app.blade.php / runtime), se ve idéntico a antes (cero regresión, cero FOUC).
+                //   · La tripleta `R G B` + `/ <alpha-value>` preserva la opacidad de Tailwind
+                //     (ej. bg-rapanel-blue/30, dark:bg-rapanel-blue/10) — ver Fase 1 del plan.
                 'rapanel-navy': {
-                    50:  '#f8fafc',  // Background Claro
-                    100: '#e2e8f0',  // Bordes Claros
-                    600: '#475569',  // Borde Dark (hover)
-                    700: '#334155',  // Superficie Dark Media (botones)
-                    800: '#1e293b',  // Superficie Dark (Cards)
-                    900: '#0f172a',  // Background Dark
+                    50:  'rgb(var(--rapanel-navy-50-rgb,  248 250 252) / <alpha-value>)', // Background Claro
+                    100: 'rgb(var(--rapanel-navy-100-rgb, 226 232 240) / <alpha-value>)', // Bordes Claros
+                    600: 'rgb(var(--rapanel-navy-600-rgb,  71  85 105) / <alpha-value>)', // Borde Dark (hover)
+                    700: 'rgb(var(--rapanel-navy-700-rgb,  51  65  85) / <alpha-value>)', // Superficie Dark Media (botones)
+                    800: 'rgb(var(--rapanel-navy-800-rgb,  30  41  59) / <alpha-value>)', // Superficie Dark (Cards)
+                    900: 'rgb(var(--rapanel-navy-900-rgb,  15  23  42) / <alpha-value>)', // Background Dark
                 },
                 'rapanel-text': {
-                    light: '#1d283a', // Tema Claro
-                    dark: '#E2E8F0',  // Tema Oscuro
+                    light: 'rgb(var(--rapanel-text-light-rgb, 29 40 58)  / <alpha-value>)', // Tema Claro
+                    dark:  'rgb(var(--rapanel-text-dark-rgb, 226 232 240) / <alpha-value>)', // Tema Oscuro
                 },
-                'rapanel-blue':   { DEFAULT: '#4A90E2', dark: '#1e3a5f' }, // Kafra Blue (Primario)
+                'rapanel-blue': {
+                    DEFAULT: 'rgb(var(--rapanel-blue-rgb,      74 144 226) / <alpha-value>)', // Kafra Blue (Primario)
+                    dark:    'rgb(var(--rapanel-blue-dark-rgb, 30  58  95) / <alpha-value>)',
+                },
 
                 // ESTADOS Y ALERTAS
-                'rapanel-success': { DEFAULT: '#2ECC71', dark: '#14532d' }, // Heal Green
-                'rapanel-danger':  { DEFAULT: '#E74C3C', dark: '#7f1d1d' }, // MVP Red
-                'rapanel-gold':    { DEFAULT: '#F1C40F', dark: '#78350f' }, // Emperium Gold
-                'rapanel-purple':  { DEFAULT: '#a855f7', dark: '#581c87' }, // Mystic Purple (VIP / Gender)
+                'rapanel-success': {
+                    DEFAULT: 'rgb(var(--rapanel-success-rgb,      46 204 113) / <alpha-value>)', // Heal Green
+                    dark:    'rgb(var(--rapanel-success-dark-rgb, 20  83  45) / <alpha-value>)',
+                },
+                'rapanel-danger': {
+                    DEFAULT: 'rgb(var(--rapanel-danger-rgb,      231 76 60) / <alpha-value>)', // MVP Red
+                    dark:    'rgb(var(--rapanel-danger-dark-rgb, 127 29 29) / <alpha-value>)',
+                },
+                'rapanel-gold': {
+                    DEFAULT: 'rgb(var(--rapanel-gold-rgb,      241 196 15) / <alpha-value>)', // Emperium Gold
+                    dark:    'rgb(var(--rapanel-gold-dark-rgb, 120  53 15) / <alpha-value>)',
+                },
+                'rapanel-purple': {
+                    DEFAULT: 'rgb(var(--rapanel-purple-rgb,      168 85 247) / <alpha-value>)', // Mystic Purple (VIP / Gender)
+                    dark:    'rgb(var(--rapanel-purple-dark-rgb,  88 28 135) / <alpha-value>)',
+                },
 
-                // Dark mode surface tokens (replaces hardcoded hex values)
-                'rapanel-surface':      '#0f1829', // dark card/panel background
-                'rapanel-surface-deep': '#0b1120', // dark sidebar/topbar background
-                'rapanel-base-dark':    '#080d14', // dark page base background
+                // Dark mode surface tokens
+                'rapanel-surface':      'rgb(var(--rapanel-surface-rgb,      15 24 41) / <alpha-value>)', // dark card/panel background
+                'rapanel-surface-deep': 'rgb(var(--rapanel-surface-deep-rgb, 11 17 32) / <alpha-value>)', // dark sidebar/topbar background
+                'rapanel-base-dark':    'rgb(var(--rapanel-base-dark-rgb,      8 13 20) / <alpha-value>)', // dark page base background
             },
         },
     },

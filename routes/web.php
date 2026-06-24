@@ -37,6 +37,7 @@ use App\Http\Controllers\MapDbController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AdminTwoFactorVerifyController;
 use App\Http\Controllers\Admin\SiteSettingsController;
+use App\Http\Controllers\Admin\AppearanceController;
 use App\Http\Controllers\Admin\DropRatesController;
 use App\Http\Controllers\WikiController;
 use App\Http\Controllers\Admin\WikiSectionController;
@@ -311,6 +312,14 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::post('/danger/clear-logs',     [SiteSettingsController::class, 'dangerClearLogs'])->name('danger.logs');
         Route::post('/danger/clear-cache',    [SiteSettingsController::class, 'dangerClearCache'])->name('danger.cache');
         Route::post('/danger/clear-sessions', [SiteSettingsController::class, 'dangerClearSessions'])->name('danger.sessions');
+    });
+
+    // Personalización / Appearance (theming en runtime)
+    Route::prefix('appearance')->name('appearance.')->group(function () {
+        Route::get('/',         [AppearanceController::class, 'index'])->name('index');
+        Route::post('/',        [AppearanceController::class, 'update'])->name('update');
+        Route::post('/reset',   [AppearanceController::class, 'reset'])->name('reset');
+        Route::delete('/image', [AppearanceController::class, 'removeImage'])->name('image.destroy');
     });
 });
 

@@ -365,9 +365,28 @@ const ro_episodes = [
     { value: 'Custom',                                                 label: 'Custom' },
 ];
 
+/**
+ * Convierte un color hex a tripleta "R G B" (el formato que consumen los
+ * tokens rapanel-* vía rgb(var(--token-rgb) / <alpha-value>) — ver Fase 1).
+ * Acepta shorthand de 3 dígitos. Devuelve null si el hex no es válido
+ * (útil para ignorar hex a medio escribir durante el preview en vivo).
+ * Espejo en PHP de App\Support\Theme::rgb().
+ */
+function hexToRgb(hex) {
+    if (typeof hex !== 'string') return null;
+    let h = hex.trim().replace(/^#/, '');
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `${r} ${g} ${b}`;
+}
+
 export {
     country_data,
     castle_db,
     ro_game_modes,
     ro_episodes,
+    hexToRgb,
 };

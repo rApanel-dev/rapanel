@@ -11,6 +11,14 @@
         }
     </script>
 
+    {{-- Theming en runtime: inyecta las CSS vars del tema guardado ANTES del CSS
+         (anti-FOUC). Si no hay tema guardado, no se emite nada y Tailwind usa los
+         fallbacks de tailwind.config.js → idéntico a una instalación limpia. --}}
+    @php $themeJson = !empty(($siteSettings ?? [])['theme']) ? json_decode($siteSettings['theme'], true) : null; @endphp
+    @if($themeJson)
+    <style id="rapanel-theme">:root{ {!! \App\Support\Theme::cssVars($themeJson) !!} }</style>
+    @endif
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
