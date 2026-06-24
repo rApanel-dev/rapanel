@@ -1,11 +1,12 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
 import { PhotoIcon, SwatchIcon, SunIcon, MoonIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -45,11 +46,35 @@ const clearBgImage = () => {
     bgPreview.value = null;
 };
 
+// --- Preview en vivo (Fase 6) ---
+// Snapshot plano del tema actual del formulario (solo colores).
+const themeFromForm = () => ({
+    buttons: { ...form.buttons },
+    light:   { ...form.light },
+    dark:    { ...form.dark },
+});
+
+onMounted(() => applyThemePreview(themeFromForm()));
+watch(
+    () => [form.buttons, form.light, form.dark],
+    () => applyThemePreview(themeFromForm()),
+    { deep: true },
+);
+onBeforeUnmount(() => clearThemePreview());
+
+// Descartar: vuelve a los valores guardados y re-aplica el preview.
+const discard = () => {
+    form.reset('buttons', 'light', 'dark');
+    applyThemePreview(themeFromForm());
+};
+
 // --- Submit ---
 const save = () => {
     form.post(route('admin.appearance.update'), {
         forceFormData: true,
         preserveScroll: true,
+        // Persistir en el <style> del head → sobrevive a la navegación SPA sin recargar.
+        onSuccess: () => commitThemePreview(themeFromForm()),
     });
 };
 
@@ -196,7 +221,10 @@ const darkFields = [
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>
-            <PrimaryButton class="ml-auto" :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">
+            <ActionButton variant="navy" class="ml-auto" :disabled="!form.isDirty" @click="discard">
+                {{ __('Discard') }}
+            </ActionButton>
+            <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">
                 {{ __('Save') }}
             </PrimaryButton>
         </div>
