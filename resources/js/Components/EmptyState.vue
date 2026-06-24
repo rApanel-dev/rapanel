@@ -7,7 +7,7 @@ defineProps({
 
 <template>
     <tr>
-        <td :colspan="colspan" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-gray-500 italic">
+        <td :colspan="colspan" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/45 italic">
             <div class="flex flex-col items-center gap-2">
                 <slot name="icon">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">

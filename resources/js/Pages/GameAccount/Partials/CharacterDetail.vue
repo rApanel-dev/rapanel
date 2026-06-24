@@ -148,7 +148,7 @@ const { openItemDb } = useItemDbModal();
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-danger/70">HP</span>
                                                 <span class="text-[10px] font-semibold text-rapanel-navy-900 dark:text-white font-mono">{{ formatNum(char.hp) }} / {{ formatNum(char.max_hp) }}</span>
                                             </div>
-                                            <div class="w-full bg-rapanel-navy-100 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="w-full bg-rapanel-navy-100 dark:bg-rapanel-navy-700 rounded-full h-2">
                                                 <div class="bg-rapanel-danger h-2 rounded-full transition-all duration-500"
                                                     :style="{ width: barPct(char.hp, char.max_hp) + '%' }"
                                                 ></div>
@@ -160,7 +160,7 @@ const { openItemDb } = useItemDbModal();
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue/70">SP</span>
                                                 <span class="text-[10px] font-semibold text-rapanel-navy-900 dark:text-white font-mono">{{ formatNum(char.sp) }} / {{ formatNum(char.max_sp) }}</span>
                                             </div>
-                                            <div class="w-full bg-rapanel-navy-100 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="w-full bg-rapanel-navy-100 dark:bg-rapanel-navy-700 rounded-full h-2">
                                                 <div class="bg-rapanel-blue h-2 rounded-full transition-all duration-500"
                                                     :style="{ width: barPct(char.sp, char.max_sp) + '%' }"
                                                 ></div>
@@ -197,7 +197,7 @@ const { openItemDb } = useItemDbModal();
                                             { l: 'DEX', v: char.dex },
                                             { l: 'LUK', v: char.luk },
                                         ]" :key="stat.l"
-                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-gray-700/40 text-center"
+                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-white/10 text-center"
                                         >
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ stat.l }}</span>
                                             <span class="font-bold text-rapanel-navy-900 dark:text-white text-base">{{ stat.v ?? 0 }}</span>
@@ -205,11 +205,11 @@ const { openItemDb } = useItemDbModal();
                                     </div>
                                     <!-- Status Points + Skill Points -->
                                     <div class="grid grid-cols-2 gap-2 mt-auto">
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-white/10">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Status Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.status_point ?? 0 }}</span>
                                         </div>
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-white/10">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Skill Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.skill_point ?? 0 }}</span>
                                         </div>

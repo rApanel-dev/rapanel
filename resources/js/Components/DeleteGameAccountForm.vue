@@ -58,7 +58,7 @@ const deleteAccount = () => {
             :disabled="disabled"
             class="flex items-center justify-center w-8 h-8 rounded-lg border transition-all"
             :class="disabled
-                ? 'opacity-30 cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-400 border-gray-300 dark:border-gray-600'
+                ? 'opacity-30 cursor-not-allowed bg-rapanel-navy-100 dark:bg-rapanel-navy-700 text-rapanel-text-light/45 border-rapanel-navy-100 dark:border-white/10'
                 : 'bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white'"
             :title="disabled ? __('Character must be offline') : __('Delete Game Account')"
         >
