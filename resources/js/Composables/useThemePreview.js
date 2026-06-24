@@ -1,54 +1,73 @@
 import { hexToRgb } from '@/helpers';
 
 /**
- * Preview en vivo del theming (Fase 6 de PLAN_PERSONALIZACION.md).
+ * Preview en vivo del theming (v2 por secciones).
  *
  * Mientras el admin mueve los color pickers, escribe un <style id="theme-preview">
- * con un bloque :root{...} de las CSS vars --*-rgb. Como toda la UI consume
- * var(--rapanel-*) (Fases 0+1), el sitio entero se recolorea al instante, sin
- * guardar ni recompilar.
+ * con DOS bloques :root{} (claro) y :root.dark{} (oscuro). Como toda la UI pública
+ * + área de usuario consume var(--rapanel-*), se recolorea al instante sin guardar.
  *
- * El <style> de preview se inserta al final del <head> → gana por orden al
- * <style id="rapanel-theme"> del SSR (Fase 4), igual especificidad. Al limpiarlo
- * (Descartar / salir de la página) se vuelve al tema guardado.
- *
- * IMPORTANTE: el mapeo color→variable debe ser idéntico al de
- * App\Support\Theme::varMap() (backend) para que preview y guardado coincidan.
+ * El mapeo debe ser IDÉNTICO al de App\Support\Theme (lightVarMap/darkVarMap).
  */
 
 const STYLE_ID = 'theme-preview';
 
-function varMap(theme) {
+// :root (claro) — globales claro + acentos compartidos + header/footer claro
+function lightMap(t) {
     return {
-        // Fondos / texto por modo
-        '--rapanel-navy-50-rgb':    theme.light.bg,
-        '--rapanel-text-light-rgb': theme.light.text,
-        '--rapanel-base-dark-rgb':  theme.dark.bg,
-        '--rapanel-surface-rgb':    theme.dark.surface,
-        '--rapanel-text-dark-rgb':  theme.dark.text,
-        // Acentos de botones (compartidos claro/oscuro)
-        '--rapanel-blue-rgb':       theme.buttons.blue,
-        '--rapanel-gold-rgb':       theme.buttons.gold,
-        '--rapanel-purple-rgb':     theme.buttons.purple,
-        '--rapanel-navy-700-rgb':   theme.buttons.navy,
-        '--rapanel-success-rgb':    theme.buttons.success,
-        '--rapanel-danger-rgb':     theme.buttons.danger,
+        '--rapanel-navy-50-rgb':     t.light.bg,
+        '--rapanel-text-light-rgb':  t.light.text,
+        '--rapanel-blue-rgb':        t.buttons.blue,
+        '--rapanel-gold-rgb':        t.buttons.gold,
+        '--rapanel-purple-rgb':      t.buttons.purple,
+        '--rapanel-navy-700-rgb':    t.buttons.navy,
+        '--rapanel-success-rgb':     t.buttons.success,
+        '--rapanel-danger-rgb':      t.buttons.danger,
+        '--rapanel-header-bg-rgb':   t.header.light.bg,
+        '--rapanel-header-text-rgb': t.header.light.text,
+        '--rapanel-header-link-rgb': t.header.light.link,
+        '--rapanel-footer-bg-rgb':   t.footer.light.bg,
+        '--rapanel-footer-text-rgb': t.footer.light.text,
+        '--rapanel-footer-link-rgb': t.footer.light.link,
     };
 }
 
-function buildCss(theme) {
-    let body = '';
-    for (const [varName, hex] of Object.entries(varMap(theme))) {
-        const rgb = hexToRgb(hex);
-        // hex inválido (a medio escribir) → se omite y ese token cae al valor guardado/fallback
-        if (rgb) body += `${varName}:${rgb};`;
-    }
-    return `:root{${body}}`;
+// :root.dark (oscuro) — globales oscuro + header/footer oscuro
+function darkMap(t) {
+    return {
+        '--rapanel-base-dark-rgb':   t.dark.bg,
+        '--rapanel-surface-rgb':     t.dark.surface,
+        '--rapanel-text-dark-rgb':   t.dark.text,
+        '--rapanel-header-bg-rgb':   t.header.dark.bg,
+        '--rapanel-header-text-rgb': t.header.dark.text,
+        '--rapanel-header-link-rgb': t.header.dark.link,
+        '--rapanel-footer-bg-rgb':   t.footer.dark.bg,
+        '--rapanel-footer-text-rgb': t.footer.dark.text,
+        '--rapanel-footer-link-rgb': t.footer.dark.link,
+    };
 }
 
-/** Aplica un tema {buttons, light, dark} como preview en vivo (no persiste). */
+function body(map) {
+    let out = '';
+    for (const [name, hex] of Object.entries(map)) {
+        const rgb = hexToRgb(hex);
+        if (rgb) out += `${name}:${rgb};`; // hex inválido (a medio escribir) → se omite
+    }
+    return out;
+}
+
+function buildCss(t) {
+    return `:root{${body(lightMap(t))}}:root.dark{${body(darkMap(t))}}`;
+}
+
+function valid(t) {
+    return t?.header?.light && t?.header?.dark && t?.footer?.light && t?.footer?.dark
+        && t?.buttons && t?.light && t?.dark;
+}
+
+/** Aplica un tema completo como preview en vivo (no persiste). */
 export function applyThemePreview(theme) {
-    if (!theme?.buttons || !theme?.light || !theme?.dark) return;
+    if (!valid(theme)) return;
 
     let el = document.getElementById(STYLE_ID);
     if (!el) {
@@ -65,13 +84,11 @@ export function clearThemePreview() {
 }
 
 /**
- * Tras guardar: persiste el tema en el <style id="rapanel-theme"> (el mismo que
- * emite el SSR en el <head>) y limpia el preview. Así el tema recién guardado
- * sobrevive a la navegación SPA y al desmontaje de la página sin recargar; un
- * full reload posterior lo regenera idéntico desde el servidor.
+ * Tras guardar: persiste el tema en el <style id="rapanel-theme"> (el del SSR) y
+ * limpia el preview, para que sobreviva a la navegación SPA sin recargar.
  */
 export function commitThemePreview(theme) {
-    if (!theme?.buttons || !theme?.light || !theme?.dark) return;
+    if (!valid(theme)) return;
 
     let el = document.getElementById('rapanel-theme');
     if (!el) {

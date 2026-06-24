@@ -1471,5 +1471,11 @@
     "Colors apply across the whole site after saving. Reload the page to see site-wide changes.": "Цвета применяются ко всему сайту после сохранения. Перезагрузите страницу, чтобы увидеть изменения на всём сайте.",
     "This will discard all custom colors and the background image.": "Это сбросит все пользовательские цвета и фоновое изображение.",
     "Appearance saved.": "Внешний вид сохранён.",
-    "Appearance reset to defaults.": "Внешний вид сброшен к значениям по умолчанию."
+    "Appearance reset to defaults.": "Внешний вид сброшен к значениям по умолчанию.",
+    "Header": "Шапка",
+    "Footer": "Подвал",
+    "Header & Footer": "Шапка и подвал",
+    "Link color": "Цвет ссылок",
+    "Page content": "Содержимое страницы",
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Применяется к публичным страницам и области авторизованного пользователя (не к админ-панели). Переключите светлый/тёмный режим, чтобы посмотреть другую тему."
 }

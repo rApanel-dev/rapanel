@@ -39,6 +39,12 @@ class AppearanceController extends Controller
         $hex = ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'];
 
         $request->validate([
+            // Secciones header / footer (color separado claro/oscuro)
+            'header.light.bg'   => $hex, 'header.light.text' => $hex, 'header.light.link' => $hex,
+            'header.dark.bg'    => $hex, 'header.dark.text'  => $hex, 'header.dark.link'  => $hex,
+            'footer.light.bg'   => $hex, 'footer.light.text' => $hex, 'footer.light.link' => $hex,
+            'footer.dark.bg'    => $hex, 'footer.dark.text'  => $hex, 'footer.dark.link'  => $hex,
+            // Acentos de botones + globales claro/oscuro
             'buttons.blue'    => $hex,
             'buttons.gold'    => $hex,
             'buttons.purple'  => $hex,
@@ -56,6 +62,8 @@ class AppearanceController extends Controller
 
         // Normaliza sobre defaults para garantizar un tema completo y válido.
         $theme = Theme::merged([
+            'header'  => $request->input('header'),
+            'footer'  => $request->input('footer'),
             'buttons' => $request->input('buttons'),
             'light'   => $request->input('light'),
             'dark'    => $request->input('dark'),

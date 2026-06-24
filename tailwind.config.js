@@ -64,6 +64,17 @@ export default {
                 'rapanel-surface':      'rgb(var(--rapanel-surface-rgb,      15 24 41) / <alpha-value>)', // dark card/panel background
                 'rapanel-surface-deep': 'rgb(var(--rapanel-surface-deep-rgb, 11 17 32) / <alpha-value>)', // dark sidebar/topbar background
                 'rapanel-base-dark':    'rgb(var(--rapanel-base-dark-rgb,      8 13 20) / <alpha-value>)', // dark page base background
+
+                // ── Tokens de SECCIÓN (theming por zona: header/footer) ──────────────
+                // Distintos por modo claro/oscuro vía :root{}/:root.dark{} inyectados
+                // (App\Support\Theme). Fallback = valor del modo CLARO (red de seguridad).
+                // Usados SOLO en Header.vue/Footer.vue (público + área usuario, NO admin).
+                'rapanel-header':      'rgb(var(--rapanel-header-bg-rgb,   255 255 255) / <alpha-value>)', // fondo header
+                'rapanel-header-text': 'rgb(var(--rapanel-header-text-rgb,  29  40  58) / <alpha-value>)', // texto header
+                'rapanel-header-link': 'rgb(var(--rapanel-header-link-rgb,  74 144 226) / <alpha-value>)', // enlaces header (hover/activo)
+                'rapanel-footer':      'rgb(var(--rapanel-footer-bg-rgb,   248 250 252) / <alpha-value>)', // fondo footer
+                'rapanel-footer-text': 'rgb(var(--rapanel-footer-text-rgb,  29  40  58) / <alpha-value>)', // texto footer
+                'rapanel-footer-link': 'rgb(var(--rapanel-footer-link-rgb,  71  85 105) / <alpha-value>)', // enlaces/iconos footer
             },
         },
     },

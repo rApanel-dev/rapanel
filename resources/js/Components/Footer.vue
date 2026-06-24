@@ -28,7 +28,7 @@ const activeNetworks = computed(() => {
 </script>
 
 <template>
-    <footer class="bg-rapanel-navy-50 dark:bg-rapanel-navy-900 transition-colors duration-200">
+    <footer class="bg-rapanel-footer transition-colors duration-200">
 
         <!-- Accent gradient line -->
         <div class="h-px bg-gradient-to-r from-rapanel-blue via-rapanel-purple to-rapanel-gold opacity-60 dark:opacity-40"></div>
@@ -37,13 +37,13 @@ const activeNetworks = computed(() => {
             <div class="grid grid-cols-3 items-center gap-4 py-7">
 
                 <!-- Left: copyright -->
-                <div class="flex flex-col gap-0.5 text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
+                <div class="flex flex-col gap-0.5 text-sm text-rapanel-footer-text">
                     <span>© {{ currentYear }} <span class="font-bold">{{ $page.props.serverName }}</span></span>
                     <span>{{ __('Powered by') }} <span class="text-rapanel-blue font-semibold">KhrizPlayCL</span></span>
                 </div>
 
                 <!-- Center: made with love -->
-                <p class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark flex items-center justify-center gap-1.5">
+                <p class="text-sm text-rapanel-footer-text flex items-center justify-center gap-1.5">
                     {{ __('Made with') }}
                     <span class="animate-pulse text-rapanel-danger text-sm leading-none">❤</span>
                 </p>
@@ -53,7 +53,7 @@ const activeNetworks = computed(() => {
                     <a v-for="net in activeNetworks" :key="net.id"
                         :href="net.url" target="_blank" rel="noopener noreferrer"
                         :aria-label="net.label"
-                        class="opacity-70 hover:opacity-100 transition-opacity duration-200 text-rapanel-navy-600 dark:text-rapanel-text-dark w-5 h-5 flex-shrink-0"
+                        class="opacity-70 hover:opacity-100 transition-opacity duration-200 text-rapanel-footer-link w-5 h-5 flex-shrink-0"
                         v-html="socialSvgs[net.id]">
                     </a>
                 </div>

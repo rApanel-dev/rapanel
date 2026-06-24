@@ -3,11 +3,14 @@
 namespace App\Support;
 
 /**
- * Helper de theming en runtime (Fases 2-4 de PLAN_PERSONALIZACION.md).
+ * Helper de theming en runtime (PLAN_PERSONALIZACION.md, v2 por secciones).
  *
- * Convierte el tema elegido por el admin (hex) en las CSS custom properties
- * `--*-rgb` (tripletas "R G B") que consume tailwind.config.js (Fase 1) vía
- * `rgb(var(--token-rgb, <fallback>) / <alpha-value>)`.
+ * Convierte el tema del admin (hex) en CSS custom properties `--*-rgb` que
+ * consume tailwind.config.js vía rgb(var(--token-rgb, <fallback>) / <alpha>).
+ *
+ * v2: las zonas con color distinto claro/oscuro (header, footer, fondos) se
+ * emiten en DOS bloques — `:root{}` (claro) y `:root.dark{}` (oscuro) — para que
+ * cada modo tenga su valor. Los acentos de botón son compartidos (van en :root).
  */
 class Theme
 {
@@ -17,7 +20,7 @@ class Theme
         return config('theme.defaults');
     }
 
-    /** '#4A90E2' → '74 144 226'. Acepta también shorthand de 3 dígitos. */
+    /** '#4A90E2' → '74 144 226'. Acepta shorthand de 3 dígitos. */
     public static function rgb(string $hex): string
     {
         $hex = ltrim(trim($hex), '#');
@@ -32,8 +35,8 @@ class Theme
     }
 
     /**
-     * Mezcla un tema almacenado sobre los defaults (por sección), tolerando
-     * claves faltantes. Devuelve siempre un tema completo y válido.
+     * Mezcla un tema almacenado sobre los defaults, tolerando claves faltantes
+     * (incluye temas v1 sin header/footer). Devuelve siempre un tema completo.
      */
     public static function merged(?array $theme): array
     {
@@ -43,7 +46,15 @@ class Theme
         }
 
         return [
-            'version' => 1,
+            'version' => 2,
+            'header'  => [
+                'light' => array_merge($d['header']['light'], $theme['header']['light'] ?? []),
+                'dark'  => array_merge($d['header']['dark'],  $theme['header']['dark']  ?? []),
+            ],
+            'footer'  => [
+                'light' => array_merge($d['footer']['light'], $theme['footer']['light'] ?? []),
+                'dark'  => array_merge($d['footer']['dark'],  $theme['footer']['dark']  ?? []),
+            ],
             'buttons' => array_merge($d['buttons'], $theme['buttons'] ?? []),
             'light'   => array_merge($d['light'],   $theme['light']   ?? []),
             'dark'    => array_merge($d['dark'],    $theme['dark']    ?? []),
@@ -51,48 +62,75 @@ class Theme
     }
 
     /**
-     * Mapeo color (hex) → variable CSS. Fuente única de verdad del theming.
-     *
-     * Nota navy: el botón "navy" mapea a --rapanel-navy-700-rgb (su superficie
-     * en oscuro). El botón navy en claro usa rapanel-navy-100, compartido con
-     * los bordes, por eso no se theme-a desde aquí (queda neutral por diseño).
-     *
-     * @return array<string,string> nombre-de-variable => hex
+     * Variables del bloque :root (tema CLARO + acentos compartidos).
+     * @return array<string,string> variable => hex
      */
-    public static function varMap(?array $theme): array
+    public static function lightVarMap(?array $theme): array
     {
         $t = self::merged($theme);
 
         return [
-            // Fondos / texto por modo
-            '--rapanel-navy-50-rgb'    => $t['light']['bg'],
-            '--rapanel-text-light-rgb' => $t['light']['text'],
-            '--rapanel-base-dark-rgb'  => $t['dark']['bg'],
-            '--rapanel-surface-rgb'    => $t['dark']['surface'],
-            '--rapanel-text-dark-rgb'  => $t['dark']['text'],
-
-            // Acentos de botones (compartidos claro/oscuro; la opacidad de
-            // ActionButton adapta el resultado a cada modo)
-            '--rapanel-blue-rgb'       => $t['buttons']['blue'],
-            '--rapanel-gold-rgb'       => $t['buttons']['gold'],
-            '--rapanel-purple-rgb'     => $t['buttons']['purple'],
-            '--rapanel-navy-700-rgb'   => $t['buttons']['navy'],
-            '--rapanel-success-rgb'    => $t['buttons']['success'],
-            '--rapanel-danger-rgb'     => $t['buttons']['danger'],
+            // Globales claro
+            '--rapanel-navy-50-rgb'     => $t['light']['bg'],
+            '--rapanel-text-light-rgb'  => $t['light']['text'],
+            // Acentos de botones (compartidos claro/oscuro → solo en :root)
+            '--rapanel-blue-rgb'        => $t['buttons']['blue'],
+            '--rapanel-gold-rgb'        => $t['buttons']['gold'],
+            '--rapanel-purple-rgb'      => $t['buttons']['purple'],
+            '--rapanel-navy-700-rgb'    => $t['buttons']['navy'],
+            '--rapanel-success-rgb'     => $t['buttons']['success'],
+            '--rapanel-danger-rgb'      => $t['buttons']['danger'],
+            // Header / Footer — claro
+            '--rapanel-header-bg-rgb'   => $t['header']['light']['bg'],
+            '--rapanel-header-text-rgb' => $t['header']['light']['text'],
+            '--rapanel-header-link-rgb' => $t['header']['light']['link'],
+            '--rapanel-footer-bg-rgb'   => $t['footer']['light']['bg'],
+            '--rapanel-footer-text-rgb' => $t['footer']['light']['text'],
+            '--rapanel-footer-link-rgb' => $t['footer']['light']['link'],
         ];
     }
 
     /**
-     * Cuerpo del bloque `:root { ... }` listo para inyectar en <head>
-     * (anti-FOUC, server-side). Cada variable como tripleta "R G B".
+     * Variables del bloque :root.dark (overrides del tema OSCURO).
+     * @return array<string,string> variable => hex
      */
-    public static function cssVars(?array $theme): string
+    public static function darkVarMap(?array $theme): array
+    {
+        $t = self::merged($theme);
+
+        return [
+            // Globales oscuro
+            '--rapanel-base-dark-rgb'   => $t['dark']['bg'],
+            '--rapanel-surface-rgb'     => $t['dark']['surface'],
+            '--rapanel-text-dark-rgb'   => $t['dark']['text'],
+            // Header / Footer — oscuro
+            '--rapanel-header-bg-rgb'   => $t['header']['dark']['bg'],
+            '--rapanel-header-text-rgb' => $t['header']['dark']['text'],
+            '--rapanel-header-link-rgb' => $t['header']['dark']['link'],
+            '--rapanel-footer-bg-rgb'   => $t['footer']['dark']['bg'],
+            '--rapanel-footer-text-rgb' => $t['footer']['dark']['text'],
+            '--rapanel-footer-link-rgb' => $t['footer']['dark']['link'],
+        ];
+    }
+
+    private static function body(array $map): string
     {
         $out = '';
-        foreach (self::varMap($theme) as $var => $hex) {
+        foreach ($map as $var => $hex) {
             $out .= $var.':'.self::rgb($hex).';';
         }
 
         return $out;
+    }
+
+    /**
+     * CSS completo `:root{...}:root.dark{...}` listo para inyectar en <head>
+     * (anti-FOUC). Se emite SIEMPRE (con defaults si no hay tema guardado) para
+     * garantizar valores correctos por modo.
+     */
+    public static function cssVars(?array $theme): string
+    {
+        return ':root{'.self::body(self::lightVarMap($theme)).'}'
+             . ':root.dark{'.self::body(self::darkVarMap($theme)).'}';
     }
 }

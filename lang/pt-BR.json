@@ -1471,5 +1471,11 @@
     "Colors apply across the whole site after saving. Reload the page to see site-wide changes.": "As cores são aplicadas a todo o site ao salvar. Recarregue a página para ver as alterações em todo o site.",
     "This will discard all custom colors and the background image.": "Isso descartará todas as cores personalizadas e a imagem de fundo.",
     "Appearance saved.": "Aparência salva.",
-    "Appearance reset to defaults.": "Aparência restaurada para os padrões."
+    "Appearance reset to defaults.": "Aparência restaurada para os padrões.",
+    "Header": "Cabeçalho",
+    "Footer": "Rodapé",
+    "Header & Footer": "Cabeçalho e rodapé",
+    "Link color": "Cor dos links",
+    "Page content": "Conteúdo da página",
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Aplica-se às páginas públicas e à área do usuário conectado (não ao painel de administração). Alterne entre o modo claro/escuro para visualizar o outro tema."
 }

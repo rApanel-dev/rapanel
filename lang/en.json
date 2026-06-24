@@ -1471,5 +1471,11 @@
     "Colors apply across the whole site after saving. Reload the page to see site-wide changes.": "Colors apply across the whole site after saving. Reload the page to see site-wide changes.",
     "This will discard all custom colors and the background image.": "This will discard all custom colors and the background image.",
     "Appearance saved.": "Appearance saved.",
-    "Appearance reset to defaults.": "Appearance reset to defaults."
+    "Appearance reset to defaults.": "Appearance reset to defaults.",
+    "Header": "Header",
+    "Footer": "Footer",
+    "Header & Footer": "Header & Footer",
+    "Link color": "Link color",
+    "Page content": "Page content",
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme."
 }

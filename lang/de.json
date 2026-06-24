@@ -1471,5 +1471,11 @@
     "Colors apply across the whole site after saving. Reload the page to see site-wide changes.": "Die Farben werden nach dem Speichern auf der gesamten Seite angewendet. Lade die Seite neu, um die seitenweiten Änderungen zu sehen.",
     "This will discard all custom colors and the background image.": "Dadurch werden alle benutzerdefinierten Farben und das Hintergrundbild verworfen.",
     "Appearance saved.": "Erscheinungsbild gespeichert.",
-    "Appearance reset to defaults.": "Erscheinungsbild auf Standard zurückgesetzt."
+    "Appearance reset to defaults.": "Erscheinungsbild auf Standard zurückgesetzt.",
+    "Header": "Kopfzeile",
+    "Footer": "Fußzeile",
+    "Header & Footer": "Kopf- und Fußzeile",
+    "Link color": "Linkfarbe",
+    "Page content": "Seiteninhalt",
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Gilt für öffentliche Seiten und den Bereich des angemeldeten Benutzers (nicht für das Admin-Panel). Wechsle zwischen Hell-/Dunkelmodus, um das andere Design vorzuschauen."
 }

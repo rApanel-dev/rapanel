@@ -7,7 +7,7 @@ import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
-import { PhotoIcon, SwatchIcon, SunIcon, MoonIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Bars3BottomLeftIcon, SwatchIcon, PhotoIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
@@ -22,14 +22,24 @@ const __ = (key, rep = {}) => {
     return t;
 };
 
-// --- Form (modelo: buttons + light + dark + imagen de fondo) ---
+// --- Form (modelo v2: header/footer por sección + buttons + globales + imagen) ---
 const form = useForm({
+    header:          { light: { ...props.theme.header.light }, dark: { ...props.theme.header.dark } },
+    footer:          { light: { ...props.theme.footer.light }, dark: { ...props.theme.footer.dark } },
     buttons:         { ...props.theme.buttons },
     light:           { ...props.theme.light },
     dark:            { ...props.theme.dark },
     bg_image:        null,
     remove_bg_image: false,
 });
+
+// --- Tabs / secciones ---
+const tabs = [
+    { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
+    { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
+    { key: 'background',    label: 'Background image', icon: PhotoIcon },
+];
+const activeTab = ref('header-footer');
 
 // --- Imagen de fondo ---
 const bgPreview = ref(props.bgImage ? '/storage/' + props.bgImage : null);
@@ -46,9 +56,10 @@ const clearBgImage = () => {
     bgPreview.value = null;
 };
 
-// --- Preview en vivo (Fase 6) ---
-// Snapshot plano del tema actual del formulario (solo colores).
+// --- Preview en vivo ---
 const themeFromForm = () => ({
+    header:  { light: { ...form.header.light }, dark: { ...form.header.dark } },
+    footer:  { light: { ...form.footer.light }, dark: { ...form.footer.dark } },
     buttons: { ...form.buttons },
     light:   { ...form.light },
     dark:    { ...form.dark },
@@ -56,29 +67,25 @@ const themeFromForm = () => ({
 
 onMounted(() => applyThemePreview(themeFromForm()));
 watch(
-    () => [form.buttons, form.light, form.dark],
+    () => [form.header, form.footer, form.buttons, form.light, form.dark],
     () => applyThemePreview(themeFromForm()),
     { deep: true },
 );
 onBeforeUnmount(() => clearThemePreview());
 
-// Descartar: vuelve a los valores guardados y re-aplica el preview.
 const discard = () => {
-    form.reset('buttons', 'light', 'dark');
+    form.reset('header', 'footer', 'buttons', 'light', 'dark');
     applyThemePreview(themeFromForm());
 };
 
-// --- Submit ---
+// --- Submit / reset ---
 const save = () => {
     form.post(route('admin.appearance.update'), {
         forceFormData: true,
         preserveScroll: true,
-        // Persistir en el <style> del head → sobrevive a la navegación SPA sin recargar.
         onSuccess: () => commitThemePreview(themeFromForm()),
     });
 };
-
-// --- Reset ---
 const showReset = ref(false);
 const resetForm = useForm({});
 const doReset = () => {
@@ -88,7 +95,12 @@ const doReset = () => {
     });
 };
 
-// --- Campos ---
+// --- Definición de campos ---
+const sectionFields = [
+    { key: 'bg',   label: 'Background color' },
+    { key: 'text', label: 'Text color' },
+    { key: 'link', label: 'Link color' },
+];
 const buttonFields = [
     { key: 'blue',    label: 'Blue',    variant: 'blue'    },
     { key: 'gold',    label: 'Gold',    variant: 'gold'    },
@@ -97,43 +109,97 @@ const buttonFields = [
     { key: 'success', label: 'Success', variant: 'success' },
     { key: 'danger',  label: 'Danger',  variant: 'danger'  },
 ];
-const lightFields = [
-    { key: 'bg',   label: 'Background color' },
-    { key: 'text', label: 'Text color' },
-];
-const darkFields = [
-    { key: 'bg',      label: 'Background color' },
-    { key: 'surface', label: 'Surface color' },
-    { key: 'text',    label: 'Text color' },
-];
 </script>
 
 <template>
     <AdminLayout>
         <PageHeader :title="__('Appearance')" :description="__('Customize the look of your site')" class="mb-6" />
 
-        <div class="space-y-6 max-w-4xl pb-28">
+        <!-- Tabs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button v-for="t in tabs" :key="t.key" @click="activeTab = t.key"
+                :class="[
+                    'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition',
+                    activeTab === t.key
+                        ? 'bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20'
+                        : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 border-rapanel-navy-100 dark:border-white/10 hover:text-rapanel-text-light dark:hover:text-rapanel-text-dark',
+                ]">
+                <component :is="t.icon" class="w-4 h-4" /> {{ __(t.label) }}
+            </button>
+        </div>
 
-            <!-- Aviso: el preview en vivo llega en Fase 6 -->
-            <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
-                {{ __('Colors apply across the whole site after saving. Reload the page to see site-wide changes.') }}
-            </p>
+        <div class="max-w-5xl pb-28">
 
-            <!-- ===== Imagen de fondo ===== -->
-            <section class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <PhotoIcon class="w-5 h-5 text-rapanel-blue" />
-                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                        {{ __('Background image') }}
-                    </h2>
+            <!-- ════════ HEADER & FOOTER ════════ -->
+            <div v-show="activeTab === 'header-footer'" class="space-y-6">
+
+                <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
+                    {{ __('Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.') }}
+                </p>
+
+                <!-- Vista previa en vivo (usa los tokens reales) -->
+                <div class="rounded-2xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 shadow-sm">
+                    <div class="bg-rapanel-header px-5 py-3.5 flex items-center justify-between">
+                        <span class="font-display font-black uppercase tracking-wider text-rapanel-header-text">{{ $page.props.serverName }}</span>
+                        <div class="flex items-center gap-4 text-sm">
+                            <span class="text-rapanel-header-text">{{ __('Home') }}</span>
+                            <span class="text-rapanel-header-link font-bold">{{ __('News') }}</span>
+                            <span class="text-rapanel-header-text">{{ __('Profile') }}</span>
+                        </div>
+                    </div>
+                    <div class="bg-rapanel-navy-50 dark:bg-rapanel-base-dark px-5 py-10 text-center text-xs text-rapanel-text-light/40 dark:text-rapanel-text-dark/40 uppercase tracking-widest">
+                        {{ __('Page content') }}
+                    </div>
+                    <div class="bg-rapanel-footer px-5 py-3.5 flex items-center justify-between text-sm">
+                        <span class="text-rapanel-footer-text">© {{ $page.props.serverName }}</span>
+                        <span class="text-rapanel-footer-link font-semibold">Discord · Facebook</span>
+                    </div>
                 </div>
 
+                <!-- Pickers: Header y Footer -->
+                <div v-for="zone in [{ key: 'header', label: 'Header' }, { key: 'footer', label: 'Footer' }]" :key="zone.key"
+                    class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-5">
+                        {{ __(zone.label) }}
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-x-10 gap-y-5">
+                        <div v-for="mode in [{ key: 'light', label: 'Light theme' }, { key: 'dark', label: 'Dark theme' }]" :key="mode.key">
+                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __(mode.label) }}</p>
+                            <div class="space-y-3">
+                                <div v-for="f in sectionFields" :key="f.key" class="flex items-center gap-3">
+                                    <input type="color" v-model="form[zone.key][mode.key][f.key]"
+                                        class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                                    <input type="text" v-model="form[zone.key][mode.key][f.key]" maxlength="7"
+                                        class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                                    <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __(f.label) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ════════ BOTONES ════════ -->
+            <div v-show="activeTab === 'buttons'"
+                class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                <div class="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                    <div v-for="f in buttonFields" :key="f.key" class="flex items-center gap-3">
+                        <input type="color" v-model="form.buttons[f.key]"
+                            class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                        <input type="text" v-model="form.buttons[f.key]" maxlength="7"
+                            class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                        <ActionButton :variant="f.variant" size="sm" class="pointer-events-none ml-auto">{{ __(f.label) }}</ActionButton>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ════════ IMAGEN DE FONDO ════════ -->
+            <div v-show="activeTab === 'background'"
+                class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
                 <div class="flex flex-col sm:flex-row gap-5 items-start">
                     <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
                         <img v-if="bgPreview" :src="bgPreview" alt="" class="w-full h-full object-cover" />
-                        <span v-else class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 px-3 text-center">
-                            {{ __('Use default background') }}
-                        </span>
+                        <span v-else class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 px-3 text-center">{{ __('Use default background') }}</span>
                     </div>
                     <div class="flex flex-col gap-3">
                         <label class="inline-flex">
@@ -142,94 +208,22 @@ const darkFields = [
                                 <PhotoIcon class="w-4 h-4" /> {{ __('Background image') }}
                             </span>
                         </label>
-                        <ActionButton v-if="bgPreview" variant="danger" size="sm" @click="clearBgImage">
-                            {{ __('Remove image') }}
-                        </ActionButton>
-                        <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">
-                            JPG, PNG, WEBP · max 10MB
-                        </p>
+                        <ActionButton v-if="bgPreview" variant="danger" size="sm" @click="clearBgImage">{{ __('Remove image') }}</ActionButton>
+                        <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">JPG, PNG, WEBP · max 10MB</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- ===== Colores de botones ===== -->
-            <section class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <SwatchIcon class="w-5 h-5 text-rapanel-purple" />
-                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                        {{ __('Button colors') }}
-                    </h2>
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-x-8 gap-y-4">
-                    <div v-for="f in buttonFields" :key="f.key" class="flex items-center gap-3">
-                        <input type="color" v-model="form.buttons[f.key]"
-                            class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
-                        <input type="text" v-model="form.buttons[f.key]" maxlength="7"
-                            class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
-                        <ActionButton :variant="f.variant" size="sm" class="pointer-events-none ml-auto">
-                            {{ __(f.label) }}
-                        </ActionButton>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ===== Tema claro / oscuro ===== -->
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Claro -->
-                <section class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <SunIcon class="w-5 h-5 text-rapanel-gold" />
-                        <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                            {{ __('Light theme') }}
-                        </h2>
-                    </div>
-                    <div class="space-y-4">
-                        <div v-for="f in lightFields" :key="f.key" class="flex items-center gap-3">
-                            <input type="color" v-model="form.light[f.key]"
-                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
-                            <input type="text" v-model="form.light[f.key]" maxlength="7"
-                                class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
-                            <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __(f.label) }}</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Oscuro -->
-                <section class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <MoonIcon class="w-5 h-5 text-rapanel-blue" />
-                        <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">
-                            {{ __('Dark theme') }}
-                        </h2>
-                    </div>
-                    <div class="space-y-4">
-                        <div v-for="f in darkFields" :key="f.key" class="flex items-center gap-3">
-                            <input type="color" v-model="form.dark[f.key]"
-                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
-                            <input type="text" v-model="form.dark[f.key]" maxlength="7"
-                                class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
-                            <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __(f.label) }}</span>
-                        </div>
-                    </div>
-                </section>
             </div>
         </div>
 
-        <!-- ===== Barra de acciones fija ===== -->
+        <!-- Barra de acciones fija -->
         <div class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>
-            <ActionButton variant="navy" class="ml-auto" :disabled="!form.isDirty" @click="discard">
-                {{ __('Discard') }}
-            </ActionButton>
-            <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">
-                {{ __('Save') }}
-            </PrimaryButton>
+            <ActionButton variant="navy" class="ml-auto" :disabled="!form.isDirty" @click="discard">{{ __('Discard') }}</ActionButton>
+            <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">{{ __('Save') }}</PrimaryButton>
         </div>
 
-        <!-- ===== Confirmación de reset ===== -->
         <ConfirmModal
             :show="showReset"
             variant="warning"

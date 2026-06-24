@@ -1472,5 +1472,11 @@
     "Colors apply across the whole site after saving. Reload the page to see site-wide changes.": "Les couleurs s'appliquent à tout le site après l'enregistrement. Rechargez la page pour voir les changements sur l'ensemble du site.",
     "This will discard all custom colors and the background image.": "Cela supprimera toutes les couleurs personnalisées et l'image d'arrière-plan.",
     "Appearance saved.": "Apparence enregistrée.",
-    "Appearance reset to defaults.": "Apparence réinitialisée aux valeurs par défaut."
+    "Appearance reset to defaults.": "Apparence réinitialisée aux valeurs par défaut.",
+    "Header": "En-tête",
+    "Footer": "Pied de page",
+    "Header & Footer": "En-tête et pied de page",
+    "Link color": "Couleur des liens",
+    "Page content": "Contenu de la page",
+    "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "S'applique aux pages publiques et à l'espace de l'utilisateur connecté (pas au panneau d'administration). Basculez entre le mode clair/sombre pour prévisualiser l'autre thème."
 }

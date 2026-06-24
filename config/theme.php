@@ -19,7 +19,19 @@
 
 return [
     'defaults' => [
-        'version' => 1,
+        'version' => 2,
+
+        // ── Secciones con color separado claro/oscuro (theming por zona) ──────────
+        // Aplican a Header.vue / Footer.vue → web pública + área de usuario logueado
+        // (NO al panel admin, que tiene su propia barra). Defaults = colores actuales.
+        'header' => [
+            'light' => ['bg' => '#ffffff', 'text' => '#1d283a', 'link' => '#4A90E2'],
+            'dark'  => ['bg' => '#0f172a', 'text' => '#E2E8F0', 'link' => '#ffffff'],
+        ],
+        'footer' => [
+            'light' => ['bg' => '#f8fafc', 'text' => '#1d283a', 'link' => '#475569'],
+            'dark'  => ['bg' => '#0f172a', 'text' => '#E2E8F0', 'link' => '#E2E8F0'],
+        ],
 
         // Colores de botones (ActionButton: blue/gold/purple/navy/success/danger)
         'buttons' => [

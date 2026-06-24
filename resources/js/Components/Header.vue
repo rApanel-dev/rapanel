@@ -94,7 +94,7 @@ function playNow(event) {
     </Teleport>
 
     <div class="ro-nav-wrapper">
-    <Disclosure as="nav" class="bg-white dark:bg-rapanel-navy-900 shadow-sm dark:shadow-2xl transition-colors duration-200" v-slot="{ open }">
+    <Disclosure as="nav" class="bg-rapanel-header shadow-sm dark:shadow-2xl transition-colors duration-200" v-slot="{ open }">
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20 border-b border-rapanel-navy-100 dark:border-white/10">
@@ -113,7 +113,7 @@ function playNow(event) {
                     
                     <div class="flex items-center gap-3 border-l border-rapanel-navy-100 dark:border-white/10 pl-4 h-8">
                         <template v-if="!$page.props.auth.user">
-                            <Link :href="safeRoute('login')" class="font-display text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white text-sm font-medium px-3 py-2 transition">
+                            <Link :href="safeRoute('login')" class="font-display text-rapanel-header-text hover:text-rapanel-header-link text-sm font-medium px-3 py-2 transition">
                                 {{ __('Login') }}
                             </Link>
                             <Link :href="safeRoute('register')" class="font-display bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
@@ -122,7 +122,7 @@ function playNow(event) {
                         </template>
                     <template v-else>
                         <Menu as="div" class="relative inline-block text-left">
-                            <MenuButton class="flex items-center gap-1.5 text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white px-3 py-2 rounded-md text-sm font-bold transition">
+                            <MenuButton class="flex items-center gap-1.5 text-rapanel-header-text hover:text-rapanel-header-link px-3 py-2 rounded-md text-sm font-bold transition">
                                 {{ $page.props.auth.user.name }}
                                 <ChevronDownIcon class="w-4 h-4 opacity-50" aria-hidden="true" />
                             </MenuButton>
@@ -148,7 +148,7 @@ function playNow(event) {
                                     </MenuItem>
 
                                     <MenuItem v-slot="{ active }">
-                                        <Link :href="safeRoute('profile.edit')" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-text-light dark:text-rapanel-text-dark', 'block px-4 py-2 text-sm transition']">
+                                        <Link :href="safeRoute('profile.edit')" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-header-text', 'block px-4 py-2 text-sm transition']">
                                             {{ __('Profile') }}
                                         </Link>
                                     </MenuItem>
@@ -173,7 +173,7 @@ function playNow(event) {
                     
                     <LocaleSelector />
 
-                    <DisclosureButton class="inline-flex items-center justify-center p-2 rounded-md text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 focus:outline-none transition">
+                    <DisclosureButton class="inline-flex items-center justify-center p-2 rounded-md text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5 focus:outline-none transition">
                         <span class="sr-only">Open main menu</span>
                         <Bars3Icon v-if="!open" class="block h-6 w-6" aria-hidden="true" />
                         <XMarkIcon v-else class="block h-6 w-6" aria-hidden="true" />
@@ -189,19 +189,19 @@ function playNow(event) {
                     <div class="flex items-center space-x-1 py-2">
                         <template v-for="item in currentMenuItems" :key="item.name">
                             <Link v-if="!item.children" :href="safeRoute(item.route)"
-                                :class="[isUrl(item.route) ? 'text-rapanel-blue dark:text-white bg-rapanel-navy-50 dark:bg-white/10' : 'text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5', 'px-3 py-2 rounded-md text-sm font-medium transition whitespace-nowrap']">
+                                :class="[isUrl(item.route) ? 'text-rapanel-header-link bg-rapanel-navy-50 dark:bg-white/10' : 'text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5', 'px-3 py-2 rounded-md text-sm font-medium transition whitespace-nowrap']">
                                 {{ __(item.name) }}
                             </Link>
 
                             <Menu v-else as="div" class="relative inline-block text-left">
-                                <MenuButton :class="['flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition whitespace-nowrap']">
+                                <MenuButton :class="['flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition whitespace-nowrap']">
                                     {{ __(item.name) }}
                                     <ChevronDownIcon class="w-4 h-4 opacity-30" />
                                 </MenuButton>
                                 <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
                                     <MenuItems class="absolute left-0 mt-2 w-56 origin-top-left rounded-md bg-white dark:bg-rapanel-navy-800 shadow-2xl py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 border border-rapanel-navy-100 dark:border-white/10">
                                         <MenuItem v-for="sub in item.children" :key="sub.name" v-slot="{ active }">
-                                            <Link :href="safeRoute(sub.route)" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-text-light dark:text-rapanel-text-dark', 'flex items-center gap-2 px-4 py-2 text-sm transition']">
+                                            <Link :href="safeRoute(sub.route)" :class="[active ? 'bg-rapanel-navy-50 dark:bg-white/5 text-rapanel-blue dark:text-white' : 'text-rapanel-header-text', 'flex items-center gap-2 px-4 py-2 text-sm transition']">
                                                 <span v-if="sub.icon" class="shrink-0">{{ sub.icon }}</span>
                                                 {{ __(sub.name) }}
                                             </Link>
@@ -248,25 +248,25 @@ function playNow(event) {
         </div>
 
         <transition enter-active-class="transition duration-150 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-100 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-            <DisclosurePanel class="md:hidden bg-white dark:bg-rapanel-navy-900 border-t border-rapanel-navy-100 dark:border-white/10">
+            <DisclosurePanel class="md:hidden bg-rapanel-header border-t border-rapanel-navy-100 dark:border-white/10">
                 <div class="px-4 pt-2 pb-6 space-y-1">
                     
                     <template v-for="item in currentMenuItems" :key="item.name">
                         <Link v-if="!item.children" :href="safeRoute(item.route)"
-                            class="block px-3 py-3 rounded-md text-base font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                            class="block px-3 py-3 rounded-md text-base font-medium text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                             {{ __(item.name) }}
                         </Link>
 
                         <div v-else class="space-y-0.5">
                             <button @click="toggleMobileSubmenu(item.name)"
-                                class="w-full flex items-center justify-between px-3 py-3 rounded-md text-base font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                class="w-full flex items-center justify-between px-3 py-3 rounded-md text-base font-medium text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                                 {{ __(item.name) }}
                                 <ChevronDownIcon class="w-4 h-4 opacity-50 transition-transform duration-200"
                                     :class="{ 'rotate-180': openMobileSubmenus[item.name] }" />
                             </button>
                             <div v-show="openMobileSubmenus[item.name]" class="space-y-0.5 pb-1">
                                 <Link v-for="sub in item.children" :key="sub.name" :href="safeRoute(sub.route)"
-                                    class="flex items-center gap-2 pl-6 pr-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue dark:hover:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
+                                    class="flex items-center gap-2 pl-6 pr-3 py-2 rounded-md text-sm font-medium text-rapanel-header-text hover:text-rapanel-header-link hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition">
                                     <span v-if="sub.icon" class="shrink-0">{{ sub.icon }}</span>
                                     {{ __(sub.name) }}
                                 </Link>
@@ -276,7 +276,7 @@ function playNow(event) {
 
                     <div class="mt-6 pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
                         <div v-if="!$page.props.auth.user" class="grid grid-cols-2 gap-3">
-                            <Link :href="safeRoute('login')" class="font-display flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-text-light dark:text-white hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
+                            <Link :href="safeRoute('login')" class="font-display flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-header-text hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
                                 {{ __('Login') }}
                             </Link>
                             <Link :href="safeRoute('register')" class="font-display flex justify-center items-center px-4 py-3 bg-rapanel-blue rounded-md text-sm font-bold text-white hover:opacity-90 transition shadow-lg uppercase tracking-widest">
@@ -284,8 +284,8 @@ function playNow(event) {
                             </Link>
                         </div>
                         <div v-else class="bg-rapanel-navy-50 dark:bg-white/5 p-4 rounded-lg border border-rapanel-navy-100 dark:border-white/5">
-                            <div class="text-[10px] text-rapanel-text-light dark:text-rapanel-text-dark uppercase font-bold mb-1 tracking-widest">{{ __('Logged in as') }}</div>
-                            <div class="text-rapanel-text-light dark:text-white font-bold mb-4">{{ $page.props.auth.user.name }}</div>
+                            <div class="text-[10px] text-rapanel-header-text uppercase font-bold mb-1 tracking-widest">{{ __('Logged in as') }}</div>
+                            <div class="text-rapanel-header-text font-bold mb-4">{{ $page.props.auth.user.name }}</div>
 
                             <div class="flex flex-col gap-2 mb-4">
                                 <Link v-if="$page.props.auth.user?.role === 'Admin'"
@@ -297,7 +297,7 @@ function playNow(event) {
                                 <Link :href="safeRoute('dashboard')" class="block px-3 py-2 rounded-md text-sm font-bold text-rapanel-blue dark:text-rapanel-blue bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
                                     {{ __('Master Account') }}
                                 </Link>
-                                <Link :href="safeRoute('profile.edit')" class="block px-3 py-2 rounded-md text-sm font-medium text-rapanel-text-light dark:text-rapanel-text-dark bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
+                                <Link :href="safeRoute('profile.edit')" class="block px-3 py-2 rounded-md text-sm font-medium text-rapanel-header-text bg-white dark:bg-rapanel-navy-800 hover:bg-rapanel-navy-100 dark:hover:bg-white/10 transition">
                                     {{ __('Profile') }}
                                 </Link>
                             </div>

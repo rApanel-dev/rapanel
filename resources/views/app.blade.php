@@ -11,13 +11,12 @@
         }
     </script>
 
-    {{-- Theming en runtime: inyecta las CSS vars del tema guardado ANTES del CSS
-         (anti-FOUC). Si no hay tema guardado, no se emite nada y Tailwind usa los
-         fallbacks de tailwind.config.js → idéntico a una instalación limpia. --}}
+    {{-- Theming en runtime: inyecta las CSS vars (claro :root + oscuro :root.dark)
+         ANTES del CSS (anti-FOUC). Se emite SIEMPRE: con el tema guardado o, si no
+         hay, con los defaults (Theme::merged) → idéntico a una instalación limpia,
+         y garantiza el valor correcto por modo en las zonas header/footer. --}}
     @php $themeJson = !empty(($siteSettings ?? [])['theme']) ? json_decode($siteSettings['theme'], true) : null; @endphp
-    @if($themeJson)
-    <style id="rapanel-theme">:root{ {!! \App\Support\Theme::cssVars($themeJson) !!} }</style>
-    @endif
+    <style id="rapanel-theme">{!! \App\Support\Theme::cssVars($themeJson) !!}</style>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
