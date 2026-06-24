@@ -3,11 +3,12 @@ import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
 const st  = computed(() => usePage().props.siteSettings ?? {})
-const src = computed(() =>
-    st.value.home_hero_bg_image
-        ? '/storage/' + st.value.home_hero_bg_image
-        : '/images/bg-main.svg'
-)
+const src = computed(() => {
+    // Prioridad: imagen de fondo del tema (Appearance) → hero del home → default.
+    if (st.value.theme_bg_image)    return '/storage/' + st.value.theme_bg_image
+    if (st.value.home_hero_bg_image) return '/storage/' + st.value.home_hero_bg_image
+    return '/images/bg-main.svg'
+})
 </script>
 
 <template>
