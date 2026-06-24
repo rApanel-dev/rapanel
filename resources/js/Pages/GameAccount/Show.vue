@@ -439,8 +439,8 @@ const { openItemDb } = useItemDbModal();
                                 <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
-                            <tr v-for="char in characters" :key="char.char_id" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
+                            <tr v-for="char in characters" :key="char.char_id" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                                 <td class="px-4 py-3 text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 font-mono">{{ char.char_num + 1 }}</td>
                                 <td class="px-4 py-3">
                                     <button @click="openCharModal(char)" class="font-bold text-rapanel-blue hover:underline hover:text-rapanel-blue/80 transition-colors text-left">
@@ -488,7 +488,7 @@ const { openItemDb } = useItemDbModal();
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-t-2 border-rapanel-navy-100 dark:border-gray-700">
+                        <tfoot class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-t-2 border-rapanel-navy-100 dark:border-white/[0.08]">
                             <tr>
                                 <td colspan="5" class="px-4 py-2 text-right text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</td>
                                 <td class="px-4 py-2 text-right font-mono font-bold text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</td>
@@ -499,9 +499,9 @@ const { openItemDb } = useItemDbModal();
                 </div>
 
                 <!-- Cards: móvil -->
-                <div v-if="characters.length > 0" class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
+                <div v-if="characters.length > 0" class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                     <div v-for="char in characters" :key="char.char_id"
-                         class="px-4 py-4 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                         class="px-4 py-4 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                         <!-- Fila principal: nombre + dot estado -->
                         <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="min-w-0">
@@ -583,9 +583,9 @@ const { openItemDb } = useItemDbModal();
                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                             <tr v-for="(item, idx) in storageItems" :key="idx"
-                                class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                                class="hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                                 <td class="px-3 py-1.5 text-center font-mono text-[11px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue"
                                     @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
                                 <td class="px-3 py-1.5 text-center cursor-pointer"
@@ -617,9 +617,9 @@ const { openItemDb } = useItemDbModal();
                 </div>
 
                 <!-- Cards storage: móvil -->
-                <div v-if="storageItems.length > 0" class="md:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30 max-h-96 overflow-y-auto">
+                <div v-if="storageItems.length > 0" class="md:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04] max-h-96 overflow-y-auto">
                     <div v-for="(item, idx) in storageItems" :key="idx"
-                         class="px-3 py-3 flex items-center gap-3 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors cursor-pointer"
+                         class="px-3 py-3 flex items-center gap-3 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors cursor-pointer"
                          @click="openItemDb(item.nameid, item)">
                         <div class="flex flex-col items-center gap-0.5 shrink-0 w-10">
                             <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-9 h-9 object-contain" :alt="item.name_english" />

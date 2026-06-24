@@ -202,8 +202,8 @@ const openClaimModal = () => {
                                 <th class="px-6 py-4 text-center">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700">
-                            <tr v-for="account in gameAccounts" :key="account.userid" class="hover:bg-rapanel-navy-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.08]">
+                            <tr v-for="account in gameAccounts" :key="account.userid" class="hover:bg-rapanel-navy-50/50 dark:hover:bg-white/[0.06] transition-colors">
                                 <td class="px-6 py-4 font-bold text-rapanel-blue">{{ account.userid }}</td>
                                 <td class="px-6 py-4 text-rapanel-text-light dark:text-rapanel-text-dark">
                                     <span v-if="account.sex === 'M'" class="flex items-center text-blue-500 font-medium">

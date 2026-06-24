@@ -342,7 +342,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Status') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ m.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
@@ -363,7 +363,7 @@ const { openItemDb } = useItemDbModal();
                                         </tbody>
                                     </table>
                                     <!-- Cards: móvil -->
-                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="m in char.party_members" :key="m.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
                                             <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <div class="relative shrink-0">
@@ -400,7 +400,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Status') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ f.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
@@ -418,7 +418,7 @@ const { openItemDb } = useItemDbModal();
                                         </tbody>
                                     </table>
                                     <!-- Cards: móvil -->
-                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="f in char.friends" :key="f.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
                                             <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <img :src="`/data/icon_jobs/icon_jobs_${f.class}.png`" @error="onImgError" class="w-6 h-6 object-contain shrink-0" />
@@ -458,7 +458,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="(item, idx) in char.inventory" :key="idx"
                                                 class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
@@ -487,7 +487,7 @@ const { openItemDb } = useItemDbModal();
                                     </table>
                                 </div>
                                 <!-- Cards: móvil -->
-                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                     <div v-for="(item, idx) in char.inventory" :key="idx"
                                          class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
                                          @click="openItemDb(item.nameid, item)">
@@ -541,7 +541,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
                                                 class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
@@ -569,7 +569,7 @@ const { openItemDb } = useItemDbModal();
                                     </table>
                                 </div>
                                 <!-- Cards: móvil -->
-                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                     <div v-for="(item, idx) in char.cart_inventory" :key="idx"
                                          class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
                                          @click="openItemDb(item.nameid, item)">
