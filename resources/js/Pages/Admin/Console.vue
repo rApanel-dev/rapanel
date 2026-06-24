@@ -180,13 +180,13 @@ RA_WS_SECRET=your_secret_here</pre>
                         <div class="grid grid-cols-2 gap-1.5 sm:flex sm:gap-2 sm:ml-auto sm:flex-wrap">
                             <button @click="serverAction(activeServer, 'start')"
                                 :disabled="['running','starting'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
-                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
+                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-rapanel-success hover:bg-rapanel-success/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                 <PlayIcon class="w-3.5 h-3.5" />
                                 {{ __('Start') }}
                             </button>
                             <button @click="serverAction(activeServer, 'stop')"
                                 :disabled="['stopped','stopping'].includes(consoles[activeServer].status.value) || controlling[activeServer]"
-                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
+                                class="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 bg-rapanel-danger hover:bg-rapanel-danger/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition">
                                 <StopIcon class="w-3.5 h-3.5" />
                                 {{ __('Stop') }}
                             </button>

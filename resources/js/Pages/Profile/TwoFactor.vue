@@ -166,7 +166,7 @@ const copySecret = () => {
                             />
                             <InputError :message="enableForm.errors.code" />
                             <button type="submit" :disabled="enableForm.processing"
-                                class="w-full py-2.5 px-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition disabled:opacity-50">
+                                class="w-full py-2.5 px-4 rounded-xl bg-rapanel-success hover:bg-rapanel-success/90 text-white font-semibold text-sm transition disabled:opacity-50">
                                 {{ __('Enable Two Factor Authentication') }}
                             </button>
                         </form>

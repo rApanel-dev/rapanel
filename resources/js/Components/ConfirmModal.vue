@@ -27,19 +27,19 @@ const iconMap = {
 
 const iconColorMap = {
     danger:  'text-rapanel-danger',
-    warning: 'text-amber-500 dark:text-amber-400',
+    warning: 'text-rapanel-gold',
     default: 'text-rapanel-blue',
 };
 
 const iconBgMap = {
     danger:  'bg-rapanel-danger/10',
-    warning: 'bg-amber-500/10',
+    warning: 'bg-rapanel-gold/10',
     default: 'bg-rapanel-blue/10',
 };
 
 const btnMap = {
     danger:  'bg-rapanel-danger hover:bg-rapanel-danger/80 text-white',
-    warning: 'bg-amber-500 hover:bg-amber-600 text-white',
+    warning: 'bg-rapanel-gold hover:bg-rapanel-gold/80 text-white',
     default: 'bg-rapanel-blue hover:bg-rapanel-blue/80 text-white',
 };
 </script>
