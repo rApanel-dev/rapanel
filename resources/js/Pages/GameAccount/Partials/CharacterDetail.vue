@@ -61,12 +61,12 @@ const { openItemDb } = useItemDbModal();
                                 <ActionButton variant="navy" @click="emit('reset-position', char)" :disabled="char.online > 0">
                                     {{ __('Reset Position') }}
                                 </ActionButton>
-                                <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-danger hover:text-white transition-all">
+                                <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark hover:bg-rapanel-danger hover:text-white transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
                             <!-- Móvil: solo cerrar -->
-                            <button @click="emit('close')" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-danger hover:text-white transition-all shrink-0">
+                            <button @click="emit('close')" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark hover:bg-rapanel-danger hover:text-white transition-all shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
