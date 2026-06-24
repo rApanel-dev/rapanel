@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -86,6 +86,14 @@ const saveChar = () => charForm.post(route('admin.appearance.character'), { forc
 
 const charPositions = [{ key: 'left', label: 'Left' }, { key: 'center', label: 'Center' }, { key: 'right', label: 'Right' }];
 const charSizes = [{ key: 'sm', label: 'Small' }, { key: 'md', label: 'Medium' }, { key: 'lg', label: 'Large' }];
+
+// Vista previa del personaje (posición + tamaño en vivo dentro del mock)
+const charPreviewPos = computed(() => ({
+    left: 'left-4', center: 'left-1/2 -translate-x-1/2', right: 'right-4',
+}[charForm.position] || 'right-4'));
+const charPreviewSize = computed(() => ({
+    sm: 'h-[55%]', md: 'h-[72%]', lg: 'h-[90%]',
+}[charForm.size] || 'h-[90%]'));
 
 // --- Preview en vivo ---
 const themeFromForm = () => ({
@@ -226,6 +234,14 @@ const buttonFields = [
 
             <!-- ════════ HOME (fondo + imagen + personaje) ════════ -->
             <div v-show="activeTab === 'home'" class="space-y-6">
+
+                <!-- Vista previa rápida: fondo de página + personaje (en vivo) -->
+                <div class="relative aspect-[21/8] rounded-2xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 shadow-sm bg-rapanel-page">
+                    <img v-if="bgPreview" :src="bgPreview" alt="" class="absolute inset-0 w-full h-full object-cover" />
+                    <img v-if="charForm.enabled" :src="framePreviews[0]" alt=""
+                         :class="['absolute bottom-0 object-contain pointer-events-none select-none', charPreviewPos, charPreviewSize]" />
+                    <span class="absolute top-2.5 left-3.5 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Preview') }}</span>
+                </div>
 
                 <!-- Color de fondo de página (claro/oscuro) -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
