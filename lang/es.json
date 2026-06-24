@@ -1480,5 +1480,20 @@
     "Applies to public pages and the logged-in user area (not the admin panel). Toggle dark/light mode to preview the other theme.": "Se aplica a las páginas públicas y al área del usuario conectado (no al panel de administración). Cambia entre modo claro/oscuro para previsualizar el otro tema.",
     "Background": "Fondo",
     "Page background": "Fondo de página",
-    "Shown where there is no background image. The home hero has its own video/image.": "Se muestra donde no hay imagen de fondo. El hero de la home tiene su propio video/imagen."
+    "Shown where there is no background image. The home hero has its own video/image.": "Se muestra donde no hay imagen de fondo. El hero de la home tiene su propio video/imagen.",
+    "Home character": "Personaje de la home",
+    "Show character": "Mostrar personaje",
+    "Show on mobile": "Mostrar en móvil",
+    "Left": "Izquierda",
+    "Center": "Centro",
+    "Right": "Derecha",
+    "Small": "Pequeño",
+    "Medium": "Mediano",
+    "Large": "Grande",
+    "Frames": "Fotogramas",
+    "Movement": "Movimiento",
+    "Hover": "Hover",
+    "Default": "Predeterminado",
+    "Character settings saved.": "Personaje guardado.",
+    "Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.": "Personaje animado en el hero de la home. Los fotogramas 1-3 se alternan como movimiento; el 4 aparece al pasar el mouse."
 }

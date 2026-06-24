@@ -31,7 +31,72 @@ class AppearanceController extends Controller
             'theme'    => Theme::merged(json_decode(SiteSetting::getValue('theme') ?? 'null', true)),
             'defaults' => Theme::defaults(),
             'bgImage'  => SiteSetting::getValue('theme_bg_image'),
+            'character' => [
+                'enabled'  => SiteSetting::getValue('home_char_enabled', '1') !== '0',
+                'mobile'   => SiteSetting::getValue('home_char_mobile', '0') === '1',
+                'position' => SiteSetting::getValue('home_char_position', 'right'),
+                'size'     => SiteSetting::getValue('home_char_size', ''),
+                'frames'   => [
+                    SiteSetting::getValue('home_char_frame1'),
+                    SiteSetting::getValue('home_char_frame2'),
+                    SiteSetting::getValue('home_char_frame3'),
+                    SiteSetting::getValue('home_char_frame4'),
+                ],
+            ],
         ]);
+    }
+
+    /**
+     * Personaje animado de la home (HomeAlt /home2): 4 frames + posición/tamaño/
+     * visibilidad. Guardado en ra_site_settings (home_char_*), compartido por
+     * Inertia y consumido por HomeAlt.vue.
+     */
+    public function updateCharacter(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'enabled'  => 'nullable|boolean',
+            'mobile'   => 'nullable|boolean',
+            'position' => 'nullable|in:left,center,right',
+            'size'     => 'nullable|in:sm,md,lg',
+            'frame1'   => 'nullable|image|mimes:png,webp|max:4096',
+            'frame2'   => 'nullable|image|mimes:png,webp|max:4096',
+            'frame3'   => 'nullable|image|mimes:png,webp|max:4096',
+            'frame4'   => 'nullable|image|mimes:png,webp|max:4096',
+            'remove_frame1' => 'nullable|boolean',
+            'remove_frame2' => 'nullable|boolean',
+            'remove_frame3' => 'nullable|boolean',
+            'remove_frame4' => 'nullable|boolean',
+        ]);
+
+        SiteSetting::setMany([
+            'home_char_enabled'  => $request->boolean('enabled') ? '1' : '0',
+            'home_char_mobile'   => $request->boolean('mobile') ? '1' : '0',
+            'home_char_position' => $request->input('position', 'right'),
+            'home_char_size'     => $request->input('size', ''),
+        ]);
+
+        foreach ([1, 2, 3, 4] as $n) {
+            if ($request->boolean("remove_frame{$n}")) {
+                $this->deleteSetting("home_char_frame{$n}");
+                SiteSetting::setValue("home_char_frame{$n}", null);
+            } elseif ($request->hasFile("frame{$n}")) {
+                $this->deleteSetting("home_char_frame{$n}");
+                SiteSetting::setValue(
+                    "home_char_frame{$n}",
+                    $request->file("frame{$n}")->store('settings/character', 'public')
+                );
+            }
+        }
+
+        return back()->with('success', __('Character settings saved.'));
+    }
+
+    private function deleteSetting(string $key): void
+    {
+        $old = SiteSetting::getValue($key);
+        if ($old) {
+            Storage::disk('public')->delete($old);
+        }
     }
 
     public function update(Request $request): RedirectResponse

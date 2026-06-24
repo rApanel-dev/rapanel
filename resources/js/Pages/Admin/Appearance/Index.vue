@@ -7,12 +7,13 @@ import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
-import { Bars3BottomLeftIcon, SwatchIcon, PhotoIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Bars3BottomLeftIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
     defaults: { type: Object, default: () => ({}) },
     bgImage:  { type: String, default: null },
+    character:{ type: Object, default: () => ({ enabled: true, mobile: false, position: 'right', size: '', frames: [null, null, null, null] }) },
 });
 
 const page = usePage();
@@ -38,6 +39,7 @@ const tabs = [
     { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
     { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
     { key: 'background',    label: 'Background', icon: PhotoIcon },
+    { key: 'character',     label: 'Home character', icon: UserIcon },
 ];
 const activeTab = ref('header-footer');
 
@@ -55,6 +57,36 @@ const clearBgImage = () => {
     form.remove_bg_image = true;
     bgPreview.value = null;
 };
+
+// --- Personaje de la home (HomeAlt /home2) — form separado ---
+const charForm = useForm({
+    enabled:  props.character.enabled,
+    mobile:   props.character.mobile,
+    position: props.character.position || 'right',
+    size:     props.character.size || '',
+    frame1: null, frame2: null, frame3: null, frame4: null,
+    remove_frame1: false, remove_frame2: false, remove_frame3: false, remove_frame4: false,
+});
+const defaultFrame = (n) => `/images/ex_se_star0${n}.png`;
+const framePreviews = ref([1, 2, 3, 4].map((n, i) =>
+    props.character.frames?.[i] ? '/storage/' + props.character.frames[i] : defaultFrame(n)
+));
+const onFrame = (n, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    charForm['frame' + n] = file;
+    charForm['remove_frame' + n] = false;
+    framePreviews.value[n - 1] = URL.createObjectURL(file);
+};
+const resetFrame = (n) => {
+    charForm['frame' + n] = null;
+    charForm['remove_frame' + n] = true;
+    framePreviews.value[n - 1] = defaultFrame(n);
+};
+const saveChar = () => charForm.post(route('admin.appearance.character'), { forceFormData: true, preserveScroll: true });
+
+const charPositions = [{ key: 'left', label: 'Left' }, { key: 'center', label: 'Center' }, { key: 'right', label: 'Right' }];
+const charSizes = [{ key: 'sm', label: 'Small' }, { key: 'md', label: 'Medium' }, { key: 'lg', label: 'Large' }];
 
 // --- Preview en vivo ---
 const themeFromForm = () => ({
@@ -238,15 +270,86 @@ const buttonFields = [
                 </div>
             </div>
             </div>
+
+            <!-- ════════ PERSONAJE DE LA HOME ════════ -->
+            <div v-show="activeTab === 'character'" class="space-y-6">
+                <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
+                    {{ __('Animated character on the home hero. Frames 1-3 cycle as movement; frame 4 shows on hover.') }}
+                </p>
+
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-6">
+                    <!-- Toggles -->
+                    <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" v-model="charForm.enabled" class="rounded border-rapanel-navy-100 dark:border-white/20 text-rapanel-blue focus:ring-rapanel-blue" />
+                            <span class="text-sm font-semibold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Show character') }}</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" v-model="charForm.mobile" class="rounded border-rapanel-navy-100 dark:border-white/20 text-rapanel-blue focus:ring-rapanel-blue" />
+                            <span class="text-sm font-semibold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Show on mobile') }}</span>
+                        </label>
+                    </div>
+
+                    <!-- Posición + tamaño -->
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-2">{{ __('Position') }}</p>
+                            <div class="flex gap-2">
+                                <button v-for="p in charPositions" :key="p.key" type="button" @click="charForm.position = p.key"
+                                    :class="['px-3 py-1.5 rounded-lg text-sm font-semibold border transition', charForm.position === p.key ? 'bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40' : 'border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70']">
+                                    {{ __(p.label) }}
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-2">{{ __('Size') }}</p>
+                            <div class="flex gap-2">
+                                <button v-for="s in charSizes" :key="s.key" type="button" @click="charForm.size = s.key"
+                                    :class="['px-3 py-1.5 rounded-lg text-sm font-semibold border transition', charForm.size === s.key ? 'bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40' : 'border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70']">
+                                    {{ __(s.label) }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frames -->
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __('Frames') }}</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div v-for="n in 4" :key="n" class="space-y-2">
+                                <div class="aspect-square rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center overflow-hidden p-2">
+                                    <img :src="framePreviews[n - 1]" alt="" class="max-h-full max-w-full object-contain" />
+                                </div>
+                                <p class="text-center text-[10px] font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">
+                                    {{ n < 4 ? __('Movement') : __('Hover') }} {{ n }}
+                                </p>
+                                <div class="flex justify-center gap-2">
+                                    <label class="cursor-pointer text-[11px] font-bold text-rapanel-blue hover:underline">
+                                        <input type="file" accept="image/png,image/webp" class="hidden" @change="(e) => onFrame(n, e)" />
+                                        {{ __('Change') }}
+                                    </label>
+                                    <button type="button" @click="resetFrame(n)" class="text-[11px] font-bold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 hover:underline">{{ __('Default') }}</button>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">PNG (transparente) o WEBP · max 4MB</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Barra de acciones fija -->
-        <div class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
+        <!-- Barra de acciones: tema (colores) -->
+        <div v-if="activeTab !== 'character'" class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>
             <ActionButton variant="navy" class="ml-auto" :disabled="!form.isDirty" @click="discard">{{ __('Discard') }}</ActionButton>
             <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" @click="save">{{ __('Save') }}</PrimaryButton>
+        </div>
+
+        <!-- Barra de acciones: personaje -->
+        <div v-else class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
+            <PrimaryButton class="ml-auto" :class="{ 'opacity-50': charForm.processing }" :disabled="charForm.processing" @click="saveChar">{{ __('Save') }}</PrimaryButton>
         </div>
 
         <ConfirmModal

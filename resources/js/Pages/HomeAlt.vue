@@ -61,6 +61,24 @@ const onCharLeave = () => {
     startCharAnimation()
 }
 
+// ── Personaje configurable (Admin → Appearance → Character) ──────────────────
+// Sin configuración guardada, todo cae a los valores actuales → cero regresión.
+const charEnabled  = computed(() => st.value.home_char_enabled !== '0')
+const charOnMobile = computed(() => st.value.home_char_mobile === '1')
+const charSrc = computed(() => {
+    const custom = st.value['home_char_frame' + charFrame.value]
+    return custom ? '/storage/' + custom : `/images/ex_se_star0${charFrame.value}.png`
+})
+const charPosClass = computed(() => ({
+    left:   'bottom-0 left-0',
+    center: 'bottom-0 left-1/2 -translate-x-1/2',
+    right:  'bottom-0 right-0',
+}[st.value.home_char_position] || 'bottom-0 right-0'))
+const charSizeStyle = computed(() => {
+    const s = st.value.home_char_size
+    return s ? { height: ({ sm: '200px', md: '300px', lg: '420px' })[s] ?? '' } : {}
+})
+
 // ── Canvas starfield ─────────────────────────────────────────────────────────
 const initCanvas = () => {
     const canvas = canvasRef.value
@@ -389,14 +407,16 @@ onUnmounted(() => {
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                             w-[700px] h-[700px] rounded-full pointer-events-none ha-central-glow" />
 
-                <!-- Personaje (fade-out con scroll, frame cycling) -->
-                <div class="ha-char-wrap absolute bottom-0 right-0 hidden sm:block"
+                <!-- Personaje (fade-out con scroll, frame cycling) — configurable -->
+                <div v-if="charEnabled"
+                     :class="['ha-char-wrap absolute', charPosClass, charOnMobile ? 'block' : 'hidden sm:block']"
                      :style="{ opacity: charOpacity }"
                      @mouseenter="onCharEnter"
                      @mouseleave="onCharLeave">
-                    <img :src="`/images/ex_se_star0${charFrame}.png`"
+                    <img :src="charSrc"
                          alt=""
                          class="ha-char-img w-auto select-none"
+                         :style="charSizeStyle"
                          draggable="false" />
                 </div>
 
