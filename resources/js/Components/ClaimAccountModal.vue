@@ -93,17 +93,17 @@ onUnmounted(() => clearInterval(interval.value));
                 </PrimaryButton>
             </div>
 
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-2">
+            <h2 class="text-xl font-bold text-rapanel-text-light dark:text-white uppercase tracking-widest mb-2">
                 {{ __('Claim your Account') }}
             </h2>
             
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/55 mb-6">
                 {{ __('Copy the command below and paste it in the game chat to verify ownership.') }}
             </p>
 
             <div 
                 @click="copyCommand"
-                class="bg-gray-100 dark:bg-rapanel-navy-900 border-2 border-dashed border-blue-500/30 dark:border-rapanel-blue/30 rounded-xl p-8 mb-6 group hover:border-blue-500 dark:hover:border-rapanel-blue transition-all cursor-pointer relative"
+                class="bg-rapanel-navy-100 dark:bg-rapanel-navy-900 border-2 border-dashed border-blue-500/30 dark:border-rapanel-blue/30 rounded-xl p-8 mb-6 group hover:border-blue-500 dark:hover:border-rapanel-blue transition-all cursor-pointer relative"
             >
                 <div class="flex flex-col items-center">
                     <span 
@@ -112,20 +112,20 @@ onUnmounted(() => clearInterval(interval.value));
                     >
                         {{ copied ? __('Command Copied!') : __('Click to copy command') }}
                     </span>
-                    <div class="text-3xl font-mono font-bold text-gray-900 dark:text-white tracking-widest">
+                    <div class="text-3xl font-mono font-bold text-rapanel-text-light dark:text-white tracking-widest">
                         {{ linkCommand }}
                     </div>
                 </div>
             </div>
 
             <div class="flex justify-between items-center mb-8">
-                <div class="flex items-center gap-3 bg-gray-50 dark:bg-rapanel-navy-900 px-4 py-2 rounded-full border border-gray-200 dark:border-white/5">
+                <div class="flex items-center gap-3 bg-rapanel-navy-50 dark:bg-rapanel-navy-900 px-4 py-2 rounded-full border border-rapanel-navy-100 dark:border-white/5">
                     <div class="w-2 h-2 rounded-full bg-red-500 dark:bg-rapanel-danger animate-ping"></div>
                     <span class="text-sm font-mono text-red-600 dark:text-rapanel-danger font-bold">{{ timerDisplay }}</span>
                 </div>
             </div>
 
-            <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-rapanel-navy-900/50 p-5 rounded-xl border border-gray-200 dark:border-white/5">
+            <div class="space-y-3 text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/55 bg-rapanel-navy-50 dark:bg-rapanel-navy-900/50 p-5 rounded-xl border border-rapanel-navy-100 dark:border-white/5">
                 <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">01.</span> {{ __('Copy the @link command above.') }}</p>
                 <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">02.</span> {{ __('Log in to RO with the account you want to claim.') }}</p>
                 <p class="flex gap-3"><span class="text-blue-600 dark:text-rapanel-blue font-bold">03.</span> {{ __('Paste the command in any chat window.') }}</p>

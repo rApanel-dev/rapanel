@@ -125,9 +125,9 @@ const { openItemDb } = useItemDbModal();
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border"
                                                 :class="char.online > 0
                                                     ? 'bg-rapanel-success/10 text-rapanel-success border-rapanel-success/20'
-                                                    : 'bg-gray-400/10 text-gray-400 border-gray-400/20'"
+                                                    : 'bg-rapanel-text-light/10 text-rapanel-text-light/60 border-rapanel-text-light/20 dark:bg-rapanel-text-dark/10 dark:text-rapanel-text-dark/50 dark:border-rapanel-text-dark/20'"
                                             >
-                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="char.online > 0 ? 'bg-rapanel-success animate-pulse' : 'bg-gray-400'"></span>
+                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="char.online > 0 ? 'bg-rapanel-success animate-pulse' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'"></span>
                                                 {{ char.online > 0 ? __('Online') : __('Offline') }}
                                             </span>
                                         </div>
@@ -148,7 +148,7 @@ const { openItemDb } = useItemDbModal();
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-danger/70">HP</span>
                                                 <span class="text-[10px] font-semibold text-rapanel-navy-900 dark:text-white font-mono">{{ formatNum(char.hp) }} / {{ formatNum(char.max_hp) }}</span>
                                             </div>
-                                            <div class="w-full bg-rapanel-navy-100 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="w-full bg-rapanel-navy-100 dark:bg-rapanel-navy-700 rounded-full h-2">
                                                 <div class="bg-rapanel-danger h-2 rounded-full transition-all duration-500"
                                                     :style="{ width: barPct(char.hp, char.max_hp) + '%' }"
                                                 ></div>
@@ -160,7 +160,7 @@ const { openItemDb } = useItemDbModal();
                                                 <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-blue/70">SP</span>
                                                 <span class="text-[10px] font-semibold text-rapanel-navy-900 dark:text-white font-mono">{{ formatNum(char.sp) }} / {{ formatNum(char.max_sp) }}</span>
                                             </div>
-                                            <div class="w-full bg-rapanel-navy-100 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="w-full bg-rapanel-navy-100 dark:bg-rapanel-navy-700 rounded-full h-2">
                                                 <div class="bg-rapanel-blue h-2 rounded-full transition-all duration-500"
                                                     :style="{ width: barPct(char.sp, char.max_sp) + '%' }"
                                                 ></div>
@@ -197,7 +197,7 @@ const { openItemDb } = useItemDbModal();
                                             { l: 'DEX', v: char.dex },
                                             { l: 'LUK', v: char.luk },
                                         ]" :key="stat.l"
-                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-gray-700/40 text-center"
+                                            class="flex flex-col items-center gap-0.5 bg-white dark:bg-rapanel-navy-800 rounded-lg px-2 py-2.5 border border-rapanel-navy-100 dark:border-white/10 text-center"
                                         >
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ stat.l }}</span>
                                             <span class="font-bold text-rapanel-navy-900 dark:text-white text-base">{{ stat.v ?? 0 }}</span>
@@ -205,11 +205,11 @@ const { openItemDb } = useItemDbModal();
                                     </div>
                                     <!-- Status Points + Skill Points -->
                                     <div class="grid grid-cols-2 gap-2 mt-auto">
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-white/10">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Status Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.status_point ?? 0 }}</span>
                                         </div>
-                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-gray-700/40">
+                                        <div class="flex items-center justify-between bg-white dark:bg-rapanel-navy-800 rounded-lg px-3 py-2 border border-rapanel-navy-100 dark:border-white/10">
                                             <span class="text-[9px] uppercase tracking-widest font-extrabold text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Skill Points') }}</span>
                                             <span class="font-bold text-rapanel-gold text-sm">{{ char.skill_point ?? 0 }}</span>
                                         </div>
@@ -342,7 +342,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Status') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="m in char.party_members" :key="m.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ m.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
@@ -357,15 +357,15 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ m.base_level }}</td>
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ m.job_level }}</td>
                                                 <td class="px-3 py-2 text-center">
-                                                    <span :class="m.online > 0 ? 'text-rapanel-success' : 'text-gray-400'" class="font-bold text-[10px]">{{ m.online > 0 ? __('Online') : __('Offline') }}</span>
+                                                    <span :class="m.online > 0 ? 'text-rapanel-success' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'" class="font-bold text-[10px]">{{ m.online > 0 ? __('Online') : __('Offline') }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                     <!-- Cards: móvil -->
-                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="m in char.party_members" :key="m.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
-                                            <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <span :class="m.online > 0 ? 'bg-rapanel-success' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <div class="relative shrink-0">
                                                 <img :src="`/data/icon_jobs/icon_jobs_${m.class}.png`" @error="onImgError" class="w-6 h-6 object-contain" />
                                                 <img v-if="m.name === char.party_leader_name" src="/data/icon_jobs/ico_partycrown.png" class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 object-contain" alt="Leader" />
@@ -400,7 +400,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Status') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="f in char.friends" :key="f.char_id" class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-3 py-2 font-medium text-rapanel-navy-900 dark:text-white">{{ f.name }}</td>
                                                 <td class="px-3 py-2 text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">
@@ -412,15 +412,15 @@ const { openItemDb } = useItemDbModal();
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ f.base_level }}</td>
                                                 <td class="px-3 py-2 text-center font-bold text-rapanel-navy-900 dark:text-white">{{ f.job_level }}</td>
                                                 <td class="px-3 py-2 text-center">
-                                                    <span :class="f.online > 0 ? 'text-rapanel-success' : 'text-gray-400'" class="font-bold text-[10px]">{{ f.online > 0 ? __('Online') : __('Offline') }}</span>
+                                                    <span :class="f.online > 0 ? 'text-rapanel-success' : 'text-rapanel-text-light/50 dark:text-rapanel-text-dark/50'" class="font-bold text-[10px]">{{ f.online > 0 ? __('Online') : __('Offline') }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                     <!-- Cards: móvil -->
-                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                    <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                         <div v-for="f in char.friends" :key="f.char_id" class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-rapanel-navy-900">
-                                            <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-gray-400'" class="w-2 h-2 rounded-full shrink-0"></span>
+                                            <span :class="f.online > 0 ? 'bg-rapanel-success' : 'bg-rapanel-text-light/40 dark:bg-rapanel-text-dark/40'" class="w-2 h-2 rounded-full shrink-0"></span>
                                             <img :src="`/data/icon_jobs/icon_jobs_${f.class}.png`" @error="onImgError" class="w-6 h-6 object-contain shrink-0" />
                                             <div class="min-w-0 flex-1">
                                                 <p class="text-xs font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ f.name }}</p>
@@ -458,7 +458,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="(item, idx) in char.inventory" :key="idx"
                                                 class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
@@ -487,7 +487,7 @@ const { openItemDb } = useItemDbModal();
                                     </table>
                                 </div>
                                 <!-- Cards: móvil -->
-                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                     <div v-for="(item, idx) in char.inventory" :key="idx"
                                          class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
                                          @click="openItemDb(item.nameid, item)">
@@ -541,7 +541,7 @@ const { openItemDb } = useItemDbModal();
                                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                             <tr v-for="(item, idx) in char.cart_inventory" :key="idx"
                                                 class="bg-white dark:bg-rapanel-navy-900 hover:bg-rapanel-navy-100/70 dark:hover:bg-rapanel-navy-800">
                                                 <td class="px-2 py-1.5 text-center font-mono text-[10px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue" @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
@@ -569,7 +569,7 @@ const { openItemDb } = useItemDbModal();
                                     </table>
                                 </div>
                                 <!-- Cards: móvil -->
-                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                                <div class="sm:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                                     <div v-for="(item, idx) in char.cart_inventory" :key="idx"
                                          class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-rapanel-navy-900 cursor-pointer hover:bg-rapanel-navy-50 dark:hover:bg-rapanel-navy-800 transition-colors"
                                          @click="openItemDb(item.nameid, item)">

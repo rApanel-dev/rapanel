@@ -14,7 +14,7 @@ const showingNavigationDropdown = ref(false);
     <div>
         <div class="min-h-screen bg-rapanel-navy-50 dark:bg-rapanel-navy-900 transition-colors duration-300">
             <nav
-                class="border-b border-rapanel-navy-100 dark:border-slate-700 bg-white dark:bg-rapanel-navy-800"
+                class="border-b border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-navy-800"
             >
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
@@ -91,7 +91,7 @@ const showingNavigationDropdown = ref(false);
                                     showingNavigationDropdown =
                                         !showingNavigationDropdown
                                 "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 dark:text-rapanel-text-dark transition duration-150 ease-in-out hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-900 focus:outline-none"
+                                class="inline-flex items-center justify-center rounded-md p-2 text-rapanel-text-light/45 dark:text-rapanel-text-dark transition duration-150 ease-in-out hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-900 focus:outline-none"
                             >
                                 <svg
                                     class="h-6 w-6"
@@ -132,7 +132,7 @@ const showingNavigationDropdown = ref(false);
                         block: showingNavigationDropdown,
                         hidden: !showingNavigationDropdown,
                     }"
-                    class="sm:hidden bg-white dark:bg-rapanel-navy-800 border-t dark:border-slate-700"
+                    class="sm:hidden bg-white dark:bg-rapanel-navy-800 border-t dark:border-white/10"
                 >
                     <div class="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
@@ -144,7 +144,7 @@ const showingNavigationDropdown = ref(false);
                     </div>
 
                     <div
-                        class="border-t border-rapanel-navy-100 dark:border-slate-700 pb-1 pt-4"
+                        class="border-t border-rapanel-navy-100 dark:border-white/10 pb-1 pt-4"
                     >
                         <div class="px-4">
                             <div
@@ -152,7 +152,7 @@ const showingNavigationDropdown = ref(false);
                             >
                                 {{ $page.props.auth.user.name }}
                             </div>
-                            <div class="text-sm font-medium text-gray-500">
+                            <div class="text-sm font-medium text-rapanel-text-light/55">
                                 {{ $page.props.auth.user.email }}
                             </div>
                         </div>
@@ -174,7 +174,7 @@ const showingNavigationDropdown = ref(false);
             </nav>
 
             <header
-                class="bg-white dark:bg-rapanel-navy-800 shadow-sm border-b dark:border-slate-700"
+                class="bg-white dark:bg-rapanel-navy-800 shadow-sm border-b dark:border-white/10"
                 v-if="$slots.header"
             >
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 text-rapanel-text-light dark:text-rapanel-text-dark">

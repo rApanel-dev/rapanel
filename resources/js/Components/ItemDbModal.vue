@@ -299,7 +299,7 @@ const elementBadge = (el) => {
                                 <button v-if="illustrationAvailable"
                                     @click="showIllustration = true"
                                     class="inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border tracking-wide transition
-                                           bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20">
+                                           bg-rapanel-purple/10 text-rapanel-purple border-rapanel-purple/20 hover:bg-rapanel-purple/20">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 21h18M3.75 3h16.5M4.5 3v18M19.5 3v18"/>
                                     </svg>

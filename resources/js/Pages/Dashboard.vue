@@ -122,7 +122,7 @@ const openClaimModal = () => {
 
             <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 md:p-10 shadow-xl dark:shadow-black/30">
                 
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-gray-700 pb-6 mb-8 gap-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rapanel-navy-100 dark:border-white/10 pb-6 mb-8 gap-6">
                     <div class="space-y-1">
                         <div class="flex items-center gap-3">
                             <h1 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-rapanel-text-dark uppercase tracking-widest">
@@ -146,7 +146,7 @@ const openClaimModal = () => {
                                 :disabled="isLimitReached"
                                 class="w-full sm:w-auto justify-center transition-all duration-300"
                                 :class="{
-                                    'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached
+                                    'opacity-40 grayscale cursor-not-allowed border-rapanel-navy-600 text-rapanel-text-light/55': isLimitReached
                                 }"
                                 :title="isLimitReached ? __('Maximum account limit reached') : __('Create New Game Account')"
                             >
@@ -157,7 +157,7 @@ const openClaimModal = () => {
                                 :disabled="isLimitReached"
                                 class="w-full sm:w-auto justify-center transition-all duration-300"
                                 :class="{
-                                    'opacity-40 grayscale cursor-not-allowed border-gray-500 text-gray-500': isLimitReached
+                                    'opacity-40 grayscale cursor-not-allowed border-rapanel-navy-600 text-rapanel-text-light/55': isLimitReached
                                 }"
                                 :title="isLimitReached ? __('Maximum account limit reached') : __('Link an existing account')"
                             >
@@ -202,8 +202,8 @@ const openClaimModal = () => {
                                 <th class="px-6 py-4 text-center">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700">
-                            <tr v-for="account in gameAccounts" :key="account.userid" class="hover:bg-rapanel-navy-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.08]">
+                            <tr v-for="account in gameAccounts" :key="account.userid" class="hover:bg-rapanel-navy-50/50 dark:hover:bg-white/[0.06] transition-colors">
                                 <td class="px-6 py-4 font-bold text-rapanel-blue">{{ account.userid }}</td>
                                 <td class="px-6 py-4 text-rapanel-text-light dark:text-rapanel-text-dark">
                                     <span v-if="account.sex === 'M'" class="flex items-center text-blue-500 font-medium">
@@ -294,7 +294,7 @@ const openClaimModal = () => {
 
         <Modal :show="creatingGameAccount" @close="closeCreateModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900 transition-colors duration-300">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-6 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-6 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">
                     {{ __('Create New Game Account') }}
                 </h2>
                 <form @submit.prevent="createAccount" class="space-y-5">

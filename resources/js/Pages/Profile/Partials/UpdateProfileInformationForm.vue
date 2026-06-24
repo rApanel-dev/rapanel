@@ -102,7 +102,7 @@ function submitEmailChange() {
                 <select
                     id="locale"
                     v-model="form.locale"
-                    class="mt-1 block w-full rounded-md border border-gray-200 dark:border-rapanel-navy-700
+                    class="mt-1 block w-full rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
                            bg-white dark:bg-rapanel-navy-800
                            px-3 py-2 text-sm text-rapanel-text-light dark:text-rapanel-text-dark
                            focus:border-rapanel-blue focus:ring-rapanel-blue shadow-sm"
@@ -112,7 +112,7 @@ function submitEmailChange() {
                         {{ lang.flag }} {{ lang.label }}
                     </option>
                 </select>
-                <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                <p class="mt-1 text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">
                     {{ __('Used for notification emails and panel language.') }}
                 </p>
                 <InputError class="mt-1.5" :message="form.errors.locale" />
@@ -125,12 +125,12 @@ function submitEmailChange() {
             <div class="mt-1 flex items-center gap-2">
                 <div
                     id="email-display"
-                    class="flex-1 rounded-md border border-gray-200 dark:border-rapanel-navy-700
-                           bg-gray-50 dark:bg-rapanel-navy-800/60
-                           px-3 py-2 text-sm text-gray-500 dark:text-gray-400
+                    class="flex-1 rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
+                           bg-rapanel-navy-50 dark:bg-rapanel-navy-800/60
+                           px-3 py-2 text-sm text-rapanel-text-light/55 dark:text-rapanel-text-dark/55
                            flex items-center gap-2 select-all"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-rapanel-text-light/45 dark:text-rapanel-text-dark/45" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                     </svg>
                     {{ user.email }}
@@ -169,7 +169,7 @@ function submitEmailChange() {
                 <select
                     id="country"
                     v-model="form.country"
-                    class="mt-1 block w-full rounded-md border border-gray-200 dark:border-rapanel-navy-700
+                    class="mt-1 block w-full rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
                            bg-white dark:bg-rapanel-navy-800
                            px-3 py-2 text-sm text-rapanel-text-light dark:text-rapanel-text-dark
                            focus:border-rapanel-blue focus:ring-rapanel-blue shadow-sm"
@@ -184,26 +184,26 @@ function submitEmailChange() {
         <!-- Last Login / Last IP (read-only) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                <p class="text-xs font-semibold uppercase tracking-wider text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-1">
                     {{ __('Last Login') }}
                 </p>
-                <div class="rounded-md border border-gray-200 dark:border-rapanel-navy-700
-                            bg-gray-50 dark:bg-rapanel-navy-800/60
-                            px-3 py-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <div class="rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
+                            bg-rapanel-navy-50 dark:bg-rapanel-navy-800/60
+                            px-3 py-2 text-sm text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-rapanel-text-light/45" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
                     </svg>
                     <span>{{ user.last_login ? new Date(user.last_login).toLocaleString() : __('Never') }}</span>
                 </div>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                <p class="text-xs font-semibold uppercase tracking-wider text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-1">
                     {{ __('Last IP') }}
                 </p>
-                <div class="rounded-md border border-gray-200 dark:border-rapanel-navy-700
-                            bg-gray-50 dark:bg-rapanel-navy-800/60
-                            px-3 py-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 font-mono">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <div class="rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
+                            bg-rapanel-navy-50 dark:bg-rapanel-navy-800/60
+                            px-3 py-2 text-sm text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 flex items-center gap-2 font-mono">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-rapanel-text-light/45" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                     </svg>
                     <span>{{ user.last_ip || __('Unknown') }}</span>
@@ -271,7 +271,7 @@ function submitEmailChange() {
                     <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white">
                         {{ __('Change Email') }}
                     </h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="mt-1 text-sm text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
                         {{ hasTwoFactor
                             ? __('Enter your new email address and confirm with your authenticator code.')
                             : __('Enter your new email address and confirm with your current password.') }}
@@ -280,7 +280,7 @@ function submitEmailChange() {
                 <button
                     type="button"
                     @click="closeEmailModal"
-                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors ml-4"
+                    class="text-rapanel-text-light/45 hover:text-rapanel-text-light/70 dark:hover:text-rapanel-text-dark/80 transition-colors ml-4"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -293,9 +293,9 @@ function submitEmailChange() {
                 <!-- Email actual (referencia, solo lectura) -->
                 <div>
                     <InputLabel :value="__('Current Email')" />
-                    <div class="mt-1 rounded-md border border-gray-200 dark:border-rapanel-navy-700
-                                bg-gray-50 dark:bg-rapanel-navy-800/60
-                                px-3 py-2 text-sm text-gray-400 dark:text-gray-500">
+                    <div class="mt-1 rounded-md border border-rapanel-navy-100 dark:border-rapanel-navy-700
+                                bg-rapanel-navy-50 dark:bg-rapanel-navy-800/60
+                                px-3 py-2 text-sm text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">
                         {{ user.email }}
                     </div>
                 </div>
@@ -369,7 +369,7 @@ function submitEmailChange() {
                         <button
                             type="button"
                             @click="showPassword = !showPassword"
-                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-rapanel-text-light/45 hover:text-rapanel-text-light/70 dark:hover:text-rapanel-text-dark/70"
                             tabindex="-1"
                         >
                             <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -421,8 +421,8 @@ function submitEmailChange() {
                     <button
                         type="button"
                         @click="closeEmailModal"
-                        class="rounded-md px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300
-                               hover:bg-gray-100 dark:hover:bg-rapanel-navy-700 transition-colors"
+                        class="rounded-md px-4 py-2 text-sm font-medium text-rapanel-text-light/70 dark:text-rapanel-text-dark/70
+                               hover:bg-rapanel-navy-100 dark:hover:bg-rapanel-navy-700 transition-colors"
                     >
                         {{ __('Cancel') }}
                     </button>

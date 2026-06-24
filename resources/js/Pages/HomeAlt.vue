@@ -413,7 +413,7 @@ onUnmounted(() => {
                     </h1>
 
                     <!-- Subtitle -->
-                    <p class="ha-subtitle opacity-0 text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+                    <p class="ha-subtitle opacity-0 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
                         {{ st.home_hero_subtitle || __('A classic Ragnarok Online experience, reimagined for a new era.') }}
                     </p>
 
@@ -434,8 +434,8 @@ onUnmounted(() => {
 
                     <!-- Scroll arrow -->
                     <div class="mt-16 flex flex-col items-center gap-1 ha-bounce">
-                        <span class="text-xs text-gray-400 dark:text-gray-500 tracking-[0.25em] uppercase">{{ __('Scroll') }}</span>
-                        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 tracking-[0.25em] uppercase">{{ __('Scroll') }}</span>
+                        <svg class="w-5 h-5 text-rapanel-text-light/45 dark:text-rapanel-text-dark/45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
@@ -458,7 +458,7 @@ onUnmounted(() => {
                                      :class="srv[s.key] ? 'text-[#2ECC71]' : 'text-red-500'">
                                     {{ srv[s.key] ? __('ONLINE') : __('OFFLINE') }}
                                 </div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __(s.label) }}</div>
+                                <div class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 uppercase tracking-widest mt-1">{{ __(s.label) }}</div>
                             </div>
                         </template>
 
@@ -469,7 +469,7 @@ onUnmounted(() => {
                                  :class="srv.ws ? 'text-[#2ECC71]' : 'text-red-500'">
                                 {{ srv.ws ? __('ONLINE') : __('OFFLINE') }}
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __('roBrowser Server') }}</div>
+                            <div class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 uppercase tracking-widest mt-1">{{ __('roBrowser Server') }}</div>
                         </div>
 
                         <!-- Peak Players (al final) -->
@@ -477,7 +477,7 @@ onUnmounted(() => {
                             <div class="font-display text-3xl font-bold text-rapanel-danger">
                                 <span :data-count="srv.peak ?? 0">{{ srv.peak ?? 0 }}</span>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">{{ __('Peak Players') }}</div>
+                            <div class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 uppercase tracking-widest mt-1">{{ __('Peak Players') }}</div>
                         </div>
 
                     </div>
@@ -514,7 +514,7 @@ onUnmounted(() => {
                                     <span :data-count-info="st.home_job_rate || 100">{{ st.home_job_rate || 100 }}</span>x /
                                     <span :data-count-info="st.home_drop_rate || 100">{{ st.home_drop_rate || 100 }}</span>x
                                 </div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Base / Job / Drop') }}</div>
+                                <div class="text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 text-xs uppercase tracking-widest mt-1">{{ __('Base / Job / Drop') }}</div>
                             </div>
                         </div>
 
@@ -532,7 +532,7 @@ onUnmounted(() => {
                                     <span :data-count-info="st.home_max_base_level || 99">{{ st.home_max_base_level || 99 }}</span> /
                                     <span :data-count-info="st.home_max_job_level || 70">{{ st.home_max_job_level || 70 }}</span>
                                 </div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Max Base / Job') }}</div>
+                                <div class="text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 text-xs uppercase tracking-widest mt-1">{{ __('Max Base / Job') }}</div>
                             </div>
                         </div>
 
@@ -547,7 +547,7 @@ onUnmounted(() => {
                             </div>
                             <div>
                                 <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark capitalize">{{ st.home_game_mode || 'Pre-Renewal' }}</div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Game Mode') }}</div>
+                                <div class="text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 text-xs uppercase tracking-widest mt-1">{{ __('Game Mode') }}</div>
                             </div>
                         </div>
 
@@ -562,7 +562,7 @@ onUnmounted(() => {
                             </div>
                             <div>
                                 <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ st.home_episode || '13.3+ — El Dicastes' }}</div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ __('Episode') }}</div>
+                                <div class="text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 text-xs uppercase tracking-widest mt-1">{{ __('Episode') }}</div>
                             </div>
                         </div>
 
@@ -577,7 +577,7 @@ onUnmounted(() => {
                             </div>
                             <div>
                                 <div class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('International') }}</div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mt-1">{{ st.home_intl_text || 'EN · ES · PT · FR' }}</div>
+                                <div class="text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 text-xs uppercase tracking-widest mt-1">{{ st.home_intl_text || 'EN · ES · PT · FR' }}</div>
                             </div>
                         </div>
 
@@ -621,12 +621,12 @@ onUnmounted(() => {
                                           :style="`background: ${item.type_color}20; color: ${item.type_color}`">
                                         {{ __(item.type_label) }}
                                     </span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ item.created_at }}</span>
+                                    <span class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ item.created_at }}</span>
                                 </div>
                                 <h4 class="ha-news-title font-display text-lg font-bold text-rapanel-text-light dark:text-rapanel-text-dark leading-snug line-clamp-2 transition-colors">
                                     {{ item.title }}
                                 </h4>
-                                <p class="text-gray-600 dark:text-gray-400 text-xs mt-2 line-clamp-2">{{ item.excerpt }}</p>
+                                <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/55 text-xs mt-2 line-clamp-2">{{ item.excerpt }}</p>
                             </Link>
                         </template>
                     </div>
@@ -655,7 +655,7 @@ onUnmounted(() => {
                             </div>
 
                             <h3 class="font-display text-xl font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ f.title }}</h3>
-                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{{ f.desc }}</p>
+                            <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-sm leading-relaxed">{{ f.desc }}</p>
 
                             <!-- Top-edge glow line -->
                             <div class="absolute top-0 left-6 right-6 h-px"
@@ -677,7 +677,7 @@ onUnmounted(() => {
                         <span class="block ha-gradient-text">{{ st.home_cta_line2 || __('Adventure') }}</span>
                     </h2>
 
-                    <p class="text-gray-600 dark:text-gray-300 text-lg mb-10 max-w-xl mx-auto">
+                    <p class="text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-lg mb-10 max-w-xl mx-auto">
                         {{ st.home_cta_subtitle || __('Join our community and experience Ragnarok Online the way it was meant to be played.') }}
                     </p>
 

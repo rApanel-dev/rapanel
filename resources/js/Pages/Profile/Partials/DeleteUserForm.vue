@@ -75,7 +75,7 @@ watch(
             <!-- ── Estado 1: Confirmar con contraseña ── -->
             <template v-if="!emailSent">
                 <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2
-                            border-b border-rapanel-navy-100 dark:border-gray-700 pb-3
+                            border-b border-rapanel-navy-100 dark:border-white/10 pb-3
                             uppercase tracking-wider">
                     {{ __('Are you sure you want to delete your account?') }}
                 </h2>
@@ -144,7 +144,7 @@ watch(
                         <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2">
                             {{ __('Check your email') }}
                         </h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                        <p class="text-sm text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 max-w-sm">
                             {{ __('account_deletion_email_sent') }}
                         </p>
                     </div>

@@ -61,7 +61,7 @@ const scrollTo = (id) => {
                                 {{ __('Register Now') }}
                             </Link>
                             <button @click="scrollTo('about')"
-                                    class="text-lg font-semibold leading-6 text-gray-900 dark:text-white hover:text-rapanel-blue dark:hover:text-rapanel-blue transition">
+                                    class="text-lg font-semibold leading-6 text-rapanel-text-light dark:text-white hover:text-rapanel-blue dark:hover:text-rapanel-blue transition">
                                 {{ __('Server Info') }} →
                             </button>
                         </div>
@@ -299,15 +299,15 @@ const scrollTo = (id) => {
                 <div class="flex flex-wrap justify-center gap-6 pb-16">
 
                     <div class="w-full max-w-xs">
-                        <div class="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+                        <div class="flex flex-col h-full bg-white dark:bg-rapanel-surface shadow-lg rounded-xl overflow-hidden">
                             <figure class="relative h-0 pb-[56.25%] overflow-hidden">
                                 <img class="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition duration-700 ease-out"
                                      src="/images/bg.gif" alt="Battlegrounds" />
                             </figure>
                             <div class="flex flex-col flex-grow p-5 text-center">
                                 <div class="flex-grow">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('New Battlegrounds') }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                                    <h3 class="text-xl font-bold text-rapanel-text-light dark:text-white mb-3">{{ __('New Battlegrounds') }}</h3>
+                                    <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 mb-6 leading-relaxed">
                                         {{ __('Discover new Battleground modes designed to improve GvG and gameplay, not found on other servers!') }}
                                     </p>
                                 </div>
@@ -321,15 +321,15 @@ const scrollTo = (id) => {
                     </div>
 
                     <div class="w-full max-w-xs">
-                        <div class="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+                        <div class="flex flex-col h-full bg-white dark:bg-rapanel-surface shadow-lg rounded-xl overflow-hidden">
                             <figure class="relative h-0 pb-[56.25%] overflow-hidden">
                                 <img class="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition duration-700 ease-out"
                                      src="/images/battlepass.gif" alt="Battle Pass" />
                             </figure>
                             <div class="flex flex-col flex-grow p-5 text-center">
                                 <div class="flex-grow">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Battle Pass') }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                                    <h3 class="text-xl font-bold text-rapanel-text-light dark:text-white mb-3">{{ __('Battle Pass') }}</h3>
+                                    <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 mb-6 leading-relaxed">
                                         {{ __('A monthly system that rewards players with exclusive items based on level progression.') }}
                                     </p>
                                 </div>
@@ -343,15 +343,15 @@ const scrollTo = (id) => {
                     </div>
 
                     <div class="w-full max-w-xs">
-                        <div class="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+                        <div class="flex flex-col h-full bg-white dark:bg-rapanel-surface shadow-lg rounded-xl overflow-hidden">
                             <figure class="relative h-0 pb-[56.25%] overflow-hidden">
                                 <img class="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition duration-700 ease-out"
                                      src="/images/championmob.gif" alt="Champion Mobs" />
                             </figure>
                             <div class="flex flex-col flex-grow p-5 text-center">
                                 <div class="flex-grow">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Champion Mobs') }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                                    <h3 class="text-xl font-bold text-rapanel-text-light dark:text-white mb-3">{{ __('Champion Mobs') }}</h3>
+                                    <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 mb-6 leading-relaxed">
                                         {{ __('Face a greater threat: Champion Monsters with exclusive drops and special rewards!') }}
                                     </p>
                                 </div>
@@ -365,15 +365,15 @@ const scrollTo = (id) => {
                     </div>
 
                     <div class="w-full max-w-xs">
-                        <div class="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+                        <div class="flex flex-col h-full bg-white dark:bg-rapanel-surface shadow-lg rounded-xl overflow-hidden">
                             <figure class="relative h-0 pb-[56.25%] overflow-hidden">
                                 <img class="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition duration-700 ease-out"
                                      src="/images/pet.gif" alt="Pet Evolution" />
                             </figure>
                             <div class="flex flex-col flex-grow p-5 text-center">
                                 <div class="flex-grow">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Pet Evolution') }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                                    <h3 class="text-xl font-bold text-rapanel-text-light dark:text-white mb-3">{{ __('Pet Evolution') }}</h3>
+                                    <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 mb-6 leading-relaxed">
                                         {{ __('Evolve your pets to improve their stats and unlock new appearances!') }}
                                     </p>
                                 </div>

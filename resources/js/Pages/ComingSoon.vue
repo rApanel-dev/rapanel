@@ -46,7 +46,7 @@ const __ = (key) => page.props.translations?.[key] || key;
                         <h2 class="text-2xl font-display font-bold text-rapanel-navy-900 dark:text-white mb-2">
                             {{ __('Coming soon') }}
                         </h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                        <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">
                             {{ __('This section is not available yet.') }}
                         </p>
                     </div>

@@ -276,7 +276,7 @@ const { openItemDb } = useItemDbModal();
                         <!-- Título + botón eliminar (móvil: mismo row) -->
                         <div class="flex items-center justify-between sm:justify-start gap-3">
                             <div class="flex items-center gap-3">
-                                <Link :href="backHref" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-gray-700 hover:bg-rapanel-blue hover:text-white transition-all">
+                                <Link :href="backHref" class="flex items-center justify-center w-8 h-8 rounded-lg bg-rapanel-navy-100 dark:bg-rapanel-navy-700 hover:bg-rapanel-blue hover:text-white transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
                                 </Link>
                                 <div>
@@ -327,7 +327,7 @@ const { openItemDb } = useItemDbModal();
                             </ActionButton>
 
                             <!-- Separador + Eliminar (danger): solo en escritorio -->
-                            <div class="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div>
+                            <div class="hidden sm:block w-px h-6 bg-rapanel-navy-100 dark:bg-white/10 self-center mx-1"></div>
                             <div class="hidden sm:block">
                                 <DeleteGameAccountForm :account="gameAccount" :disabled="isAccountOnline" />
                             </div>
@@ -419,7 +419,7 @@ const { openItemDb } = useItemDbModal();
                     </h3>
                 </div>
 
-                <div v-if="characters.length === 0" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-gray-500 italic text-sm">
+                <div v-if="characters.length === 0" class="px-6 py-12 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/45 italic text-sm">
                     {{ __('No characters found.') }}
                 </div>
 
@@ -439,8 +439,8 @@ const { openItemDb } = useItemDbModal();
                                 <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
-                            <tr v-for="char in characters" :key="char.char_id" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                        <tbody class="divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
+                            <tr v-for="char in characters" :key="char.char_id" class="hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                                 <td class="px-4 py-3 text-rapanel-text-light/50 dark:text-rapanel-text-dark/50 font-mono">{{ char.char_num + 1 }}</td>
                                 <td class="px-4 py-3">
                                     <button @click="openCharModal(char)" class="font-bold text-rapanel-blue hover:underline hover:text-rapanel-blue/80 transition-colors text-left">
@@ -488,7 +488,7 @@ const { openItemDb } = useItemDbModal();
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-t-2 border-rapanel-navy-100 dark:border-gray-700">
+                        <tfoot class="bg-rapanel-navy-100/70 dark:bg-rapanel-navy-800 border-t-2 border-rapanel-navy-100 dark:border-white/[0.08]">
                             <tr>
                                 <td colspan="5" class="px-4 py-2 text-right text-[10px] uppercase tracking-widest font-extrabold text-rapanel-text-light/50 dark:text-rapanel-text-dark/50">{{ __('Total Zeny') }}</td>
                                 <td class="px-4 py-2 text-right font-mono font-bold text-rapanel-danger dark:text-rapanel-gold">{{ formatNum(totalZeny) }} z</td>
@@ -499,9 +499,9 @@ const { openItemDb } = useItemDbModal();
                 </div>
 
                 <!-- Cards: móvil -->
-                <div v-if="characters.length > 0" class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-gray-700/50">
+                <div v-if="characters.length > 0" class="md:hidden divide-y divide-rapanel-navy-100 dark:divide-white/[0.06]">
                     <div v-for="char in characters" :key="char.char_id"
-                         class="px-4 py-4 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                         class="px-4 py-4 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                         <!-- Fila principal: nombre + dot estado -->
                         <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="min-w-0">
@@ -562,7 +562,7 @@ const { openItemDb } = useItemDbModal();
                     </h3>
                 </div>
 
-                <div v-if="storageItems.length === 0" class="px-6 py-10 text-center text-rapanel-text-light/40 dark:text-gray-500 italic text-sm">
+                <div v-if="storageItems.length === 0" class="px-6 py-10 text-center text-rapanel-text-light/40 dark:text-rapanel-text-dark/45 italic text-sm">
                     {{ __('No storage items found.') }}
                 </div>
 
@@ -583,9 +583,9 @@ const { openItemDb } = useItemDbModal();
                                 <th class="px-3 py-2 text-center">{{ __('Slot 4') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30">
+                        <tbody class="divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04]">
                             <tr v-for="(item, idx) in storageItems" :key="idx"
-                                class="hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors">
+                                class="hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors">
                                 <td class="px-3 py-1.5 text-center font-mono text-[11px] text-rapanel-text-light/50 dark:text-rapanel-text-dark/40 cursor-pointer hover:text-rapanel-blue"
                                     @click="openItemDb(item.nameid, item)">{{ item.nameid }}</td>
                                 <td class="px-3 py-1.5 text-center cursor-pointer"
@@ -617,9 +617,9 @@ const { openItemDb } = useItemDbModal();
                 </div>
 
                 <!-- Cards storage: móvil -->
-                <div v-if="storageItems.length > 0" class="md:hidden divide-y divide-rapanel-navy-100/50 dark:divide-gray-700/30 max-h-96 overflow-y-auto">
+                <div v-if="storageItems.length > 0" class="md:hidden divide-y divide-rapanel-navy-100/50 dark:divide-white/[0.04] max-h-96 overflow-y-auto">
                     <div v-for="(item, idx) in storageItems" :key="idx"
-                         class="px-3 py-3 flex items-center gap-3 hover:bg-rapanel-navy-50/30 dark:hover:bg-gray-700/20 transition-colors cursor-pointer"
+                         class="px-3 py-3 flex items-center gap-3 hover:bg-rapanel-navy-50/30 dark:hover:bg-white/[0.05] transition-colors cursor-pointer"
                          @click="openItemDb(item.nameid, item)">
                         <div class="flex flex-col items-center gap-0.5 shrink-0 w-10">
                             <img :src="`/data/items/item/${item.nameid}.png`" @error="onImgError" class="w-9 h-9 object-contain" :alt="item.name_english" />
@@ -665,10 +665,10 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: CHANGE PASSWORD ===== -->
         <Modal :show="changePasswordModal" @close="closeChangePasswordModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">
                     {{ __('Change Password for') }} <span class="text-rapanel-blue">{{ gameAccount.userid }}</span>
                 </h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4 italic">
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-4 italic">
                     {{ __('Enter a new password for this game account. For security, we request your master account password.') }}
                 </p>
                 <!-- Password rules -->
@@ -722,15 +722,15 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: CHANGE GENDER ===== -->
         <Modal :show="genderModal" @close="closeGenderModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">
                     {{ __('Change Gender') }}
                 </h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-1">
                     {{ __('Account') }}: <span class="font-bold text-rapanel-blue">{{ gameAccount.userid }}</span>
                     &nbsp;|&nbsp; {{ __('Current Gender') }}: <span class="font-bold text-rapanel-purple">{{ formatSex(gameAccount.sex) }}</span>
                     &nbsp;→&nbsp; <span class="font-bold text-rapanel-gold">{{ gameAccount.sex === 'M' ? __('Female') : __('Male') }}</span>
                 </p>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-6 italic">
                     {{ __('All characters must be offline. Confirm with your master password.') }}
                 </p>
                 <form @submit.prevent="submitGender" class="space-y-5">
@@ -763,9 +763,9 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: RESET POSITION ===== -->
         <Modal :show="resetPosModal" @close="closeResetPosModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Position') }}</h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPos?.name }}</span></p>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will teleport the character to the default spawn point. Confirm with your master password.') }}</p>
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">{{ __('Reset Position') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPos?.name }}</span></p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-6 italic">{{ __('This will teleport the character to the default spawn point. Confirm with your master password.') }}</p>
                 <form @submit.prevent="confirmResetPos" class="space-y-5">
                     <div>
                         <InputLabel for="rpos_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
@@ -784,9 +784,9 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: RESET LOOK ===== -->
         <Modal :show="resetLookModal" @close="closeResetLookModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Reset Look') }}</h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedLook?.name }}</span></p>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-6 italic">{{ __('This will reset the character\'s appearance (hair, color, outfit) to default values. Confirm with your master password.') }}</p>
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">{{ __('Reset Look') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-1">{{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedLook?.name }}</span></p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-6 italic">{{ __('This will reset the character\'s appearance (hair, color, outfit) to default values. Confirm with your master password.') }}</p>
                 <form @submit.prevent="confirmResetLook" class="space-y-5">
                     <div>
                         <InputLabel for="rlook_pw" :value="__('Master Account Password')" class="text-rapanel-gold font-bold uppercase text-xs" />
@@ -805,12 +805,12 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: CHANGE SLOT ===== -->
         <Modal :show="slotModal" @close="closeSlotModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Change Slot') }}</h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-1">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">{{ __('Change Slot') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-1">
                     {{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedSlotChar?.name }}</span>
                     &nbsp;|&nbsp; {{ __('Current Slot') }}: <span class="font-bold text-rapanel-blue">{{ (selectedSlotChar?.char_num ?? 0) + 1 }}</span>
                 </p>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4 italic">{{ __('Select a slot for this character. If the target slot is occupied, the characters will be swapped.') }}</p>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-4 italic">{{ __('Select a slot for this character. If the target slot is occupied, the characters will be swapped.') }}</p>
 
                 <!-- Slot picker -->
                 <div class="grid grid-cols-3 gap-2 mb-5">
@@ -859,8 +859,8 @@ const { openItemDb } = useItemDbModal();
         <!-- ===== MODAL: CHARACTER PREFERENCES ===== -->
         <Modal :show="prefModal" @close="closePrefModal">
             <div class="p-6 bg-white dark:bg-rapanel-navy-900">
-                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-gray-700 pb-3 uppercase tracking-wider">{{ __('Character Preferences') }}</h2>
-                <p class="text-sm text-rapanel-text-light/60 dark:text-gray-400 mb-4">
+                <h2 class="text-lg font-bold text-rapanel-navy-900 dark:text-white mb-2 border-b border-rapanel-navy-100 dark:border-white/10 pb-3 uppercase tracking-wider">{{ __('Character Preferences') }}</h2>
+                <p class="text-sm text-rapanel-text-light/60 dark:text-rapanel-text-dark/55 mb-4">
                     {{ __('Character') }}: <span class="font-bold text-rapanel-blue">{{ selectedPrefChar?.name }}</span>
                 </p>
                 <form @submit.prevent="confirmPrefUpdate" class="space-y-5">
