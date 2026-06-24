@@ -135,7 +135,7 @@ function playNow(event) {
                                         <MenuItem v-slot="{ active }">
                                             <Link :href="safeRoute('admin.dashboard')" :class="[active ? 'bg-rapanel-gold/10 dark:bg-rapanel-gold/10' : '', 'flex items-center gap-2 px-4 py-2 text-sm font-bold text-rapanel-gold transition']">
                                                 <span class="text-[10px] bg-rapanel-gold text-rapanel-navy-900 px-1.5 py-0.5 rounded font-black uppercase tracking-widest">Admin</span>
-                                                Panel
+                                                {{ __('Panel') }}
                                             </Link>
                                         </MenuItem>
                                         <div class="border-t border-rapanel-navy-100 dark:border-white/10 my-1"></div>
