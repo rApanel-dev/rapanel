@@ -32,6 +32,7 @@ import {
     ShieldExclamationIcon,
     StarIcon,
     CurrencyDollarIcon,
+    SwatchIcon,
 } from '@heroicons/vue/24/outline';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
@@ -125,6 +126,7 @@ const groups = [
             { name: 'Action Logs',      route: 'admin.logs.index',          icon: ClipboardDocumentListIcon },
             { name: 'Console',          route: 'admin.console.index',       icon: CommandLineIcon           },
             { name: 'Settings',         route: 'admin.settings.index',      icon: Cog6ToothIcon             },
+            { name: 'Appearance',       route: 'admin.appearance.index',    icon: SwatchIcon                },
         ],
     },
 ];
