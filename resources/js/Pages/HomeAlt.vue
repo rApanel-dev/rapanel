@@ -183,18 +183,31 @@ const countUp = (el, target, dur = 1800, suffix = '') => {
 }
 
 // ── GSAP loader ──────────────────────────────────────────────────────────────
+// Resuelve true/false. NUNCA cuelga: si el CDN está bloqueado (onerror) o tarda
+// (>4s), resuelve y el caller revela los textos sin animación (no quedan ocultos).
 const loadGSAP = () => new Promise(resolve => {
-    if (window.gsap && window.ScrollTrigger) { resolve(); return }
+    if (window.gsap && window.ScrollTrigger) { resolve(true); return }
+    let done = false
+    const finish = (ok) => { if (!done) { done = true; resolve(ok) } }
     const s1 = document.createElement('script')
     s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js'
+    s1.onerror = () => finish(false)
     s1.onload = () => {
         const s2 = document.createElement('script')
         s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js'
-        s2.onload = () => { window.gsap.registerPlugin(window.ScrollTrigger); resolve() }
+        s2.onerror = () => finish(false)
+        s2.onload = () => { window.gsap.registerPlugin(window.ScrollTrigger); finish(true) }
         document.head.appendChild(s2)
     }
     document.head.appendChild(s1)
+    setTimeout(() => finish(!!(window.gsap && window.ScrollTrigger)), 4000)
 })
+
+// Fallback: si GSAP no está disponible, muestra los elementos que nacen opacity-0.
+const revealAll = () => {
+    document.querySelectorAll('.ha-title, .ha-subtitle, .ha-cta, .stat-chip, .feat-card, .info-block, .cta-inner')
+        .forEach(el => { el.style.opacity = '1'; el.style.transform = 'none' })
+}
 
 const initGSAP = () => {
     const { gsap, ScrollTrigger } = window
@@ -359,8 +372,8 @@ const initGridGlow = () => {
 onMounted(async () => {
     initCanvas()
     initGridGlow()
-    await loadGSAP()
-    initGSAP()
+    const gsapOk = await loadGSAP()
+    if (gsapOk && window.gsap) { initGSAP() } else { revealAll() }
     setTimeout(initTilt, 600)
     startCharAnimation(false)
     window.addEventListener('scroll', handleScroll, { passive: true })
