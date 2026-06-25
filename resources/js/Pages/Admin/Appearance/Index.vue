@@ -51,34 +51,42 @@ const tabs = [
 ];
 const activeTab = ref('header-footer');
 
-// --- Imagen de fondo ---
-const bgPreview = ref(props.bgImage ? '/storage/' + props.bgImage : null);
+// --- Imágenes: siempre se muestra la actual (custom o el default real) ---
+const BG_DEFAULT   = '/images/bg-main.svg';
+const INFO_DEFAULT = '/images/bg-main-rapanel.svg';
+
+const bgPreview  = ref(props.bgImage ? '/storage/' + props.bgImage : BG_DEFAULT);
+const bgIsCustom = ref(!!props.bgImage);
 const onBgImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     form.bg_image = file;
     form.remove_bg_image = false;
     bgPreview.value = URL.createObjectURL(file);
+    bgIsCustom.value = true;
 };
-// --- Imagen de la sección Info de la home ---
-const infoPreview = ref(props.infoBgImage ? '/storage/' + props.infoBgImage : null);
+const clearBgImage = () => {
+    form.bg_image = null;
+    form.remove_bg_image = true;
+    bgPreview.value = BG_DEFAULT;
+    bgIsCustom.value = false;
+};
+
+const infoPreview  = ref(props.infoBgImage ? '/storage/' + props.infoBgImage : INFO_DEFAULT);
+const infoIsCustom = ref(!!props.infoBgImage);
 const onInfoImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     form.info_bg_image = file;
     form.remove_info_bg_image = false;
     infoPreview.value = URL.createObjectURL(file);
+    infoIsCustom.value = true;
 };
 const clearInfoImage = () => {
     form.info_bg_image = null;
     form.remove_info_bg_image = true;
-    infoPreview.value = null;
-};
-
-const clearBgImage = () => {
-    form.bg_image = null;
-    form.remove_bg_image = true;
-    bgPreview.value = null;
+    infoPreview.value = INFO_DEFAULT;
+    infoIsCustom.value = false;
 };
 
 // --- Personaje de la home (HomeAlt /home2) — form separado ---
@@ -118,6 +126,14 @@ const charPreviewPos = computed(() => ({
 const charPreviewSize = computed(() => ({
     sm: 'h-[55%]', md: 'h-[72%]', lg: 'h-[90%]',
 }[charForm.size] || 'h-[90%]'));
+
+// Degradado de títulos en vivo (para el mock de la home)
+const homeGradientStyle = computed(() => ({
+    background: `linear-gradient(120deg, ${form.home.title_gradient.from} 0%, ${form.home.title_gradient.mid} 45%, ${form.home.title_gradient.to} 100%)`,
+    '-webkit-background-clip': 'text',
+    'background-clip': 'text',
+    '-webkit-text-fill-color': 'transparent',
+}));
 
 // --- Preview en vivo ---
 const themeFromForm = () => ({
@@ -192,7 +208,7 @@ const buttonFields = [
             </button>
         </div>
 
-        <div class="max-w-5xl pb-28">
+        <div class="max-w-7xl pb-28">
 
             <!-- ════════ HEADER & FOOTER ════════ -->
             <div v-show="activeTab === 'header-footer'" class="space-y-6">
@@ -260,13 +276,27 @@ const buttonFields = [
             <!-- ════════ HOME (fondo + imagen + personaje) ════════ -->
             <div v-show="activeTab === 'home'" class="space-y-6">
 
-                <!-- Vista previa rápida: fondo de página + personaje (en vivo) -->
+                <!-- Vista previa en vivo del hero de la home: fondo + degradado + acento + paleta + personaje -->
                 <div class="relative aspect-[21/8] rounded-2xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 shadow-sm bg-rapanel-page">
-                    <img v-if="bgPreview" :src="bgPreview" alt="" class="absolute inset-0 w-full h-full object-cover" />
+                    <!-- glow del acento -->
+                    <div class="absolute inset-0 pointer-events-none" :style="{ background: `radial-gradient(60% 80% at 30% 70%, ${form.home.accent}22 0%, transparent 60%)` }" />
+                    <!-- contenido del hero -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-4 text-center">
+                        <span class="text-[10px] uppercase tracking-widest text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('Welcome to') }}</span>
+                        <span class="text-2xl sm:text-3xl font-display font-black leading-none" :style="homeGradientStyle">{{ $page.props.serverName }}</span>
+                        <span class="mt-1 px-3 py-1 rounded-md text-[11px] font-bold text-white shadow" :style="{ background: form.home.accent }">{{ __('Register Now') }}</span>
+                    </div>
+                    <!-- paleta de tarjetas -->
+                    <div class="absolute top-2.5 right-3 flex gap-1">
+                        <span v-for="(c, i) in form.home.palette" :key="i" class="w-2.5 h-2.5 rounded-full ring-1 ring-black/10" :style="{ background: c }" />
+                    </div>
+                    <!-- personaje -->
                     <img v-if="charForm.enabled" :src="framePreviews[0]" alt=""
                          :class="['absolute bottom-0 object-contain pointer-events-none select-none', charPreviewPos, charPreviewSize]" />
                     <span class="absolute top-2.5 left-3.5 text-[10px] font-black uppercase tracking-widest text-rapanel-text-light/40 dark:text-rapanel-text-dark/40">{{ __('Preview') }}</span>
                 </div>
+
+                <div class="grid lg:grid-cols-2 gap-6 items-start">
 
                 <!-- Color de fondo de página (claro/oscuro) -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
@@ -332,8 +362,7 @@ const buttonFields = [
                     <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-4">{{ __('Info section image') }}</h2>
                     <div class="flex flex-col sm:flex-row gap-5 items-start">
                         <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
-                            <img v-if="infoPreview" :src="infoPreview" alt="" class="w-full h-full object-cover" />
-                            <span v-else class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 px-3 text-center">{{ __('Use default background') }}</span>
+                            <img :src="infoPreview" alt="" class="w-full h-full object-cover" />
                         </div>
                         <div class="flex flex-col gap-3">
                             <label class="inline-flex">
@@ -342,7 +371,8 @@ const buttonFields = [
                                     <PhotoIcon class="w-4 h-4" /> {{ __('Change') }}
                                 </span>
                             </label>
-                            <ActionButton v-if="infoPreview" variant="danger" size="sm" @click="clearInfoImage">{{ __('Remove image') }}</ActionButton>
+                            <ActionButton v-if="infoIsCustom" variant="danger" size="sm" @click="clearInfoImage">{{ __('Remove image') }}</ActionButton>
+                            <span class="text-[11px] font-bold uppercase tracking-wider" :class="infoIsCustom ? 'text-rapanel-success' : 'text-rapanel-text-light/40 dark:text-rapanel-text-dark/40'">{{ infoIsCustom ? __('Custom') : __('Default') }}</span>
                         </div>
                     </div>
                 </div>
@@ -353,8 +383,7 @@ const buttonFields = [
                 <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 mb-4">{{ __('Used on inner pages. The home page background (hero) is set in Settings → Home.') }}</p>
                 <div class="flex flex-col sm:flex-row gap-5 items-start">
                     <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
-                        <img v-if="bgPreview" :src="bgPreview" alt="" class="w-full h-full object-cover" />
-                        <span v-else class="text-xs text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 px-3 text-center">{{ __('Use default background') }}</span>
+                        <img :src="bgPreview" alt="" class="w-full h-full object-cover" />
                     </div>
                     <div class="flex flex-col gap-3">
                         <label class="inline-flex">
@@ -363,11 +392,14 @@ const buttonFields = [
                                 <PhotoIcon class="w-4 h-4" /> {{ __('Background image') }}
                             </span>
                         </label>
-                        <ActionButton v-if="bgPreview" variant="danger" size="sm" @click="clearBgImage">{{ __('Remove image') }}</ActionButton>
+                        <ActionButton v-if="bgIsCustom" variant="danger" size="sm" @click="clearBgImage">{{ __('Remove image') }}</ActionButton>
+                        <span class="text-[11px] font-bold uppercase tracking-wider" :class="bgIsCustom ? 'text-rapanel-success' : 'text-rapanel-text-light/40 dark:text-rapanel-text-dark/40'">{{ bgIsCustom ? __('Custom') : __('Default') }}</span>
                         <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">JPG, PNG, WEBP · max 10MB</p>
                     </div>
                 </div>
             </div>
+
+                </div>
 
                 <!-- ── Personaje de la home ── -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-6">
