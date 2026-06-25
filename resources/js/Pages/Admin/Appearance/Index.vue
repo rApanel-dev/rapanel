@@ -389,7 +389,7 @@ const buttonFields = [
                         <label class="inline-flex">
                             <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onBgImage" />
                             <span class="cursor-pointer inline-flex items-center gap-1.5 font-display font-bold text-xs px-3 py-1.5 rounded-lg border bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all">
-                                <PhotoIcon class="w-4 h-4" /> {{ __('Background image') }}
+                                <PhotoIcon class="w-4 h-4" /> {{ __('Change') }}
                             </span>
                         </label>
                         <ActionButton v-if="bgIsCustom" variant="danger" size="sm" @click="clearBgImage">{{ __('Remove image') }}</ActionButton>
@@ -469,7 +469,7 @@ const buttonFields = [
                     </div>
 
                     <div class="flex justify-end pt-4 border-t border-rapanel-navy-100 dark:border-white/10">
-                        <PrimaryButton :class="{ 'opacity-50': charForm.processing }" :disabled="charForm.processing" @click="saveChar">{{ __('Save character') }}</PrimaryButton>
+                        <PrimaryButton :class="{ 'opacity-50': charForm.processing }" :disabled="charForm.processing" @click="saveChar">{{ __('Save') }}</PrimaryButton>
                     </div>
                 </div>
             </div>
