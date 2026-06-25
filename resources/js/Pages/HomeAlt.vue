@@ -105,13 +105,18 @@ const initCanvas = () => {
         twinkleSpeed: Math.random() * 0.02 + 0.005,
     }))
 
+    // El canvas NO entiende var() de CSS → leemos el acento de la variable y
+    // construimos un rgba() válido (sigue siendo personalizable desde el tema).
+    const accent = (getComputedStyle(document.documentElement).getPropertyValue('--ha-accent-rgb').trim() || '74 144 226').split(/\s+/).map(Number)
+    const accentRgba = (a) => `rgba(${accent[0] ?? 74}, ${accent[1] ?? 144}, ${accent[2] ?? 226}, ${a})`
+
     const nebulasDark = [
-        { x: 0.15, y: 0.3,  r: 180, c: 'rgb(var(--ha-accent-rgb,74 144 226) / 0.06)' },
+        { x: 0.15, y: 0.3,  r: 180, c: accentRgba(0.06) },
         { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.05)' },
         { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.04)'  },
     ]
     const nebulasLight = [
-        { x: 0.15, y: 0.3,  r: 180, c: 'rgb(var(--ha-accent-rgb,74 144 226) / 0.18)' },
+        { x: 0.15, y: 0.3,  r: 180, c: accentRgba(0.18) },
         { x: 0.85, y: 0.6,  r: 200, c: 'rgba(168,85,247,0.14)' },
         { x: 0.5,  y: 0.85, r: 150, c: 'rgba(241,196,15,0.12)'  },
     ]
@@ -369,11 +374,17 @@ const initGridGlow = () => {
 }
 
 onMounted(async () => {
-    initCanvas()
-    initGridGlow()
+    // Cada init va aislado: un error en uno (canvas, etc.) NO debe impedir que el
+    // resto corra ni que las secciones se revelen.
+    try { initCanvas() }   catch (e) { console.error('initCanvas', e) }
+    try { initGridGlow() } catch (e) { console.error('initGridGlow', e) }
     const gsapOk = await loadGSAP()
-    if (gsapOk && window.gsap) { initGSAP() } else { revealAll() }
-    setTimeout(initTilt, 600)
+    if (gsapOk && window.gsap) {
+        try { initGSAP() } catch (e) { console.error('initGSAP', e); revealAll() }
+    } else {
+        revealAll()
+    }
+    setTimeout(() => { try { initTilt() } catch (e) {} }, 600)
     startCharAnimation(false)
     window.addEventListener('scroll', handleScroll, { passive: true })
 })
