@@ -213,10 +213,9 @@ const initGSAP = () => {
     const { gsap, ScrollTrigger } = window
 
     // Hero entrance
-    const tl = gsap.timeline()
-    tl.fromTo('.ha-title',    { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' })
-      .fromTo('.ha-subtitle', { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5')
-      .fromTo('.ha-cta',      { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.4')
+    // Hero: la entrada de título/subtítulo/CTA ahora es animación CSS pura
+    // (.ha-title/.ha-subtitle/.ha-cta) → no depende de GSAP ni del CDN, los textos
+    // siempre se ven. GSAP solo se usa para las animaciones de scroll de abajo.
 
     // Stats
     ScrollTrigger.create({
@@ -438,7 +437,7 @@ onUnmounted(() => {
                 <div class="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto pt-8">
 
                     <!-- Title -->
-                    <h1 class="ha-title opacity-0 font-display font-bold leading-none mb-5
+                    <h1 class="ha-title font-display font-bold leading-none mb-5
                                text-5xl sm:text-7xl md:text-8xl">
                         <span class="block text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Welcome to') }}</span>
                         <span class="block ha-gradient-text">
@@ -447,12 +446,12 @@ onUnmounted(() => {
                     </h1>
 
                     <!-- Subtitle -->
-                    <p class="ha-subtitle opacity-0 text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+                    <p class="ha-subtitle text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
                         {{ st.home_hero_subtitle || __('A classic Ragnarok Online experience, reimagined for a new era.') }}
                     </p>
 
                     <!-- CTAs -->
-                    <div class="ha-cta opacity-0 flex flex-wrap justify-center gap-4">
+                    <div class="ha-cta flex flex-wrap justify-center gap-4">
                         <Link :href="safeRoute('register')" class="ha-btn-primary font-display text-base md:text-lg font-bold uppercase tracking-widest px-9 py-4 rounded-xl">
                             {{ __('Register Now') }}
                         </Link>
@@ -777,6 +776,18 @@ onUnmounted(() => {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* ── Hero: entrada por CSS pura (bulletproof — no depende de GSAP/CDN) ── */
+@keyframes ha-rise {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.ha-title    { animation: ha-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both; }
+.ha-subtitle { animation: ha-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+.ha-cta      { animation: ha-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both; }
+@media (prefers-reduced-motion: reduce) {
+    .ha-title, .ha-subtitle, .ha-cta { animation: none; opacity: 1; transform: none; }
 }
 
 /* ── Grid glow ──────────────────────────────────────────────── */
