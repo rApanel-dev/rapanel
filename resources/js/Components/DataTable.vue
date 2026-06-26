@@ -31,7 +31,7 @@ defineProps({
                     <Link v-if="link.url" :href="link.url" v-html="link.label"
                         :class="[
                             link.active
-                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue shadow-sm'
+                                ? 'bg-rapanel-blue text-white border-rapanel-blue shadow-sm'
                                 : 'bg-white dark:bg-white/[0.04] text-rapanel-text-light/65 dark:text-white/60 hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.08] border-rapanel-navy-100 dark:border-white/[0.08]',
                             'px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150'
                         ]" />
