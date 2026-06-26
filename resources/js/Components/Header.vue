@@ -4,6 +4,7 @@ import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline
 import { Link, usePage } from '@inertiajs/vue3';
 import LocaleSelector from '@/Components/LocaleSelector.vue';
 import ThemeSelector from '@/Components/ThemeSelector.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import { visitorMenuItems, authMenuItems } from '@/menu.js';
 import { computed, ref } from 'vue';
 import { playNowMobile, closeGame, gameOverlayUrl } from '@/Composables/usePlayNow.js';
@@ -116,9 +117,9 @@ function playNow(event) {
                             <Link :href="safeRoute('login')" class="font-display text-rapanel-header-text hover:text-rapanel-header-link text-sm font-medium px-3 py-2 transition">
                                 {{ __('Login') }}
                             </Link>
-                            <Link :href="safeRoute('register')" class="font-display bg-rapanel-blue hover:opacity-90 text-rapanel-text-dark px-4 py-2 rounded-md text-sm font-medium transition shadow-lg">
+                            <ActionButton :href="safeRoute('register')" variant="blue" fill="solid" size="lg">
                                 {{ __('Register') }}
-                            </Link>
+                            </ActionButton>
                         </template>
                     <template v-else>
                         <Menu as="div" class="relative inline-block text-left">
@@ -279,9 +280,9 @@ function playNow(event) {
                             <Link :href="safeRoute('login')" class="font-display flex justify-center items-center px-4 py-3 border border-rapanel-navy-100 dark:border-white/10 rounded-md text-sm font-bold text-rapanel-header-text hover:bg-rapanel-navy-50 dark:hover:bg-white/5 transition uppercase tracking-widest">
                                 {{ __('Login') }}
                             </Link>
-                            <Link :href="safeRoute('register')" class="font-display flex justify-center items-center px-4 py-3 bg-rapanel-blue rounded-md text-sm font-bold text-white hover:opacity-90 transition shadow-lg uppercase tracking-widest">
+                            <ActionButton :href="safeRoute('register')" variant="blue" fill="solid" size="lg" class="w-full">
                                 {{ __('Register') }}
-                            </Link>
+                            </ActionButton>
                         </div>
                         <div v-else class="bg-rapanel-navy-50 dark:bg-white/5 p-4 rounded-lg border border-rapanel-navy-100 dark:border-white/5">
                             <div class="text-[10px] text-rapanel-header-text uppercase font-bold mb-1 tracking-widest">{{ __('Logged in as') }}</div>

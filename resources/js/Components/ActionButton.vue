@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 /**
  * Botón canónico del proyecto. Una sola fuente para TODOS los botones.
@@ -7,7 +8,8 @@ import { computed } from 'vue';
  *   - fill:    estilo  → 'soft' (translúcido, por defecto) · 'solid' (relleno, acciones
  *              primarias) · 'ghost' (superficie neutra con borde, secundario/cancelar)
  *   - size:    lg · md (def) · sm · icon
- * Todos los colores usan tokens rapanel-* → recolorea el panel de Apariencia.
+ *   - href:    si se pasa, renderiza como navegación (Inertia <Link>, o <a> si external).
+ * Los colores de botón usan tokens rapanel-btn-* → recolorea el panel de Apariencia.
  */
 const props = defineProps({
     variant:  { type: String,  default: 'blue' },
@@ -16,7 +18,11 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     title:    { type: String,  default: undefined },
     type:     { type: String,  default: 'button' },
+    href:     { type: String,  default: null },
+    external: { type: Boolean, default: false },
 });
+
+const tag = computed(() => props.href ? (props.external ? 'a' : Link) : 'button');
 
 // soft = translúcido (acciones de fila / secundarias). Usa tokens rapanel-btn-* (themeables).
 const soft = {
@@ -56,9 +62,13 @@ const colorClasses = computed(() => {
 </script>
 
 <template>
-    <button
-        :type="type"
-        :disabled="disabled"
+    <component
+        :is="tag"
+        :href="href || undefined"
+        :type="href ? undefined : type"
+        :disabled="!href && disabled ? true : undefined"
+        :target="external ? '_blank' : undefined"
+        :rel="external ? 'noopener' : undefined"
         :title="title"
         :aria-label="title"
         class="font-display inline-flex items-center justify-center gap-1.5 rounded-lg font-bold border transition-all"
@@ -69,5 +79,5 @@ const colorClasses = computed(() => {
         ]"
     >
         <slot />
-    </button>
+    </component>
 </template>
