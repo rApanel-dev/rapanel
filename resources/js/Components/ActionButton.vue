@@ -48,6 +48,7 @@ const solid = {
 const ghostClass = 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:bg-rapanel-navy-50 dark:hover:bg-white/5';
 
 const sizeClasses = {
+    xl:   'px-8 py-3 text-sm',
     lg:   'px-4 py-2 text-sm',
     md:   'px-3 py-1.5 text-xs',
     sm:   'px-2.5 py-1 text-xs',

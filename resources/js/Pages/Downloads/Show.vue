@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 
 defineProps({
     download: { type: Object, required: true },
@@ -81,13 +82,12 @@ const __ = (key) => page.props.translations?.[key] || key;
 
                     <!-- Download button -->
                     <div class="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-rapanel-navy-100 dark:border-white/10">
-                        <a :href="route('downloads.get', download.slug)"
-                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-rapanel-blue text-white font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-rapanel-blue/20">
+                        <ActionButton :href="route('downloads.get', download.slug)" external variant="blue" fill="solid" size="xl" class="w-full sm:w-auto">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                             </svg>
                             {{ __('Download Now') }}
-                        </a>
+                        </ActionButton>
 
                         <Link :href="route('downloads')"
                             class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark hover:text-rapanel-blue transition-colors">
