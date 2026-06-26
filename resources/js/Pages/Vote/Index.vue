@@ -159,7 +159,7 @@ onMounted(() => {
                         <button
                             v-if="cashPointsEnabled && localVotePoints >= conversionRate.from && gameAccounts.length"
                             @click="openConvertModal"
-                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm text-white bg-rapanel-danger dark:bg-rapanel-gold dark:text-rapanel-navy-900"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm text-white bg-rapanel-btn-danger dark:bg-rapanel-btn-gold dark:text-rapanel-navy-900"
                         >
                             <ArrowPathIcon class="w-4 h-4" />
                             {{ __('Convert to Cash Points') }}
