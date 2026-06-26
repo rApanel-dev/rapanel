@@ -284,7 +284,7 @@ const buttonFields = [
                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-4 text-center">
                         <span class="text-[10px] uppercase tracking-widest text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('Welcome to') }}</span>
                         <span class="text-2xl sm:text-3xl font-display font-black leading-none" :style="homeGradientStyle">{{ $page.props.serverName }}</span>
-                        <span class="mt-1 px-3 py-1 rounded-md text-[11px] font-bold text-white shadow" :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, #2563eb 100%)` }">{{ __('Register Now') }}</span>
+                        <span class="mt-1 px-3 py-1 rounded-md text-[11px] font-bold text-white shadow" :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, color-mix(in srgb, ${form.home.accent}, #000 30%) 100%)` }">{{ __('Register Now') }}</span>
                     </div>
                     <!-- paleta de tarjetas -->
                     <div class="absolute top-2.5 right-3 flex gap-1">

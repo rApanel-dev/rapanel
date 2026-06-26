@@ -882,7 +882,7 @@ onUnmounted(() => {
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .ha-btn-primary {
-    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, #2563eb 100%);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, color-mix(in srgb, rgb(var(--ha-accent-rgb,74 144 226)), #000 30%) 100%);
     color: #fff;
     box-shadow: 0 0 32px rgb(var(--ha-accent-rgb,74 144 226) / 0.45);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
@@ -892,19 +892,19 @@ onUnmounted(() => {
     transform: translateY(-3px);
 }
 .ha-btn-ghost {
-    background: rgba(15,23,42,0.06);
+    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.06);
     color: #1d283a;
-    border: 1px solid rgba(15,23,42,0.14);
+    border: 1px solid rgb(var(--ha-accent-rgb,74 144 226) / 0.30);
     transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
 .dark .ha-btn-ghost {
-    background: rgba(255,255,255,0.06);
+    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.10);
     color: #fff;
-    border-color: rgba(255,255,255,0.14);
+    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.30);
 }
 .ha-btn-ghost:hover {
-    background: rgba(15,23,42,0.11);
-    border-color: rgba(15,23,42,0.28);
+    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.16);
+    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.55);
     transform: translateY(-3px);
 }
 .dark .ha-btn-ghost:hover {
@@ -1041,7 +1041,7 @@ onUnmounted(() => {
     font-size: 0.9rem;
     letter-spacing: 0.05em;
     color: #fff;
-    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, #2563eb 100%);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, color-mix(in srgb, rgb(var(--ha-accent-rgb,74 144 226)), #000 30%) 100%);
     box-shadow: 0 0 18px rgb(var(--ha-accent-rgb,74 144 226) / 0.35);
     transition: box-shadow 0.25s ease, transform 0.2s ease;
     text-decoration: none;
