@@ -4,6 +4,7 @@ import { watch } from 'vue';
 import Header from '@/Components/Header.vue';
 import Footer from '@/Components/Footer.vue';
 import BgMain from '@/Components/BgMain.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
@@ -85,11 +86,9 @@ watch(() => page.props.flash?.success, (val) => {
                         <InputError :message="form.errors.email" class="mt-1" />
                     </div>
 
-                    <button type="submit"
-                            :disabled="form.processing"
-                            class="w-full py-2.5 rounded-xl bg-rapanel-blue text-white text-sm font-display font-semibold hover:bg-rapanel-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg">
+                    <ActionButton type="submit" variant="blue" fill="solid" size="lg" :disabled="form.processing" class="w-full">
                         {{ form.processing ? __('Sending...') : __('Send Reset Link') }}
-                    </button>
+                    </ActionButton>
                 </form>
 
                 <div class="mt-6 text-center">

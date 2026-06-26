@@ -3,6 +3,7 @@ import { Head, useForm, usePage } from '@inertiajs/vue3';
 import Header from '@/Components/Header.vue';
 import Footer from '@/Components/Footer.vue';
 import BgMain from '@/Components/BgMain.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
@@ -65,11 +66,9 @@ const submit = () => form.post(safeRoute('game-password.update', { token: props.
                         <InputError :message="form.errors.password_confirmation" class="mt-1" />
                     </div>
 
-                    <button type="submit"
-                            :disabled="form.processing"
-                            class="w-full py-2.5 rounded-xl bg-rapanel-success text-white text-sm font-display font-semibold hover:bg-rapanel-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg">
+                    <ActionButton type="submit" variant="success" fill="solid" size="lg" :disabled="form.processing" class="w-full">
                         {{ form.processing ? __('Saving...') : __('Save New Password') }}
-                    </button>
+                    </ActionButton>
                 </form>
             </div>
         </div>
