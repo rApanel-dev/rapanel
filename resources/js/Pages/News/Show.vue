@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, usePage, useForm, router } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import { computed, ref } from 'vue';
 import { useSafeHtml } from '@/Composables/useSafeHtml';
 
@@ -253,11 +254,7 @@ const deleteComment = (commentId) => {
                                             <div class="flex items-center justify-between mt-2">
                                                 <p v-if="commentForm.errors.body" class="text-xs text-rapanel-danger">{{ commentForm.errors.body }}</p>
                                                 <span v-else class="text-[10px] text-rapanel-text-light/30 dark:text-white/25">{{ commentForm.body.length }}/1000</span>
-                                                <button
-                                                    type="submit"
-                                                    :disabled="commentForm.processing || !commentForm.body.trim()"
-                                                    class="ml-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-rapanel-blue text-white hover:bg-rapanel-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                                                >
+                                                <ActionButton type="submit" :disabled="commentForm.processing || !commentForm.body.trim()" variant="blue" fill="solid" size="md" class="ml-auto">
                                                     <svg v-if="commentForm.processing" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
@@ -266,7 +263,7 @@ const deleteComment = (commentId) => {
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
                                                     </svg>
                                                     {{ __('Post Comment') }}
-                                                </button>
+                                                </ActionButton>
                                             </div>
                                         </div>
                                     </div>
@@ -277,10 +274,9 @@ const deleteComment = (commentId) => {
                                     <p class="text-sm text-rapanel-text-light/50 dark:text-white/35">
                                         {{ __('You must be logged in to comment.') }}
                                     </p>
-                                    <Link :href="safeRoute('login')"
-                                          class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-rapanel-blue text-white hover:bg-rapanel-blue/90 transition shrink-0">
+                                    <ActionButton :href="safeRoute('login')" variant="blue" fill="solid" size="md" class="shrink-0">
                                         {{ __('Login to comment') }}
-                                    </Link>
+                                    </ActionButton>
                                 </div>
                             </div>
                         </div>
