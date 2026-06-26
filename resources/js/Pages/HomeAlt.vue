@@ -882,7 +882,7 @@ onUnmounted(() => {
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .ha-btn-primary {
-    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, color-mix(in srgb, rgb(var(--ha-accent-rgb,74 144 226)), #000 30%) 100%);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, rgb(var(--ha-accent2-rgb,37 99 235)) 100%);
     color: #fff;
     box-shadow: 0 0 32px rgb(var(--ha-accent-rgb,74 144 226) / 0.45);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
@@ -1041,7 +1041,7 @@ onUnmounted(() => {
     font-size: 0.9rem;
     letter-spacing: 0.05em;
     color: #fff;
-    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, color-mix(in srgb, rgb(var(--ha-accent-rgb,74 144 226)), #000 30%) 100%);
+    background: linear-gradient(135deg, rgb(var(--ha-accent-rgb,74 144 226)) 0%, rgb(var(--ha-accent2-rgb,37 99 235)) 100%);
     box-shadow: 0 0 18px rgb(var(--ha-accent-rgb,74 144 226) / 0.35);
     transition: box-shadow 0.25s ease, transform 0.2s ease;
     text-decoration: none;

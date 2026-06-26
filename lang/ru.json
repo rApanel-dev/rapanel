@@ -1501,5 +1501,6 @@
     "Card palette": "Палитра карточек",
     "Applied after saving.": "Применяется после сохранения.",
     "Info section image": "Изображение раздела Info",
-    "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Используется на внутренних страницах. Фон главной страницы (hero) задаётся в Settings → Home."
+    "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Используется на внутренних страницах. Фон главной страницы (hero) задаётся в Settings → Home.",
+    "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Два цвета для градиента кнопки героя. Первый также окрашивает сетки и свечения фона."
 }

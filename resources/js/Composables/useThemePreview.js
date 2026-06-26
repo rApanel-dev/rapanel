@@ -66,6 +66,8 @@ function homeBody(t) {
     if (g.to)   out += `--ha-grad-to:${g.to};`;
     const accent = hexToRgb(h.accent);
     if (accent) out += `--ha-accent-rgb:${accent};`;
+    const accent2 = hexToRgb(h.accent2);
+    if (accent2) out += `--ha-accent2-rgb:${accent2};`;
     return out;
 }
 

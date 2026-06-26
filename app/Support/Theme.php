@@ -61,6 +61,7 @@ class Theme
             'home'    => [
                 'title_gradient' => array_merge($d['home']['title_gradient'], $theme['home']['title_gradient'] ?? []),
                 'accent'  => $theme['home']['accent']  ?? $d['home']['accent'],
+                'accent2' => $theme['home']['accent2'] ?? $d['home']['accent2'],
                 'palette' => $theme['home']['palette'] ?? $d['home']['palette'],
             ],
         ];
@@ -77,7 +78,8 @@ class Theme
         $g = $t['title_gradient'];
 
         return "--ha-grad-from:{$g['from']};--ha-grad-mid:{$g['mid']};--ha-grad-to:{$g['to']};"
-             . '--ha-accent-rgb:'.self::rgb($t['accent']).';';
+             . '--ha-accent-rgb:'.self::rgb($t['accent']).';'
+             . '--ha-accent2-rgb:'.self::rgb($t['accent2']).';';
     }
 
     /**

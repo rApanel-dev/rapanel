@@ -35,6 +35,7 @@ const form = useForm({
     home:            {
         title_gradient: { ...props.theme.home.title_gradient },
         accent:         props.theme.home.accent,
+        accent2:        props.theme.home.accent2,
         palette:        [...props.theme.home.palette],
     },
     bg_image:             null,
@@ -142,7 +143,7 @@ const themeFromForm = () => ({
     buttons: { ...form.buttons },
     light:   { ...form.light },
     dark:    { ...form.dark },
-    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, palette: [...form.home.palette] },
+    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, accent2: form.home.accent2, palette: [...form.home.palette] },
 });
 
 onMounted(() => applyThemePreview(themeFromForm()));
@@ -284,7 +285,7 @@ const buttonFields = [
                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-4 text-center">
                         <span class="text-[10px] uppercase tracking-widest text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('Welcome to') }}</span>
                         <span class="text-2xl sm:text-3xl font-display font-black leading-none" :style="homeGradientStyle">{{ $page.props.serverName }}</span>
-                        <span class="mt-1 px-3 py-1 rounded-md text-[11px] font-bold text-white shadow" :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, color-mix(in srgb, ${form.home.accent}, #000 30%) 100%)` }">{{ __('Register Now') }}</span>
+                        <span class="mt-1 px-3 py-1 rounded-md text-[11px] font-bold text-white shadow" :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, ${form.home.accent2} 100%)` }">{{ __('Register Now') }}</span>
                     </div>
                     <!-- paleta de tarjetas -->
                     <div class="absolute top-2.5 right-3 flex gap-1">
@@ -337,13 +338,18 @@ const buttonFields = [
                         </div>
                     </div>
 
-                    <!-- Acento decorativo -->
-                    <div class="flex items-center gap-3">
-                        <input type="color" v-model="form.home.accent"
-                            class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
-                        <input type="text" v-model="form.home.accent" maxlength="7"
-                            class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
-                        <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Accent color') }}</span>
+                    <!-- Acento + degradado del botón del hero (2 colores) -->
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __('Accent color') }}</p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <input type="color" v-model="form.home.accent" title="Inicio del degradado"
+                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                            <input type="color" v-model="form.home.accent2" title="Fin del degradado"
+                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                            <span class="px-4 py-1.5 rounded-md text-xs font-bold text-white shadow"
+                                  :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, ${form.home.accent2} 100%)` }">{{ __('Register Now') }}</span>
+                        </div>
+                        <p class="mt-2 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">{{ __('Two colors for the hero button gradient. The first also tints the background grids and glows.') }}</p>
                     </div>
 
                     <!-- Paleta de tarjetas -->
