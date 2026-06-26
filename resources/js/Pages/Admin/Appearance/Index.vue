@@ -36,6 +36,7 @@ const form = useForm({
         title_gradient: { ...props.theme.home.title_gradient },
         accent:         props.theme.home.accent,
         accent2:        props.theme.home.accent2,
+        ghost:          props.theme.home.ghost,
         palette:        [...props.theme.home.palette],
     },
     bg_image:             null,
@@ -143,7 +144,7 @@ const themeFromForm = () => ({
     buttons: { ...form.buttons },
     light:   { ...form.light },
     dark:    { ...form.dark },
-    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, accent2: form.home.accent2, palette: [...form.home.palette] },
+    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, accent2: form.home.accent2, ghost: form.home.ghost, palette: [...form.home.palette] },
 });
 
 onMounted(() => applyThemePreview(themeFromForm()));
@@ -350,6 +351,20 @@ const buttonFields = [
                                   :style="{ background: `linear-gradient(135deg, ${form.home.accent} 0%, ${form.home.accent2} 100%)` }">{{ __('Register Now') }}</span>
                         </div>
                         <p class="mt-2 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">{{ __('Two colors for the hero button gradient. The first also tints the background grids and glows.') }}</p>
+                    </div>
+
+                    <!-- Botón secundario del hero (Learn More) -->
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __('Secondary button') }}</p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <input type="color" v-model="form.home.ghost"
+                                class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                            <input type="text" v-model="form.home.ghost" maxlength="7"
+                                class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                            <span class="px-4 py-1.5 rounded-md text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark"
+                                  :style="{ background: `${form.home.ghost}1a`, border: `1px solid ${form.home.ghost}59` }">{{ __('Learn More') }}</span>
+                        </div>
+                        <p class="mt-2 text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45">{{ __('The "Learn More" outline button in the hero.') }}</p>
                     </div>
 
                     <!-- Paleta de tarjetas -->

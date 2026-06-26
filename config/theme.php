@@ -39,6 +39,7 @@ return [
             'title_gradient' => ['from' => '#4A90E2', 'mid' => '#F1C40F', 'to' => '#a855f7'],
             'accent'  => '#4A90E2', // acento principal (decorativos + inicio del degradado del botón)
             'accent2' => '#2563eb', // fin del degradado del botón del hero
+            'ghost'   => '#4A90E2', // botón secundario del hero (Learn More)
             'palette' => ['#4A90E2', '#F1C40F', '#2ECC71', '#a855f7', '#E74C3C', '#e2e8f0'],
         ],
 

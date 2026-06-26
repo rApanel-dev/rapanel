@@ -892,19 +892,19 @@ onUnmounted(() => {
     transform: translateY(-3px);
 }
 .ha-btn-ghost {
-    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.06);
+    background: rgb(var(--ha-ghost-rgb,74 144 226) / 0.06);
     color: #1d283a;
-    border: 1px solid rgb(var(--ha-accent-rgb,74 144 226) / 0.30);
+    border: 1px solid rgb(var(--ha-ghost-rgb,74 144 226) / 0.30);
     transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
 .dark .ha-btn-ghost {
-    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.10);
+    background: rgb(var(--ha-ghost-rgb,74 144 226) / 0.10);
     color: #fff;
-    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.30);
+    border-color: rgb(var(--ha-ghost-rgb,74 144 226) / 0.30);
 }
 .ha-btn-ghost:hover {
-    background: rgb(var(--ha-accent-rgb,74 144 226) / 0.16);
-    border-color: rgb(var(--ha-accent-rgb,74 144 226) / 0.55);
+    background: rgb(var(--ha-ghost-rgb,74 144 226) / 0.16);
+    border-color: rgb(var(--ha-ghost-rgb,74 144 226) / 0.55);
     transform: translateY(-3px);
 }
 .dark .ha-btn-ghost:hover {

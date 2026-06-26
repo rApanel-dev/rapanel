@@ -1503,5 +1503,7 @@
     "Applied after saving.": "Appliqué après l'enregistrement.",
     "Info section image": "Image de la section Info",
     "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Utilisé sur les pages internes. L'arrière-plan de la page d'accueil (hero) se configure dans Settings → Home.",
-    "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Deux couleurs pour le dégradé du bouton du hero. La première teinte aussi les grilles et halos du fond."
+    "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Deux couleurs pour le dégradé du bouton du hero. La première teinte aussi les grilles et halos du fond.",
+    "Secondary button": "Bouton secondaire",
+    "The \"Learn More\" outline button in the hero.": "Le bouton contour \"Learn More\" du hero."
 }

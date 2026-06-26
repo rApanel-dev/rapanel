@@ -68,6 +68,8 @@ function homeBody(t) {
     if (accent) out += `--ha-accent-rgb:${accent};`;
     const accent2 = hexToRgb(h.accent2);
     if (accent2) out += `--ha-accent2-rgb:${accent2};`;
+    const ghost = hexToRgb(h.ghost);
+    if (ghost) out += `--ha-ghost-rgb:${ghost};`;
     return out;
 }
 
