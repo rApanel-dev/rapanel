@@ -112,7 +112,7 @@ const deleteComment = (commentId) => {
 
                 <!-- Back link -->
                 <Link :href="safeRoute('news.index')"
-                      class="inline-flex items-center gap-2 shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-all bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue">
+                      class="inline-flex items-center gap-2 shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-all bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                     </svg>

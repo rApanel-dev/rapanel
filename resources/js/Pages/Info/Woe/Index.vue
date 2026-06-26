@@ -104,7 +104,7 @@ const activeCount = computed(() => props.schedules.filter(s => s.is_active).leng
                         'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border transition',
                         activeFilter === null
                             ? 'bg-rapanel-navy-900 dark:bg-white text-white dark:text-rapanel-navy-900 border-rapanel-navy-900 dark:border-white'
-                            : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                            : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                     ]">
                     {{ __('All') }}
                     <span class="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-rapanel-navy-100 dark:bg-white/10">{{ schedules.length }}</span>
@@ -115,7 +115,7 @@ const activeCount = computed(() => props.schedules.filter(s => s.is_active).leng
                         'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border transition',
                         activeFilter === Number(t)
                             ? 'bg-rapanel-navy-900 dark:bg-white text-white dark:text-rapanel-navy-900 border-rapanel-navy-900 dark:border-white'
-                            : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                            : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                     ]">
                     {{ label }}
                     <span class="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-rapanel-navy-100 dark:bg-white/10">{{ typeCounts[t] }}</span>

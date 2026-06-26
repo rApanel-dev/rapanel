@@ -344,7 +344,7 @@ const { openItemDb } = useItemDbModal();
                           :class="[
                               'inline-flex items-center justify-center min-w-[2rem] h-8 px-2 rounded-lg text-xs font-semibold border transition-all duration-150',
                               link.active
-                                  ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                                  ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
                                   : 'border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/60 dark:text-white/40 hover:border-rapanel-blue/40 hover:text-rapanel-blue',
                               !link.url && 'opacity-30 pointer-events-none',
                           ]"

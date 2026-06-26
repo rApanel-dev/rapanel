@@ -328,7 +328,7 @@ const displayImg = (s) => s.image_url || null;
 
                                 <!-- Upload area -->
                                 <label v-else
-                                    class="flex flex-col items-center justify-center gap-2 w-full h-24 rounded-xl border-2 border-dashed border-rapanel-navy-100 dark:border-white/10 cursor-pointer hover:border-rapanel-blue transition">
+                                    class="flex flex-col items-center justify-center gap-2 w-full h-24 rounded-xl border-2 border-dashed border-rapanel-navy-100 dark:border-white/10 cursor-pointer hover:border-rapanel-btn-blue transition">
                                     <PhotoIcon class="w-7 h-7 text-rapanel-text-light dark:text-rapanel-text-dark" />
                                     <span class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark">PNG, JPG, GIF, WEBP · max 10 MB</span>
                                     <input ref="imageInputRef" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="hidden" @change="onImageChange" />
@@ -347,7 +347,7 @@ const displayImg = (s) => s.image_url || null;
                                             'py-2 rounded-lg text-xs font-bold border transition',
                                             form.type === Number(val)
                                                 ? 'bg-rapanel-navy-900 dark:bg-white text-white dark:text-rapanel-navy-900 border-rapanel-navy-900 dark:border-white'
-                                                : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                                                : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                                         ]">
                                         {{ label }}
                                     </button>

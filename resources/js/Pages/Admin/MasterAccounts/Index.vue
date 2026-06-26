@@ -418,7 +418,7 @@ const clearMfa = (user) => {
                     <div class="flex gap-1">
                         <template v-for="link in users.links" :key="link.label">
                             <Link v-if="link.url" :href="link.url" v-html="link.label"
-                                :class="[link.active ? 'bg-rapanel-blue text-white border-rapanel-blue' : 'bg-white dark:bg-white/[0.04] text-rapanel-text-light/65 dark:text-white/60 hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.08] border-rapanel-navy-100 dark:border-white/[0.08]',
+                                :class="[link.active ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue' : 'bg-white dark:bg-white/[0.04] text-rapanel-text-light/65 dark:text-white/60 hover:bg-rapanel-navy-100 dark:hover:bg-white/[0.08] border-rapanel-navy-100 dark:border-white/[0.08]',
                                 'px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all']" />
                             <span v-else v-html="link.label" class="px-2.5 py-1.5 rounded-lg text-xs text-rapanel-text-light/25 dark:text-white/15" />
                         </template>

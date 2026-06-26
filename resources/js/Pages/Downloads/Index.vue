@@ -46,8 +46,8 @@ const filtered = computed(() =>
                     :class="[
                         'px-4 py-1.5 rounded-full text-sm font-semibold border transition-all',
                         activeCategory === null
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue shadow-sm'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue dark:hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue shadow-sm'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue dark:hover:border-rapanel-btn-blue'
                     ]">
                     {{ __('All') }}
                 </button>
@@ -57,8 +57,8 @@ const filtered = computed(() =>
                     :class="[
                         'px-4 py-1.5 rounded-full text-sm font-semibold border transition-all',
                         activeCategory === cat.id
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue shadow-sm'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue dark:hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue shadow-sm'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue dark:hover:border-rapanel-btn-blue'
                     ]">
                     <span v-if="cat.icon" class="mr-1">{{ cat.icon }}</span>{{ cat.name }}
                 </button>

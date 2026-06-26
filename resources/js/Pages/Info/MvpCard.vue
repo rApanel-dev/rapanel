@@ -54,8 +54,8 @@ const { openItemDb } = useItemDbModal();
                         :class="[
                             'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                             sortBy === 'id'
-                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                         ]">
                         ID
                     </button>
@@ -64,8 +64,8 @@ const { openItemDb } = useItemDbModal();
                         :class="[
                             'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                             sortBy === 'name'
-                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                         ]">
                         {{ __('Name') }}
                     </button>
@@ -74,8 +74,8 @@ const { openItemDb } = useItemDbModal();
                         :class="[
                             'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                             sortBy === 'count'
-                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                                : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                         ]">
                         {{ __('Count') }}
                     </button>

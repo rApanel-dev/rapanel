@@ -157,7 +157,7 @@ const destroy = (id, name) => {
                 <div class="flex gap-1">
                     <Link v-for="link in downloads.links" :key="link.label"
                         :href="link.url ?? '#'"
-                        :class="['px-2.5 py-1 rounded border transition', link.active ? 'bg-rapanel-blue text-white border-rapanel-blue' : 'border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue']"
+                        :class="['px-2.5 py-1 rounded border transition', link.active ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue' : 'border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue']"
                         v-html="link.label" />
                 </div>
             </div>

@@ -766,8 +766,8 @@ const skillConditionVal = (skill) => {
                                     <div class="flex items-center gap-1">
                                         <button @click="spawnSort = 'desc'"
                                             :class="spawnSort === 'desc'
-                                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'"
+                                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'"
                                             class="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[10px] font-bold transition">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -776,8 +776,8 @@ const skillConditionVal = (skill) => {
                                         </button>
                                         <button @click="spawnSort = 'asc'"
                                             :class="spawnSort === 'asc'
-                                                ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'"
+                                                ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                                                : 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-white/50 border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'"
                                             class="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[10px] font-bold transition">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />

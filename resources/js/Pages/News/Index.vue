@@ -54,26 +54,26 @@ const typeBadge = (type) => {
                     <button @click="filterBy(null)" :class="[
                         'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                         !activeType
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                     ]">{{ __('All') }}</button>
                     <button @click="filterBy('1')" :class="[
                         'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                         activeType === '1'
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                     ]">{{ __('News') }}</button>
                     <button @click="filterBy('2')" :class="[
                         'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                         activeType === '2'
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                     ]">{{ __('Event') }}</button>
                     <button @click="filterBy('3')" :class="[
                         'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                         activeType === '3'
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue'
                     ]">{{ __('Notice') }}</button>
                 </div>
             </div>
@@ -177,7 +177,7 @@ const typeBadge = (type) => {
                           :class="[
                               'inline-flex items-center justify-center min-w-[2rem] h-8 px-2 rounded-lg text-xs font-semibold border transition-all duration-150',
                               link.active
-                                  ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                                  ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
                                   : 'border-rapanel-navy-100 dark:border-white/10 text-rapanel-text-light/60 dark:text-white/40 hover:border-rapanel-blue/40 hover:text-rapanel-blue',
                               !link.url && 'opacity-30 pointer-events-none',
                           ]"

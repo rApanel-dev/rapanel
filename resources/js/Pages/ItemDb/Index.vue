@@ -159,9 +159,9 @@ const typeBadge = (t) => {
                     :class="[
                         'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all',
                         link.active
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
                             : link.url
-                                ? 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                                ? 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                                 : 'bg-transparent text-rapanel-text-light/40 dark:text-white/20 border-transparent cursor-default',
                     ]"
                     v-html="link.label"

@@ -86,7 +86,7 @@ const locationBadgeClass = (loc) => {
                     'inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border transition',
                     classFilter === cls
                         ? 'bg-rapanel-navy-900 dark:bg-white text-white dark:text-rapanel-navy-900 border-rapanel-navy-900 dark:border-white'
-                        : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                        : 'bg-white dark:bg-transparent text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                 ]">
                 {{ label }}
                 <span :class="[

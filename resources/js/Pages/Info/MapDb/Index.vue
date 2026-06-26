@@ -93,8 +93,8 @@ const onImgError = (mapName, e) => {
                         v-for="f in bgFilters" :key="f.key"
                         @click="filterByBg(f.key)"
                         :class="bgType === f.key
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
-                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue dark:hover:text-rapanel-blue'"
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
+                            : 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue dark:hover:text-rapanel-blue'"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all">
                         {{ __(f.label) }}
                     </button>
@@ -170,9 +170,9 @@ const onImgError = (mapName, e) => {
                     :class="[
                         'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all',
                         link.active
-                            ? 'bg-rapanel-blue text-white border-rapanel-blue'
+                            ? 'bg-rapanel-btn-blue text-white border-rapanel-btn-blue'
                             : link.url
-                                ? 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-blue hover:text-rapanel-blue'
+                                ? 'bg-white dark:bg-rapanel-navy-900 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:border-rapanel-btn-blue hover:text-rapanel-blue'
                                 : 'bg-transparent text-rapanel-text-light/40 dark:text-white/20 border-transparent cursor-default',
                     ]"
                     v-html="link.label"

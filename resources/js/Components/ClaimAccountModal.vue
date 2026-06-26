@@ -103,7 +103,7 @@ onUnmounted(() => clearInterval(interval.value));
 
             <div 
                 @click="copyCommand"
-                class="bg-rapanel-navy-100 dark:bg-rapanel-navy-900 border-2 border-dashed border-blue-500/30 dark:border-rapanel-blue/30 rounded-xl p-8 mb-6 group hover:border-blue-500 dark:hover:border-rapanel-blue transition-all cursor-pointer relative"
+                class="bg-rapanel-navy-100 dark:bg-rapanel-navy-900 border-2 border-dashed border-blue-500/30 dark:border-rapanel-blue/30 rounded-xl p-8 mb-6 group hover:border-blue-500 dark:hover:border-rapanel-btn-blue transition-all cursor-pointer relative"
             >
                 <div class="flex flex-col items-center">
                     <span 
