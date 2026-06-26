@@ -746,12 +746,12 @@ onUnmounted(() => {
 <style scoped>
 /* ── Root ───────────────────────────────────────────────────── */
 .ha-root {
-    background: #f8fafc;
+    background: rgb(var(--rapanel-page-bg-rgb, 248 250 252));
     color: #1d283a;
     font-family: 'Figtree', sans-serif;
 }
 .dark .ha-root {
-    background: #0f172a;
+    background: rgb(var(--rapanel-page-bg-rgb, 15 23 42));
     color: #E2E8F0;
 }
 .font-display { font-family: 'Rajdhani', sans-serif; }
@@ -775,10 +775,10 @@ onUnmounted(() => {
 
 /* ── Info section ───────────────────────────────────────────── */
 .ha-info-section {
-    background: #e8eef6;
+    background: rgb(var(--rapanel-page-bg-rgb, 232 238 246));
 }
 .dark .ha-info-section {
-    background: #080e1a;
+    background: rgb(var(--rapanel-page-bg-rgb, 8 14 26));
 }
 
 /* ── Gradient text ──────────────────────────────────────────── */
@@ -849,13 +849,13 @@ onUnmounted(() => {
 
 /* ── Glass card ─────────────────────────────────────────────── */
 .ha-glass {
-    background: rgba(255,255,255,0.95);
+    background: rgb(var(--rapanel-card-rgb, 255 255 255) / 0.95);
     border: 1px solid rgba(15,23,42,0.08);
     backdrop-filter: blur(14px);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
 }
 .dark .ha-glass {
-    background: #0f172a;
+    background: rgb(var(--rapanel-card-rgb, 15 23 42));
     border-color: rgba(255,255,255,0.07);
 }
 .ha-glass:hover {
@@ -953,7 +953,7 @@ onUnmounted(() => {
 
 /* ── Highlight cards ────────────────────────────────────────── */
 .ha-hcard {
-    background: rgba(255,255,255,0.9);
+    background: rgb(var(--rapanel-card-rgb, 255 255 255) / 0.9);
     border: 1px solid rgba(15,23,42,0.1);
     border-radius: 16px;
     overflow: hidden;
@@ -962,7 +962,7 @@ onUnmounted(() => {
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .dark .ha-hcard {
-    background: #0f172a;
+    background: rgb(var(--rapanel-card-rgb, 15 23 42));
     border-color: rgba(255,255,255,0.08);
 }
 .ha-hcard:hover {

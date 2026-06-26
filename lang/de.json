@@ -1504,5 +1504,6 @@
     "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Wird auf inneren Seiten verwendet. Der Hintergrund der Startseite (Hero) wird in Settings → Home festgelegt.",
     "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Zwei Farben für den Verlauf des Hero-Buttons. Die erste färbt auch die Raster und Glüheffekte des Hintergrunds.",
     "Secondary button": "Sekundärer Button",
-    "The \"Learn More\" outline button in the hero.": "Der Umriss-Button \"Learn More\" im Hero."
+    "The \"Learn More\" outline button in the hero.": "Der Umriss-Button \"Learn More\" im Hero.",
+    "Card color": "Kartenfarbe"
 }

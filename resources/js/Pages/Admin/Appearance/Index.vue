@@ -37,6 +37,7 @@ const form = useForm({
         accent:         props.theme.home.accent,
         accent2:        props.theme.home.accent2,
         ghost:          props.theme.home.ghost,
+        card:           { light: props.theme.home.card.light, dark: props.theme.home.card.dark },
         palette:        [...props.theme.home.palette],
     },
     bg_image:             null,
@@ -144,7 +145,7 @@ const themeFromForm = () => ({
     buttons: { ...form.buttons },
     light:   { ...form.light },
     dark:    { ...form.dark },
-    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, accent2: form.home.accent2, ghost: form.home.ghost, palette: [...form.home.palette] },
+    home:    { title_gradient: { ...form.home.title_gradient }, accent: form.home.accent, accent2: form.home.accent2, ghost: form.home.ghost, card: { ...form.home.card }, palette: [...form.home.palette] },
 });
 
 onMounted(() => applyThemePreview(themeFromForm()));
@@ -308,12 +309,21 @@ const buttonFields = [
                     <div class="grid sm:grid-cols-2 gap-x-10 gap-y-5">
                         <div v-for="mode in [{ key: 'light', label: 'Light theme' }, { key: 'dark', label: 'Dark theme' }]" :key="mode.key">
                             <p class="text-[11px] font-black uppercase tracking-widest text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 mb-3">{{ __(mode.label) }}</p>
-                            <div class="flex items-center gap-3">
-                                <input type="color" v-model="form[mode.key].bg"
-                                    class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
-                                <input type="text" v-model="form[mode.key].bg" maxlength="7"
-                                    class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
-                                <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Background color') }}</span>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <input type="color" v-model="form[mode.key].bg"
+                                        class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                                    <input type="text" v-model="form[mode.key].bg" maxlength="7"
+                                        class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                                    <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Background color') }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" v-model="form.home.card[mode.key]"
+                                        class="h-9 w-11 shrink-0 rounded-md border border-rapanel-navy-100 dark:border-white/10 cursor-pointer bg-transparent p-0.5" />
+                                    <input type="text" v-model="form.home.card[mode.key]" maxlength="7"
+                                        class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
+                                    <span class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70">{{ __('Card color') }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

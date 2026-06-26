@@ -16,6 +16,7 @@ const STYLE_ID = 'theme-preview';
 function lightMap(t) {
     return {
         '--rapanel-page-bg-rgb':     t.light.bg,
+        '--rapanel-card-rgb':        t.home.card.light,
         '--rapanel-text-light-rgb':  t.light.text,
         '--rapanel-btn-blue-rgb':    t.buttons.blue,
         '--rapanel-btn-gold-rgb':    t.buttons.gold,
@@ -36,6 +37,7 @@ function lightMap(t) {
 function darkMap(t) {
     return {
         '--rapanel-page-bg-rgb':     t.dark.bg,
+        '--rapanel-card-rgb':        t.home.card.dark,
         '--rapanel-surface-rgb':     t.dark.surface,
         '--rapanel-text-dark-rgb':   t.dark.text,
         '--rapanel-header-bg-rgb':   t.header.dark.bg,

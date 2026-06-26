@@ -1504,5 +1504,6 @@
     "Used on inner pages. The home page background (hero) is set in Settings → Home.": "Used on inner pages. The home page background (hero) is set in Settings → Home.",
     "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Two colors for the hero button gradient. The first also tints the background grids and glows.",
     "Secondary button": "Secondary button",
-    "The \"Learn More\" outline button in the hero.": "The \"Learn More\" outline button in the hero."
+    "The \"Learn More\" outline button in the hero.": "The \"Learn More\" outline button in the hero.",
+    "Card color": "Card color"
 }

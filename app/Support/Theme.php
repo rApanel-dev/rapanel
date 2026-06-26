@@ -63,6 +63,7 @@ class Theme
                 'accent'  => $theme['home']['accent']  ?? $d['home']['accent'],
                 'accent2' => $theme['home']['accent2'] ?? $d['home']['accent2'],
                 'ghost'   => $theme['home']['ghost']   ?? $d['home']['ghost'],
+                'card'    => array_merge($d['home']['card'], $theme['home']['card'] ?? []),
                 'palette' => $theme['home']['palette'] ?? $d['home']['palette'],
             ],
         ];
@@ -95,6 +96,7 @@ class Theme
         return [
             // Globales claro
             '--rapanel-page-bg-rgb'     => $t['light']['bg'],   // fondo de página claro
+            '--rapanel-card-rgb'        => $t['home']['card']['light'], // superficie de tarjeta (claro)
             '--rapanel-text-light-rgb'  => $t['light']['text'],
             // Colores de BOTÓN (tokens rapanel-btn-*, solo los usa ActionButton).
             // Separados de los acentos base rapanel-* (que quedan FIJOS para los
@@ -126,6 +128,7 @@ class Theme
         return [
             // Globales oscuro
             '--rapanel-page-bg-rgb'     => $t['dark']['bg'],   // fondo de página oscuro
+            '--rapanel-card-rgb'        => $t['home']['card']['dark'], // superficie de tarjeta (oscuro)
             '--rapanel-surface-rgb'     => $t['dark']['surface'],
             '--rapanel-text-dark-rgb'   => $t['dark']['text'],
             // Header / Footer — oscuro
