@@ -18,25 +18,25 @@ const props = defineProps({
     type:     { type: String,  default: 'button' },
 });
 
-// soft = translúcido (acciones de fila / secundarias)
+// soft = translúcido (acciones de fila / secundarias). Usa tokens rapanel-btn-* (themeables).
 const soft = {
-    blue:         'bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white',
-    gold:         'bg-rapanel-gold/30 dark:bg-rapanel-gold/10 text-rapanel-gold border-rapanel-gold/40 dark:border-rapanel-gold/20 hover:bg-rapanel-gold hover:text-white',
-    purple:       'bg-rapanel-purple/30 dark:bg-rapanel-purple/10 text-rapanel-purple border-rapanel-purple/40 dark:border-rapanel-purple/20 hover:bg-rapanel-purple hover:text-white',
-    danger:       'bg-rapanel-danger/30 dark:bg-rapanel-danger/10 text-rapanel-danger border-rapanel-danger/40 dark:border-rapanel-danger/20 hover:bg-rapanel-danger hover:text-white',
-    success:      'bg-rapanel-success/30 dark:bg-rapanel-success/10 text-rapanel-success border-rapanel-success/40 dark:border-rapanel-success/20 hover:bg-rapanel-success hover:text-white',
-    navy:         'bg-rapanel-navy-100 dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-rapanel-navy-600 hover:bg-rapanel-navy-900 hover:text-white dark:hover:bg-rapanel-navy-600',
-    'reset-look': 'bg-rapanel-danger/10 dark:bg-rapanel-gold/10 text-rapanel-danger dark:text-rapanel-gold border-rapanel-danger/40 dark:border-rapanel-gold/20 hover:bg-rapanel-danger hover:text-white dark:hover:bg-rapanel-gold dark:hover:text-rapanel-navy-900',
+    blue:         'bg-rapanel-btn-blue/30 dark:bg-rapanel-btn-blue/10 text-rapanel-btn-blue border-rapanel-btn-blue/40 dark:border-rapanel-btn-blue/20 hover:bg-rapanel-btn-blue hover:text-white',
+    gold:         'bg-rapanel-btn-gold/30 dark:bg-rapanel-btn-gold/10 text-rapanel-btn-gold border-rapanel-btn-gold/40 dark:border-rapanel-btn-gold/20 hover:bg-rapanel-btn-gold hover:text-white',
+    purple:       'bg-rapanel-btn-purple/30 dark:bg-rapanel-btn-purple/10 text-rapanel-btn-purple border-rapanel-btn-purple/40 dark:border-rapanel-btn-purple/20 hover:bg-rapanel-btn-purple hover:text-white',
+    danger:       'bg-rapanel-btn-danger/30 dark:bg-rapanel-btn-danger/10 text-rapanel-btn-danger border-rapanel-btn-danger/40 dark:border-rapanel-btn-danger/20 hover:bg-rapanel-btn-danger hover:text-white',
+    success:      'bg-rapanel-btn-success/30 dark:bg-rapanel-btn-success/10 text-rapanel-btn-success border-rapanel-btn-success/40 dark:border-rapanel-btn-success/20 hover:bg-rapanel-btn-success hover:text-white',
+    navy:         'bg-rapanel-navy-100 dark:bg-rapanel-navy-700 text-rapanel-navy-900 dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-rapanel-navy-600 hover:bg-rapanel-btn-navy hover:text-white dark:hover:bg-rapanel-btn-navy',
+    'reset-look': 'bg-rapanel-btn-danger/10 dark:bg-rapanel-btn-gold/10 text-rapanel-btn-danger dark:text-rapanel-btn-gold border-rapanel-btn-danger/40 dark:border-rapanel-btn-gold/20 hover:bg-rapanel-btn-danger hover:text-white dark:hover:bg-rapanel-btn-gold dark:hover:text-rapanel-navy-900',
 };
 // solid = relleno (acciones primarias: Nuevo · Guardar · Crear)
 const solid = {
-    blue:    'bg-rapanel-blue text-white border-rapanel-blue hover:bg-rapanel-blue/90',
-    gold:    'bg-rapanel-gold text-rapanel-navy-900 border-rapanel-gold hover:bg-rapanel-gold/90',
-    purple:  'bg-rapanel-purple text-white border-rapanel-purple hover:bg-rapanel-purple/90',
-    danger:  'bg-rapanel-danger text-white border-rapanel-danger hover:bg-rapanel-danger/90',
-    success: 'bg-rapanel-success text-white border-rapanel-success hover:bg-rapanel-success/90',
-    navy:    'bg-rapanel-navy-900 dark:bg-rapanel-navy-700 text-white border-rapanel-navy-900 dark:border-rapanel-navy-600 hover:bg-rapanel-navy-800 dark:hover:bg-rapanel-navy-600',
-    'reset-look': 'bg-rapanel-danger text-white border-rapanel-danger hover:bg-rapanel-danger/90',
+    blue:    'bg-rapanel-btn-blue text-white border-rapanel-btn-blue hover:bg-rapanel-btn-blue/90',
+    gold:    'bg-rapanel-btn-gold text-rapanel-navy-900 border-rapanel-btn-gold hover:bg-rapanel-btn-gold/90',
+    purple:  'bg-rapanel-btn-purple text-white border-rapanel-btn-purple hover:bg-rapanel-btn-purple/90',
+    danger:  'bg-rapanel-btn-danger text-white border-rapanel-btn-danger hover:bg-rapanel-btn-danger/90',
+    success: 'bg-rapanel-btn-success text-white border-rapanel-btn-success hover:bg-rapanel-btn-success/90',
+    navy:    'bg-rapanel-btn-navy text-white border-rapanel-btn-navy hover:bg-rapanel-btn-navy/90',
+    'reset-look': 'bg-rapanel-btn-danger text-white border-rapanel-btn-danger hover:bg-rapanel-btn-danger/90',
 };
 // ghost = superficie neutra con borde (secundario / cancelar) — neutral, el variant no aplica
 const ghostClass = 'bg-white dark:bg-rapanel-navy-800 text-rapanel-text-light dark:text-rapanel-text-dark border-rapanel-navy-100 dark:border-white/10 hover:bg-rapanel-navy-50 dark:hover:bg-white/5';

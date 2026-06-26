@@ -92,13 +92,15 @@ class Theme
             // Globales claro
             '--rapanel-page-bg-rgb'     => $t['light']['bg'],   // fondo de página claro
             '--rapanel-text-light-rgb'  => $t['light']['text'],
-            // Acentos de botones (compartidos claro/oscuro → solo en :root)
-            '--rapanel-blue-rgb'        => $t['buttons']['blue'],
-            '--rapanel-gold-rgb'        => $t['buttons']['gold'],
-            '--rapanel-purple-rgb'      => $t['buttons']['purple'],
-            '--rapanel-navy-700-rgb'    => $t['buttons']['navy'],
-            '--rapanel-success-rgb'     => $t['buttons']['success'],
-            '--rapanel-danger-rgb'      => $t['buttons']['danger'],
+            // Colores de BOTÓN (tokens rapanel-btn-*, solo los usa ActionButton).
+            // Separados de los acentos base rapanel-* (que quedan FIJOS para los
+            // colores funcionales: tipos de ítem, elementos de mob, estados).
+            '--rapanel-btn-blue-rgb'    => $t['buttons']['blue'],
+            '--rapanel-btn-gold-rgb'    => $t['buttons']['gold'],
+            '--rapanel-btn-purple-rgb'  => $t['buttons']['purple'],
+            '--rapanel-btn-navy-rgb'    => $t['buttons']['navy'],
+            '--rapanel-btn-success-rgb' => $t['buttons']['success'],
+            '--rapanel-btn-danger-rgb'  => $t['buttons']['danger'],
             // Header / Footer — claro
             '--rapanel-header-bg-rgb'   => $t['header']['light']['bg'],
             '--rapanel-header-text-rgb' => $t['header']['light']['text'],

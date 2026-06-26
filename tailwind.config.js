@@ -60,6 +60,18 @@ export default {
                     dark:    'rgb(var(--rapanel-purple-dark-rgb,  88 28 135) / <alpha-value>)',
                 },
 
+                // ── Colores de BOTÓN (personalizables desde Apariencia) ──────────────
+                // SEPARADOS de los acentos base de arriba: el panel theme-a estos, NO los
+                // rapanel-blue/success/etc., que quedan FIJOS para los colores funcionales
+                // (tipos de ítem, elementos de mob, estados online/offline). Solo los usa
+                // ActionButton. Fallback = valor actual de cada acento.
+                'rapanel-btn-blue':    'rgb(var(--rapanel-btn-blue-rgb,    74 144 226) / <alpha-value>)',
+                'rapanel-btn-gold':    'rgb(var(--rapanel-btn-gold-rgb,   241 196  15) / <alpha-value>)',
+                'rapanel-btn-purple':  'rgb(var(--rapanel-btn-purple-rgb, 168  85 247) / <alpha-value>)',
+                'rapanel-btn-success': 'rgb(var(--rapanel-btn-success-rgb, 46 204 113) / <alpha-value>)',
+                'rapanel-btn-danger':  'rgb(var(--rapanel-btn-danger-rgb, 231  76  60) / <alpha-value>)',
+                'rapanel-btn-navy':    'rgb(var(--rapanel-btn-navy-rgb,    51  65  85) / <alpha-value>)',
+
                 // Dark mode surface tokens
                 'rapanel-surface':      'rgb(var(--rapanel-surface-rgb,      15 24 41) / <alpha-value>)', // dark card/panel background
                 'rapanel-surface-deep': 'rgb(var(--rapanel-surface-deep-rgb, 11 17 32) / <alpha-value>)', // dark sidebar/topbar background
