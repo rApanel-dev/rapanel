@@ -1505,5 +1505,19 @@
     "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Два цвета для градиента кнопки героя. Первый также окрашивает сетки и свечения фона.",
     "Secondary button": "Вторичная кнопка",
     "The \"Learn More\" outline button in the hero.": "Контурная кнопка «Learn More» в герое.",
-    "Card color": "Цвет карточек"
+    "Card color": "Цвет карточек",
+    "Hero background": "Фон героя",
+    "Background Image": "Фоновое изображение",
+    "Background Video": "Фоновое видео",
+    "Remove video": "Удалить видео",
+    "Takes priority over the image.": "Имеет приоритет над изображением.",
+    "Used on inner pages, not the home hero (set above).": "Используется на внутренних страницах, не в герое главной (задаётся выше).",
+    "The hero background (image / video) is now set in Appearance → Home.": "Фон героя (изображение / видео) теперь настраивается в Оформление → Home.",
+    "If a video is set it takes priority over the image. Leave both empty to use the default background.": "Если задано видео, оно имеет приоритет над изображением. Оставьте оба пустыми для фона по умолчанию.",
+    "Brand": "Бренд",
+    "Home content": "Содержимое главной",
+    "Logo": "Логотип",
+    "Logos, favicon and theme color are now set in Appearance → Brand.": "Логотипы, фавикон и цвет темы теперь настраиваются в Оформление → Brand.",
+    "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Логотип, фавикон и цвет темы браузера. Отображаются на публичном сайте и в личном кабинете.",
+    "Accent colors come from the palette in Appearance → Home.": "Акцентные цвета берутся из палитры в Оформление → Home."
 }

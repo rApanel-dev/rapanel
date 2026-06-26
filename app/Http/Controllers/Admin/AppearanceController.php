@@ -33,6 +33,13 @@ class AppearanceController extends Controller
             'bgImage'  => SiteSetting::getValue('theme_bg_image'),
             'infoBgImage' => SiteSetting::getValue('home_info_bg_image'),
             'heroBgImage' => SiteSetting::getValue('home_hero_bg_image'),
+            'heroBgVideo' => SiteSetting::getValue('home_hero_bg_video'),
+            'brand' => [
+                'logo_light'  => SiteSetting::getValue('logo_light'),
+                'logo_dark'   => SiteSetting::getValue('logo_dark'),
+                'favicon'     => SiteSetting::getValue('favicon'),
+                'theme_color' => SiteSetting::getValue('seo_theme_color', '#3b82f6'),
+            ],
             'character' => [
                 'enabled'  => SiteSetting::getValue('home_char_enabled', '1') !== '0',
                 'mobile'   => SiteSetting::getValue('home_char_mobile', '0') === '1',
@@ -93,6 +100,32 @@ class AppearanceController extends Controller
         return back()->with('success', __('Character settings saved.'));
     }
 
+    /**
+     * Marca / identidad visual: logos (claro/oscuro), favicon y color de tema del
+     * navegador. Movido desde Settings → General porque son assets de diseño.
+     * Guardado en ra_site_settings (setMany invalida el cache compartido).
+     */
+    public function updateBrand(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'logo_light'  => 'nullable|image|max:2048',
+            'logo_dark'   => 'nullable|image|max:2048',
+            'favicon'     => 'nullable|image|mimes:png,jpg,jpeg,ico,svg|max:512',
+            'theme_color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,8}$/',
+        ]);
+
+        SiteSetting::setValue('seo_theme_color', $request->input('theme_color', '#3b82f6'));
+
+        foreach (['logo_light', 'logo_dark', 'favicon'] as $field) {
+            if ($request->hasFile($field)) {
+                $this->deleteSetting($field);
+                SiteSetting::setValue($field, $request->file($field)->store('settings', 'public'));
+            }
+        }
+
+        return back()->with('success', __('Appearance saved.'));
+    }
+
     private function deleteSetting(string $key): void
     {
         $old = SiteSetting::getValue($key);
@@ -134,6 +167,12 @@ class AppearanceController extends Controller
             'remove_bg_image' => 'nullable|boolean',
             'info_bg_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:10240',
             'remove_info_bg_image' => 'nullable|boolean',
+            // Media de fondo del hero de la home (imagen o video). Es identidad
+            // visual → vive aquí en Appearance, no en Settings.
+            'hero_bg_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
+            'remove_hero_bg_image' => 'nullable|boolean',
+            'hero_bg_video'        => 'nullable|mimes:mp4,webm|max:102400',
+            'remove_hero_bg_video' => 'nullable|boolean',
         ]);
 
         // Normaliza sobre defaults para garantizar un tema completo y válido.
@@ -170,6 +209,29 @@ class AppearanceController extends Controller
             SiteSetting::setValue(
                 'home_info_bg_image',
                 $request->file('info_bg_image')->store('settings/home', 'public')
+            );
+        }
+
+        // Media de fondo del hero (imagen / video), movida desde Settings.
+        if ($request->boolean('remove_hero_bg_image')) {
+            $this->deleteSetting('home_hero_bg_image');
+            SiteSetting::setValue('home_hero_bg_image', null);
+        } elseif ($request->hasFile('hero_bg_image')) {
+            $this->deleteSetting('home_hero_bg_image');
+            SiteSetting::setValue(
+                'home_hero_bg_image',
+                $request->file('hero_bg_image')->store('settings/hero', 'public')
+            );
+        }
+
+        if ($request->boolean('remove_hero_bg_video')) {
+            $this->deleteSetting('home_hero_bg_video');
+            SiteSetting::setValue('home_hero_bg_video', null);
+        } elseif ($request->hasFile('hero_bg_video')) {
+            $this->deleteSetting('home_hero_bg_video');
+            SiteSetting::setValue(
+                'home_hero_bg_video',
+                $request->file('hero_bg_video')->store('settings/hero', 'public')
             );
         }
 

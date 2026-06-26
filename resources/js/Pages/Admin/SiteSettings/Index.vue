@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { useForm, usePage, router } from '@inertiajs/vue3';
+import { useForm, usePage, router, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import { ro_game_modes, ro_episodes } from '@/helpers';
@@ -33,49 +33,15 @@ const __ = (key, rep = {}) => {
 const activeTab = ref('general');
 
 // --- General form ---
+// Logos, favicon y color de tema se gestionan en Appearance → Brand (diseño).
 const generalForm = useForm({
     site_name:          props.settings.site_name ?? '',
-    logo_light:         null,
-    logo_dark:          null,
-    favicon:            null,
-    seo_theme_color:    props.settings.seo_theme_color ?? '#3b82f6',
     discord_server_id:  props.settings.discord_server_id ?? '',
     discord_invite_url: props.settings.discord_invite_url ?? '',
 });
 
-const logoLightPreview = ref(
-    props.settings.logo_light ? '/storage/' + props.settings.logo_light : '/images/logo.png'
-);
-const logoDarkPreview = ref(
-    props.settings.logo_dark ? '/storage/' + props.settings.logo_dark : '/images/logo.png'
-);
-const faviconPreview = ref(
-    props.settings.favicon ? '/storage/' + props.settings.favicon : null
-);
-
-const onLogoLight = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    generalForm.logo_light = file;
-    logoLightPreview.value = URL.createObjectURL(file);
-};
-
-const onLogoDark = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    generalForm.logo_dark = file;
-    logoDarkPreview.value = URL.createObjectURL(file);
-};
-
-const onFavicon = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    generalForm.favicon = file;
-    faviconPreview.value = URL.createObjectURL(file);
-};
-
 const submitGeneral = () => {
-    generalForm.post(route('admin.settings.general'), { forceFormData: true });
+    generalForm.post(route('admin.settings.general'));
 };
 
 // --- Home sections toggles ---
@@ -89,7 +55,7 @@ const sections = ref({
 
 const tabs = computed(() => [
     { key: 'general',     label: 'General',         icon: Cog6ToothIcon },
-    { key: 'home',        label: 'Home',             icon: HomeIcon },
+    { key: 'home',        label: 'Home content',     icon: HomeIcon },
     ...(sections.value.home_show_info ? [{ key: 'server-info', label: 'Server Info', icon: InformationCircleIcon }] : []),
     ...(sections.value.home_show_features ? [{ key: 'features', label: 'Panel Features', icon: Squares2X2Icon }] : []),
     ...(sections.value.home_show_cta      ? [{ key: 'cta',      label: 'Call to Action', icon: RocketLaunchIcon }] : []),
@@ -163,6 +129,17 @@ const infoBlocksMeta = [
     },
 ]
 
+// Acentos de las tarjetas de la home (info blocks + feature cards): se toman de
+// la paleta editable en Appearance → Home → Card palette. Aquí solo se usa para
+// la previsualización; el color ya no se edita por tarjeta.
+const cardPalette = computed(() => {
+    try {
+        const p = JSON.parse(props.settings.theme || 'null')?.home?.palette;
+        if (Array.isArray(p) && p.length) return p;
+    } catch {}
+    return ['#4A90E2', '#F1C40F', '#2ECC71', '#a855f7', '#E74C3C', '#e2e8f0'];
+});
+
 const infoBlocks   = ref(parseInfoBlocks())
 const infoFiles    = ref([null, null, null, null, null])
 const infoPreviews = ref(parseInfoBlocks().map(b => b.image ? '/storage/' + b.image : null))
@@ -195,7 +172,6 @@ const submitInfoBlocks = () => {
     infoBlocks.value.forEach((b, i) => {
         fd.append(`blocks[${i}][show]`,      b.show ? '1' : '0')
         fd.append(`blocks[${i}][icon_type]`, b.icon_type)
-        fd.append(`blocks[${i}][color]`,     b.color || infoBlocksMeta[i].color)
         fd.append(`blocks[${i}][svg_code]`,  b.svg_code ?? '')
         if (infoFiles.value[i]) fd.append(`blocks[${i}][image]`, infoFiles.value[i])
     })
@@ -246,39 +222,10 @@ const submitHighlightCards = () => {
 const heroForm = useForm({
     home_hero_subtitle:   props.settings.home_hero_subtitle  ?? '',
     home_learn_more_url:  props.settings.home_learn_more_url ?? '',
-    home_hero_bg_image:   null,
-    home_hero_bg_video:   null,
-    remove_hero_bg_image: false,
-    remove_hero_bg_video: false,
 });
 
-const heroBgImageIsCustom = ref(!!props.settings.home_hero_bg_image);
-const heroBgImagePreview  = ref(
-    props.settings.home_hero_bg_image
-        ? '/storage/' + props.settings.home_hero_bg_image
-        : '/images/bg-main.svg'
-);
-const heroBgVideoPreview = ref(
-    props.settings.home_hero_bg_video ? '/storage/' + props.settings.home_hero_bg_video : null
-);
-
-const onHeroBgImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    heroForm.home_hero_bg_image = file;
-    heroBgImagePreview.value    = URL.createObjectURL(file);
-    heroBgImageIsCustom.value   = true;
-};
-
-const onHeroBgVideo = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    heroForm.home_hero_bg_video = file;
-    heroBgVideoPreview.value = URL.createObjectURL(file);
-};
-
 const submitHero = () => {
-    heroForm.post(route('admin.settings.home-hero'), { forceFormData: true });
+    heroForm.post(route('admin.settings.home-hero'));
 };
 
 
@@ -393,7 +340,6 @@ const submitFeatures = () => {
     featureCards.value.forEach((c, i) => {
         fd.append(`cards[${i}][title]`,     c.title     ?? '');
         fd.append(`cards[${i}][desc]`,      c.desc      ?? '');
-        fd.append(`cards[${i}][color]`,     c.color     ?? '');
         fd.append(`cards[${i}][svg_code]`,  c.svg_code  ?? '');
         fd.append(`cards[${i}][icon_type]`, c.icon_type ?? 'icon');
         fd.append(`cards[${i}][enabled]`,   c.enabled   ? '1' : '0');
@@ -504,70 +450,12 @@ const executeDanger = () => {
                     <p v-if="generalForm.errors.site_name" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.site_name }}</p>
                 </div>
 
-                <!-- Logos -->
-                <div>
-                    <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-3">
-                        {{ __('Recommended size: 300×60 px — PNG or SVG with transparent background, max 2 MB. The logo is displayed at 36–48 px height in the header.') }}
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <!-- Logo light -->
-                        <div>
-                            <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-2">{{ __('Logo (Light Mode)') }}</label>
-                            <div class="h-14 bg-rapanel-navy-50 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 flex items-center mb-2">
-                                <img :src="logoLightPreview" class="h-9 object-contain max-w-[200px]" alt="Logo light preview" />
-                            </div>
-                            <input type="file" accept="image/*" @change="onLogoLight"
-                                class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                            <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Used on white/light backgrounds') }}</p>
-                            <p v-if="generalForm.errors.logo_light" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.logo_light }}</p>
-                        </div>
-
-                        <!-- Logo dark -->
-                        <div>
-                            <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-2">{{ __('Logo (Dark Mode)') }}</label>
-                            <div class="h-14 bg-rapanel-navy-800 border border-white/10 rounded-lg px-3 flex items-center mb-2">
-                                <img :src="logoDarkPreview" class="h-9 object-contain max-w-[200px]" alt="Logo dark preview" />
-                            </div>
-                            <input type="file" accept="image/*" @change="onLogoDark"
-                                class="text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                            <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Used on dark/navy backgrounds') }}</p>
-                            <p v-if="generalForm.errors.logo_dark" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.logo_dark }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Branding -->
-            <div class="bg-white dark:bg-rapanel-navy-900 rounded-xl border border-rapanel-navy-100 dark:border-white/10 shadow-sm p-6 space-y-5">
-                <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Branding') }}</h2>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Favicon -->
-                    <div>
-                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Favicon') }}</label>
-                        <div class="h-20 w-20 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center mb-2">
-                            <img v-if="faviconPreview" :src="faviconPreview" class="h-12 w-12 object-contain" alt="Favicon" />
-                            <PhotoIcon v-else class="w-8 h-8 text-rapanel-navy-300 dark:text-rapanel-navy-600" />
-                        </div>
-                        <input type="file" accept=".png,.jpg,.jpeg,.ico,.svg" @change="onFavicon"
-                            class="block text-sm text-rapanel-text-light dark:text-rapanel-text-dark file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('PNG/ICO, max 512KB') }}</p>
-                        <p v-if="generalForm.errors.favicon" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.favicon }}</p>
-                    </div>
-
-                    <!-- Theme Color -->
-                    <div>
-                        <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white mb-1.5">{{ __('Theme Color') }}</label>
-                        <div class="flex items-center gap-3">
-                            <input type="color" v-model="generalForm.seo_theme_color"
-                                class="h-9 w-14 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
-                            <input type="text" v-model="generalForm.seo_theme_color" maxlength="20" placeholder="#3b82f6"
-                                class="w-32 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
-                        </div>
-                        <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60">{{ __('Browser tab and PWA color.') }}</p>
-                        <p v-if="generalForm.errors.seo_theme_color" class="mt-1 text-xs text-rapanel-danger">{{ generalForm.errors.seo_theme_color }}</p>
-                    </div>
-                </div>
+                <!-- Logos, favicon y color de tema → Appearance → Brand (diseño) -->
+                <Link :href="route('admin.appearance.index')"
+                    class="flex items-center gap-2 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue dark:hover:text-rapanel-blue transition">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                    <span>{{ __('Logos, favicon and theme color are now set in Appearance → Brand.') }}</span>
+                </Link>
             </div>
 
             <!-- Discord -->
@@ -671,56 +559,13 @@ const executeDanger = () => {
                         <p class="mt-1 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50">{{ __('Leave empty to scroll to the next section.') }}</p>
                     </div>
 
-                    <!-- Background Image -->
+                    <!-- La media de fondo del hero (imagen/video) se gestiona en Appearance -->
                     <div class="border-t border-rapanel-navy-100 dark:border-white/10 pt-4">
-                        <p class="text-xs font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider mb-3">{{ __('Background') }}</p>
-                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-55 mb-4">
-                            {{ __('If a video is set it takes priority over the image. Leave both empty to use the default SVG background.') }}
-                        </p>
-
-                        <!-- Image -->
-                        <div class="space-y-2 mb-5">
-                            <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white">{{ __('Background Image') }}</label>
-                            <div class="relative w-full h-28 rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10">
-                                <img :src="heroBgImagePreview" class="w-full h-full object-cover" />
-                                <span class="absolute top-2 left-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded-full">
-                                    {{ heroBgImageIsCustom ? __('Custom image') : __('Default background') }}
-                                </span>
-                                <button v-if="heroBgImageIsCustom" type="button"
-                                        @click="heroBgImagePreview = '/images/bg-main.svg'; heroBgImageIsCustom = false; heroForm.remove_hero_bg_image = true; heroForm.home_hero_bg_image = null; heroForm.post(route('admin.settings.home-hero'), { forceFormData: true })"
-                                        class="absolute top-2 right-2 w-6 h-6 rounded-full bg-rapanel-danger flex items-center justify-center hover:opacity-80 transition-opacity"
-                                        title="Remove image">
-                                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" @change="onHeroBgImage"
-                                class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                            <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">JPG/PNG/WebP — max 10 MB. Recomendado: 1920×1080 px.</p>
-                        </div>
-
-                        <!-- Video -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-rapanel-navy-900 dark:text-white">{{ __('Background Video') }}</label>
-                            <div v-if="heroBgVideoPreview"
-                                 class="relative w-full h-28 rounded-xl overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-black">
-                                <video :src="heroBgVideoPreview" class="w-full h-full object-cover" autoplay muted loop playsinline />
-                                <span class="absolute top-2 left-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded-full">{{ __('Current video') }}</span>
-                                <button type="button"
-                                        @click="heroBgVideoPreview = null; heroForm.remove_hero_bg_video = true; heroForm.home_hero_bg_video = null; heroForm.post(route('admin.settings.home-hero'), { forceFormData: true })"
-                                        class="absolute top-2 right-2 w-6 h-6 rounded-full bg-rapanel-danger flex items-center justify-center hover:opacity-80 transition-opacity"
-                                        title="Remove video">
-                                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                            <div v-else class="w-full h-16 rounded-xl border border-dashed border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-rapanel-text-light dark:text-rapanel-text-dark opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/>
-                                </svg>
-                            </div>
-                            <input type="file" accept="video/mp4,video/webm" @change="onHeroBgVideo"
-                                class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                            <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">MP4/WebM — max 100 MB. Tiene prioridad sobre la imagen.</p>
-                        </div>
+                        <Link :href="route('admin.appearance.index')"
+                            class="flex items-center gap-2 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue dark:hover:text-rapanel-blue transition">
+                            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                            <span>{{ __('The hero background (image / video) is now set in Appearance → Home.') }}</span>
+                        </Link>
                     </div>
                 </div>
 
@@ -748,6 +593,11 @@ const executeDanger = () => {
                     <a href="https://heroicons.com" target="_blank" class="text-rapanel-gold hover:underline">heroicons.com</a> ·
                     <a href="https://lucide.dev" target="_blank" class="text-rapanel-gold hover:underline">lucide.dev</a>
                 </p>
+                <Link :href="route('admin.appearance.index')"
+                    class="flex items-center gap-1.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue transition mb-5">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                    <span>{{ __('Accent colors come from the palette in Appearance → Home.') }}</span>
+                </Link>
 
                 <div class="space-y-3">
                     <div v-for="(block, i) in infoBlocks" :key="block.id"
@@ -758,7 +608,7 @@ const executeDanger = () => {
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                                      :style="`background:${block.color || infoBlocksMeta[i].color}`"></span>
+                                      :style="`background:${cardPalette[i % cardPalette.length]}`"></span>
                                 <span class="text-sm font-semibold text-rapanel-navy-900 dark:text-white">{{ __(infoBlocksMeta[i].label) }}</span>
                             </div>
                             <button type="button" role="switch" :aria-checked="block.show"
@@ -780,13 +630,13 @@ const executeDanger = () => {
                                     <!-- Preview actual -->
                                     <div class="relative flex-shrink-0">
                                         <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                                             :style="`background:${block.color || infoBlocksMeta[i].color}20; border:1px solid ${block.color || infoBlocksMeta[i].color}40`">
+                                             :style="`background:${cardPalette[i % cardPalette.length]}20; border:1px solid ${cardPalette[i % cardPalette.length]}40`">
                                             <img v-if="infoPreviews[i]" :src="infoPreviews[i]" class="w-10 h-10 object-contain" />
                                             <span v-else-if="block.svg_code"
-                                                  class="w-6 h-6" :style="`color:${block.color || infoBlocksMeta[i].color}`"
+                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
                                                   v-html="block.svg_code" />
                                             <span v-else
-                                                  class="w-6 h-6" :style="`color:${block.color || infoBlocksMeta[i].color}`"
+                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
                                                   v-html="infoBlocksMeta[i].svg" />
                                         </div>
                                         <!-- × quita lo custom y vuelve al original -->
@@ -821,16 +671,6 @@ const executeDanger = () => {
                                     </div>
                                 </div>
 
-                                <!-- Color de acento -->
-                                <div>
-                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Accent Color') }}</label>
-                                    <div class="flex items-center gap-2">
-                                        <input type="color" v-model="block.color"
-                                               class="h-8 w-12 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
-                                        <input type="text" v-model="block.color" maxlength="20" placeholder="#4A90E2"
-                                               class="w-28 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Columna derecha: valores de texto -->
@@ -1009,7 +849,12 @@ const executeDanger = () => {
                     <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Feature Cards') }}</h2>
                     <span v-if="featuresSaving" class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 animate-pulse">{{ __('Saving...') }}</span>
                 </div>
-                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-5">{{ __('Toggle visibility and customize each feature card. Paste SVG code to replace the default icon.') }}</p>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Toggle visibility and customize each feature card. Paste SVG code to replace the default icon.') }}</p>
+                <Link :href="route('admin.appearance.index')"
+                    class="flex items-center gap-1.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue transition mb-5">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                    <span>{{ __('Accent colors come from the palette in Appearance → Home.') }}</span>
+                </Link>
 
                 <div class="space-y-4">
                     <div v-for="(card, i) in featureCards" :key="i"
@@ -1018,7 +863,7 @@ const executeDanger = () => {
 
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full flex-shrink-0" :style="`background:${card.color}`"></span>
+                                <span class="w-3 h-3 rounded-full flex-shrink-0" :style="`background:${cardPalette[i % cardPalette.length]}`"></span>
                                 <span class="text-sm font-bold text-rapanel-navy-900 dark:text-white">{{ __('Card') }} {{ i + 1 }}</span>
                             </div>
                             <button type="button" role="switch" :aria-checked="card.enabled"
@@ -1043,15 +888,6 @@ const executeDanger = () => {
                                     <textarea v-model="card.desc" rows="2" maxlength="300"
                                               class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Accent Color') }}</label>
-                                    <div class="flex items-center gap-2">
-                                        <input type="color" v-model="card.color"
-                                               class="h-8 w-12 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
-                                        <input type="text" v-model="card.color" maxlength="20" placeholder="#4A90E2"
-                                               class="w-28 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Derecha: ícono (mismo patrón que Server Info) -->
@@ -1062,13 +898,13 @@ const executeDanger = () => {
                                     <!-- Preview actual -->
                                     <div class="relative flex-shrink-0">
                                         <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                                             :style="`background:${card.color}20; border:1px solid ${card.color}40`">
+                                             :style="`background:${cardPalette[i % cardPalette.length]}20; border:1px solid ${cardPalette[i % cardPalette.length]}40`">
                                             <img v-if="featurePreviews[i]" :src="featurePreviews[i]" class="w-10 h-10 object-contain" />
                                             <span v-else-if="card.svg_code"
-                                                  class="w-6 h-6" :style="`color:${card.color}`"
+                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
                                                   v-html="card.svg_code" />
                                             <span v-else
-                                                  class="w-6 h-6" :style="`color:${card.color}`"
+                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
                                                   v-html="defaultFeatureCards[i].icon" />
                                         </div>
                                         <!-- × quita lo custom y vuelve al original -->

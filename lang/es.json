@@ -1505,5 +1505,19 @@
     "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Dos colores para el degradado del botón del hero. El primero también tiñe las rejillas y brillos del fondo.",
     "Secondary button": "Botón secundario",
     "The \"Learn More\" outline button in the hero.": "El botón de contorno \"Learn More\" del hero.",
-    "Card color": "Color de tarjeta"
+    "Card color": "Color de tarjeta",
+    "Hero background": "Fondo del hero",
+    "Background Image": "Imagen de fondo",
+    "Background Video": "Video de fondo",
+    "Remove video": "Quitar video",
+    "Takes priority over the image.": "Tiene prioridad sobre la imagen.",
+    "Used on inner pages, not the home hero (set above).": "Se usa en páginas internas, no en el hero del home (se configura arriba).",
+    "The hero background (image / video) is now set in Appearance → Home.": "El fondo del hero (imagen / video) ahora se configura en Apariencia → Home.",
+    "If a video is set it takes priority over the image. Leave both empty to use the default background.": "Si hay un video, tiene prioridad sobre la imagen. Deja ambos vacíos para usar el fondo por defecto.",
+    "Brand": "Marca",
+    "Home content": "Contenido del home",
+    "Logo": "Logo",
+    "Logos, favicon and theme color are now set in Appearance → Brand.": "Los logos, favicon y color de tema ahora se configuran en Apariencia → Brand.",
+    "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon y color de tema del navegador. Se muestran en el sitio público y el área de usuario.",
+    "Accent colors come from the palette in Appearance → Home.": "Los colores de acento se toman de la paleta en Apariencia → Home."
 }

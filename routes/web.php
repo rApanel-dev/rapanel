@@ -318,6 +318,7 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::prefix('appearance')->name('appearance.')->group(function () {
         Route::get('/',         [AppearanceController::class, 'index'])->name('index');
         Route::post('/',          [AppearanceController::class, 'update'])->name('update');
+        Route::post('/brand',     [AppearanceController::class, 'updateBrand'])->name('brand');
         Route::post('/character', [AppearanceController::class, 'updateCharacter'])->name('character');
         Route::post('/reset',     [AppearanceController::class, 'reset'])->name('reset');
         Route::delete('/image', [AppearanceController::class, 'removeImage'])->name('image.destroy');

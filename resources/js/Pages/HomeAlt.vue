@@ -307,9 +307,9 @@ const infoBlocks = computed(() => {
     ]
 })
 
-// Color por bloque: usa el guardado en BD o el color de la paleta por índice
+// Color por bloque: lo define la paleta editable (Appearance → Home → Card palette).
 const infoColors = computed(() =>
-    infoBlocks.value.map((b, i) => b.color || cardPalette.value[i])
+    infoBlocks.value.map((b, i) => cardPalette.value[i % cardPalette.value.length])
 )
 
 const highlightCards = computed(() => {

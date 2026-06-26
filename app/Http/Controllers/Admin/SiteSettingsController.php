@@ -32,34 +32,18 @@ class SiteSettingsController extends Controller
 
     public function updateGeneral(Request $request): RedirectResponse
     {
+        // Logos, favicon y color de tema se gestionan en Appearance → Brand.
         $request->validate([
             'site_name'          => 'required|string|max:100',
-            'logo_light'         => 'nullable|image|max:2048',
-            'logo_dark'          => 'nullable|image|max:2048',
-            'favicon'            => 'nullable|image|mimes:png,jpg,jpeg,ico,svg|max:512',
-            'seo_theme_color'    => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,8}$/',
             'discord_server_id'  => 'nullable|string|max:100',
             'discord_invite_url' => 'nullable|url|max:500',
         ]);
 
-        $data = [
+        SiteSetting::setMany([
             'site_name'          => $request->site_name,
-            'seo_theme_color'    => $request->seo_theme_color ?? '#3b82f6',
             'discord_server_id'  => $request->discord_server_id ?? '',
             'discord_invite_url' => $request->discord_invite_url ?? '',
-        ];
-
-        foreach (['logo_light', 'logo_dark', 'favicon'] as $field) {
-            if ($request->hasFile($field)) {
-                $old = SiteSetting::getValue($field);
-                if ($old) {
-                    Storage::disk('public')->delete($old);
-                }
-                $data[$field] = $request->file($field)->store('settings', 'public');
-            }
-        }
-
-        SiteSetting::setMany($data);
+        ]);
 
         $this->clearCache();
         return back()->with('success', __('General settings saved.'));
@@ -93,44 +77,17 @@ class SiteSettingsController extends Controller
 
     public function updateHomeHero(Request $request): RedirectResponse
     {
+        // Solo CONTENIDO del hero (subtítulo + URL "Learn More"). La media de fondo
+        // (imagen/video) se gestiona ahora en Appearance (AppearanceController::update).
         $request->validate([
-            'home_hero_subtitle'     => 'nullable|string|max:300',
-            'home_learn_more_url'    => 'nullable|url|max:500',
-            'home_hero_bg_image'     => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
-            'home_hero_bg_video'     => 'nullable|mimes:mp4,webm|max:102400',
-            'remove_hero_bg_video'   => 'nullable|boolean',
-            'remove_hero_bg_image'   => 'nullable|boolean',
+            'home_hero_subtitle'  => 'nullable|string|max:300',
+            'home_learn_more_url' => 'nullable|url|max:500',
         ]);
 
-        $data = [
+        SiteSetting::setMany([
             'home_hero_subtitle'  => $request->home_hero_subtitle  ?? '',
             'home_learn_more_url' => $request->home_learn_more_url ?? '',
-        ];
-
-        // Eliminar video si se solicitó
-        if ($request->boolean('remove_hero_bg_video')) {
-            $old = SiteSetting::getValue('home_hero_bg_video');
-            if ($old) Storage::disk('public')->delete($old);
-            $data['home_hero_bg_video'] = null;
-        }
-
-        // Eliminar imagen si se solicitó
-        if ($request->boolean('remove_hero_bg_image')) {
-            $old = SiteSetting::getValue('home_hero_bg_image');
-            if ($old) Storage::disk('public')->delete($old);
-            $data['home_hero_bg_image'] = null;
-        }
-
-        // Subir archivos nuevos
-        foreach (['home_hero_bg_image', 'home_hero_bg_video'] as $field) {
-            if ($request->hasFile($field)) {
-                $old = SiteSetting::getValue($field);
-                if ($old) Storage::disk('public')->delete($old);
-                $data[$field] = $request->file($field)->store('settings/hero', 'public');
-            }
-        }
-
-        SiteSetting::setMany($data);
+        ]);
 
         $this->clearCache();
         return back()->with('success', __('Home settings saved.'));
@@ -193,8 +150,9 @@ class SiteSettingsController extends Controller
                 $image = null;
             }
 
-            $color    = $request->input("blocks.{$i}.color", $existing['color'] ?? null);
-            $blocks[] = ['id' => $id, 'show' => $show, 'icon_type' => $iconType, 'image' => $image, 'svg_code' => $svgCode, 'color' => $color];
+            // El color de acento ya no se guarda por bloque: lo define la paleta
+            // editable en Appearance → Home → Card palette (consumida por HomeAlt).
+            $blocks[] = ['id' => $id, 'show' => $show, 'icon_type' => $iconType, 'image' => $image, 'svg_code' => $svgCode];
         }
 
         SiteSetting::setValue('home_info_blocks', json_encode($blocks));
@@ -364,10 +322,11 @@ class SiteSettingsController extends Controller
                 $image = null;
             }
 
+            // El color de acento ya no se guarda por tarjeta: lo define la paleta
+            // editable en Appearance → Home → Card palette (consumida por HomeAlt).
             $cards[] = [
                 'title'     => $request->input("cards.{$i}.title",  $existing['title']  ?? $defaults[$i]['title']),
                 'desc'      => $request->input("cards.{$i}.desc",   $existing['desc']   ?? $defaults[$i]['desc']),
-                'color'     => $request->input("cards.{$i}.color",  $existing['color']  ?? $defaults[$i]['color']),
                 'svg_code'  => $svgCode,
                 'image'     => $image,
                 'icon_type' => $iconType,

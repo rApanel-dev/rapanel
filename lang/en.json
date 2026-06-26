@@ -1505,5 +1505,19 @@
     "Two colors for the hero button gradient. The first also tints the background grids and glows.": "Two colors for the hero button gradient. The first also tints the background grids and glows.",
     "Secondary button": "Secondary button",
     "The \"Learn More\" outline button in the hero.": "The \"Learn More\" outline button in the hero.",
-    "Card color": "Card color"
+    "Card color": "Card color",
+    "Hero background": "Hero background",
+    "Background Image": "Background Image",
+    "Background Video": "Background Video",
+    "Remove video": "Remove video",
+    "Takes priority over the image.": "Takes priority over the image.",
+    "Used on inner pages, not the home hero (set above).": "Used on inner pages, not the home hero (set above).",
+    "The hero background (image / video) is now set in Appearance → Home.": "The hero background (image / video) is now set in Appearance → Home.",
+    "If a video is set it takes priority over the image. Leave both empty to use the default background.": "If a video is set it takes priority over the image. Leave both empty to use the default background.",
+    "Brand": "Brand",
+    "Home content": "Home content",
+    "Logo": "Logo",
+    "Logos, favicon and theme color are now set in Appearance → Brand.": "Logos, favicon and theme color are now set in Appearance → Brand.",
+    "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.",
+    "Accent colors come from the palette in Appearance → Home.": "Accent colors come from the palette in Appearance → Home."
 }

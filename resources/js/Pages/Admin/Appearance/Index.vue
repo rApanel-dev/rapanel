@@ -7,7 +7,7 @@ import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
-import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon, SparklesIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
@@ -15,6 +15,8 @@ const props = defineProps({
     bgImage:     { type: String, default: null },
     infoBgImage: { type: String, default: null },
     heroBgImage: { type: String, default: null },
+    heroBgVideo: { type: String, default: null },
+    brand:    { type: Object, default: () => ({ logo_light: null, logo_dark: null, favicon: null, theme_color: '#3b82f6' }) },
     character:{ type: Object, default: () => ({ enabled: true, mobile: false, position: 'right', size: '', frames: [null, null, null, null] }) },
 });
 
@@ -44,15 +46,35 @@ const form = useForm({
     remove_bg_image:      false,
     info_bg_image:        null,
     remove_info_bg_image: false,
+    hero_bg_image:        null,
+    remove_hero_bg_image: false,
+    hero_bg_video:        null,
+    remove_hero_bg_video: false,
 });
 
 // --- Tabs / secciones ---
 const tabs = [
+    { key: 'brand',         label: 'Brand',           icon: SparklesIcon },
     { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
     { key: 'home',          label: 'Home',            icon: HomeIcon },
     { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
 ];
-const activeTab = ref('header-footer');
+const activeTab = ref('brand');
+
+// --- Brand: logos (claro/oscuro), favicon, color de tema (form independiente) ---
+const brandForm = useForm({
+    logo_light:  null,
+    logo_dark:   null,
+    favicon:     null,
+    theme_color: props.brand.theme_color || '#3b82f6',
+});
+const logoLightPreview = ref(props.brand.logo_light ? '/storage/' + props.brand.logo_light : '/images/logo.png');
+const logoDarkPreview  = ref(props.brand.logo_dark  ? '/storage/' + props.brand.logo_dark  : '/images/logo.png');
+const faviconPreview   = ref(props.brand.favicon    ? '/storage/' + props.brand.favicon    : null);
+const onLogoLight = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.logo_light = f; logoLightPreview.value = URL.createObjectURL(f); };
+const onLogoDark  = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.logo_dark  = f; logoDarkPreview.value  = URL.createObjectURL(f); };
+const onFavicon   = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.favicon     = f; faviconPreview.value   = URL.createObjectURL(f); };
+const saveBrand = () => brandForm.post(route('admin.appearance.brand'), { forceFormData: true, preserveScroll: true });
 
 // --- Imágenes: siempre se muestra la actual (custom o el default real) ---
 const BG_DEFAULT   = '/images/bg-main.svg';
@@ -90,6 +112,39 @@ const clearInfoImage = () => {
     form.remove_info_bg_image = true;
     infoPreview.value = INFO_DEFAULT;
     infoIsCustom.value = false;
+};
+
+// --- Hero media (fondo del hero de la home): imagen o video. El video tiene prioridad. ---
+const HERO_DEFAULT = '/images/bg-main.svg';
+const heroPreview  = ref(props.heroBgImage ? '/storage/' + props.heroBgImage : HERO_DEFAULT);
+const heroIsCustom = ref(!!props.heroBgImage);
+const onHeroImage = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    form.hero_bg_image = file;
+    form.remove_hero_bg_image = false;
+    heroPreview.value = URL.createObjectURL(file);
+    heroIsCustom.value = true;
+};
+const clearHeroImage = () => {
+    form.hero_bg_image = null;
+    form.remove_hero_bg_image = true;
+    heroPreview.value = HERO_DEFAULT;
+    heroIsCustom.value = false;
+};
+
+const heroVideoPreview = ref(props.heroBgVideo ? '/storage/' + props.heroBgVideo : null);
+const onHeroVideo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    form.hero_bg_video = file;
+    form.remove_hero_bg_video = false;
+    heroVideoPreview.value = URL.createObjectURL(file);
+};
+const clearHeroVideo = () => {
+    form.hero_bg_video = null;
+    form.remove_hero_bg_video = true;
+    heroVideoPreview.value = null;
 };
 
 // --- Personaje de la home (HomeAlt /home2) — form separado ---
@@ -212,6 +267,73 @@ const buttonFields = [
         </div>
 
         <div class="max-w-7xl pb-28">
+
+            <!-- ════════ BRAND ════════ -->
+            <form v-show="activeTab === 'brand'" @submit.prevent="saveBrand" class="space-y-6">
+                <p class="text-xs text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">
+                    {{ __('Logo, favicon and browser theme color. Shown across the public site and the logged-in area.') }}
+                </p>
+
+                <!-- Logos -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-4">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Logo') }}</h2>
+                    <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('Recommended size: 300×60 px — PNG or SVG with transparent background, max 2 MB. The logo is displayed at 36–48 px height in the header.') }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __('Logo (Light Mode)') }}</label>
+                            <div class="h-14 bg-rapanel-navy-50 border border-rapanel-navy-100 dark:border-white/10 rounded-lg px-3 flex items-center mb-2">
+                                <img :src="logoLightPreview" class="h-9 object-contain max-w-[200px]" alt="" />
+                            </div>
+                            <input type="file" accept="image/*" @change="onLogoLight"
+                                class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                            <p v-if="brandForm.errors.logo_light" class="mt-1 text-xs text-rapanel-danger">{{ brandForm.errors.logo_light }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __('Logo (Dark Mode)') }}</label>
+                            <div class="h-14 bg-rapanel-navy-800 border border-white/10 rounded-lg px-3 flex items-center mb-2">
+                                <img :src="logoDarkPreview" class="h-9 object-contain max-w-[200px]" alt="" />
+                            </div>
+                            <input type="file" accept="image/*" @change="onLogoDark"
+                                class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                            <p v-if="brandForm.errors.logo_dark" class="mt-1 text-xs text-rapanel-danger">{{ brandForm.errors.logo_dark }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Favicon + Theme color -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __('Favicon') }}</label>
+                            <div class="h-20 w-20 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center mb-2">
+                                <img v-if="faviconPreview" :src="faviconPreview" class="h-12 w-12 object-contain" alt="" />
+                                <PhotoIcon v-else class="w-8 h-8 text-rapanel-navy-300 dark:text-rapanel-navy-600" />
+                            </div>
+                            <input type="file" accept=".png,.jpg,.jpeg,.ico,.svg" @change="onFavicon"
+                                class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                            <p class="mt-1 text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('PNG/ICO, max 512KB') }}</p>
+                            <p v-if="brandForm.errors.favicon" class="mt-1 text-xs text-rapanel-danger">{{ brandForm.errors.favicon }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __('Theme Color') }}</label>
+                            <div class="flex items-center gap-3">
+                                <input type="color" v-model="brandForm.theme_color"
+                                    class="h-9 w-14 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
+                                <input type="text" v-model="brandForm.theme_color" maxlength="20" placeholder="#3b82f6"
+                                    class="w-32 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue font-mono" />
+                            </div>
+                            <p class="mt-1 text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('Browser tab and PWA color.') }}</p>
+                            <p v-if="brandForm.errors.theme_color" class="mt-1 text-xs text-rapanel-danger">{{ brandForm.errors.theme_color }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <PrimaryButton type="submit" :disabled="brandForm.processing">
+                        {{ brandForm.processing ? __('Saving...') : __('Save') }}
+                    </PrimaryButton>
+                </div>
+            </form>
 
             <!-- ════════ HEADER & FOOTER ════════ -->
             <div v-show="activeTab === 'header-footer'" class="space-y-6">
@@ -388,6 +510,52 @@ const buttonFields = [
                     </div>
                 </div>
 
+                <!-- Fondo del hero de la home (imagen / video) -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6 space-y-5">
+                    <div>
+                        <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Hero background') }}</h2>
+                        <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 mt-1">{{ __('If a video is set it takes priority over the image. Leave both empty to use the default background.') }}</p>
+                    </div>
+
+                    <!-- Imagen del hero -->
+                    <div class="flex flex-col sm:flex-row gap-5 items-start">
+                        <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
+                            <img :src="heroPreview" alt="" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Background Image') }}</span>
+                            <label class="inline-flex">
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" @change="onHeroImage" />
+                                <span class="cursor-pointer inline-flex items-center gap-1.5 font-display font-bold text-xs px-3 py-1.5 rounded-lg border bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all">
+                                    <PhotoIcon class="w-4 h-4" /> {{ __('Change') }}
+                                </span>
+                            </label>
+                            <ActionButton v-if="heroIsCustom" variant="danger" size="sm" @click="clearHeroImage">{{ __('Remove image') }}</ActionButton>
+                            <span class="text-[11px] font-bold uppercase tracking-wider" :class="heroIsCustom ? 'text-rapanel-success' : 'text-rapanel-text-light/40 dark:text-rapanel-text-dark/40'">{{ heroIsCustom ? __('Custom') : __('Default') }}</span>
+                            <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">JPG, PNG, WEBP · max 10MB · 1920×1080</p>
+                        </div>
+                    </div>
+
+                    <!-- Video del hero -->
+                    <div class="flex flex-col sm:flex-row gap-5 items-start border-t border-rapanel-navy-100 dark:border-white/10 pt-5">
+                        <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-black flex items-center justify-center shrink-0">
+                            <video v-if="heroVideoPreview" :src="heroVideoPreview" class="w-full h-full object-cover" autoplay muted loop playsinline />
+                            <svg v-else class="w-6 h-6 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('Background Video') }}</span>
+                            <label class="inline-flex">
+                                <input type="file" accept="video/mp4,video/webm" class="hidden" @change="onHeroVideo" />
+                                <span class="cursor-pointer inline-flex items-center gap-1.5 font-display font-bold text-xs px-3 py-1.5 rounded-lg border bg-rapanel-blue/30 dark:bg-rapanel-blue/10 text-rapanel-blue border-rapanel-blue/40 dark:border-rapanel-blue/20 hover:bg-rapanel-blue hover:text-white transition-all">
+                                    <PhotoIcon class="w-4 h-4" /> {{ __('Change') }}
+                                </span>
+                            </label>
+                            <ActionButton v-if="heroVideoPreview" variant="danger" size="sm" @click="clearHeroVideo">{{ __('Remove video') }}</ActionButton>
+                            <p class="text-[11px] text-rapanel-text-light/45 dark:text-rapanel-text-dark/45 max-w-xs">MP4, WEBM · max 100MB · {{ __('Takes priority over the image.') }}</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Imagen de la sección "Server Info" -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
                     <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-4">{{ __('Info section image') }}</h2>
@@ -411,7 +579,7 @@ const buttonFields = [
                 <!-- Imagen de fondo (otras páginas) -->
                 <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
                 <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-1">{{ __('Background image') }}</h2>
-                <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 mb-4">{{ __('Used on inner pages. The home page background (hero) is set in Settings → Home.') }}</p>
+                <p class="text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55 mb-4">{{ __('Used on inner pages, not the home hero (set above).') }}</p>
                 <div class="flex flex-col sm:flex-row gap-5 items-start">
                     <div class="w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-surface flex items-center justify-center shrink-0">
                         <img :src="bgPreview" alt="" class="w-full h-full object-cover" />
@@ -506,8 +674,8 @@ const buttonFields = [
             </div>
         </div>
 
-        <!-- Barra de acciones: tema (colores) -->
-        <div class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
+        <!-- Barra de acciones: tema (colores). En la pestaña Brand hay un form aparte. -->
+        <div v-show="activeTab !== 'brand'" class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>
