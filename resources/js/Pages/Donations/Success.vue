@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import { CheckCircleIcon, SparklesIcon, HomeIcon, GiftIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -278,11 +279,10 @@ onUnmounted(() => {
 
                         <!-- Buttons -->
                         <div class="flex gap-3">
-                            <Link :href="route('donations')" @click="clearInterval(timer)"
-                                class="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl bg-rapanel-blue text-white font-semibold text-sm hover:opacity-90 active:scale-95 transition shadow-lg shadow-rapanel-blue/30">
+                            <ActionButton :href="route('donations')" @click="clearInterval(timer)" variant="blue" fill="solid" size="xl" class="flex-1">
                                 <GiftIcon class="w-4 h-4" />
                                 {{ __('Donate Again') }}
-                            </Link>
+                            </ActionButton>
                             <Link :href="route('dashboard')" @click="clearInterval(timer)"
                                 class="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/8 hover:bg-white/12 border border-white/10 text-white/80 font-semibold text-sm transition active:scale-95">
                                 <HomeIcon class="w-4 h-4" />

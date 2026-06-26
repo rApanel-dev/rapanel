@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import ActionButton from '@/Components/ActionButton.vue';
 import { XCircleIcon, ArrowLeftIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const page = usePage();
@@ -49,11 +50,10 @@ const __ = (key, rep = {}) => {
 
                         <!-- Buttons -->
                         <div class="flex gap-3">
-                            <Link :href="route('donations')"
-                                class="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl bg-rapanel-blue text-white font-semibold text-sm hover:opacity-90 active:scale-95 transition shadow-lg shadow-rapanel-blue/30">
+                            <ActionButton :href="route('donations')" variant="blue" fill="solid" size="xl" class="flex-1">
                                 <ArrowPathIcon class="w-4 h-4" />
                                 {{ __('Try Again') }}
-                            </Link>
+                            </ActionButton>
                             <Link :href="route('home')"
                                 class="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/8 hover:bg-white/12 border border-white/10 text-white/80 font-semibold text-sm transition active:scale-95">
                                 <ArrowLeftIcon class="w-4 h-4" />
