@@ -81,15 +81,15 @@
     {{-- JSON-LD Structured Data --}}
     <script type="application/ld+json">{!! $jsonLd !!}</script>
 
-    {{-- Favicons & PWA --}}
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $fv('icons/apple-touch-icon.png') }}">
+    {{-- Favicons & PWA — apple-touch e iconos PWA se editan en Appearance → Brand --}}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ !empty($st['pwa_apple_touch']) ? asset('storage/' . $st['pwa_apple_touch']) : asset('icons/apple-touch-icon.png') . '?v=' . $fv('icons/apple-touch-icon.png') }}">
     @if($faviconUrl)
         <link rel="icon" href="{{ $faviconUrl }}">
     @else
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}?v={{ $fv('images/favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}?v={{ $fv('images/favicon-16x16.png') }}">
     @endif
-    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $fv('manifest.json') }}">
+    <link rel="manifest" href="{{ route('manifest') }}">
     <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}?v={{ $fv('icons/safari-pinned-tab.svg') }}" color="{{ $themeColor }}">
     <meta name="msapplication-TileColor" content="{{ $themeColor }}">
     <meta name="theme-color" content="{{ $themeColor }}">

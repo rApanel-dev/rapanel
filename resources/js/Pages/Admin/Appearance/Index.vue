@@ -1,13 +1,13 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage, router } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import ActionButton from '@/Components/ActionButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { applyThemePreview, clearThemePreview, commitThemePreview } from '@/Composables/useThemePreview';
-import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon, SparklesIcon } from '@heroicons/vue/24/outline';
+import { Bars3BottomLeftIcon, HomeIcon, SwatchIcon, PhotoIcon, UserIcon, ArrowPathIcon, SparklesIcon, Squares2X2Icon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     theme:    { type: Object, default: () => ({}) },
@@ -18,6 +18,7 @@ const props = defineProps({
     heroBgVideo: { type: String, default: null },
     brand:    { type: Object, default: () => ({ logo_light: null, logo_dark: null, favicon: null, theme_color: '#3b82f6' }) },
     character:{ type: Object, default: () => ({ enabled: true, mobile: false, position: 'right', size: '', frames: [null, null, null, null] }) },
+    cards:    { type: Object, default: () => ({ info: [], feature: [] }) },
 });
 
 const page = usePage();
@@ -57,6 +58,7 @@ const tabs = [
     { key: 'brand',         label: 'Brand',           icon: SparklesIcon },
     { key: 'header-footer', label: 'Header & Footer', icon: Bars3BottomLeftIcon },
     { key: 'home',          label: 'Home',            icon: HomeIcon },
+    { key: 'cards',         label: 'Cards',           icon: Squares2X2Icon },
     { key: 'buttons',       label: 'Button colors',   icon: SwatchIcon },
 ];
 const activeTab = ref('brand');
@@ -67,13 +69,21 @@ const brandForm = useForm({
     logo_dark:   null,
     favicon:     null,
     theme_color: props.brand.theme_color || '#3b82f6',
+    // PWA / manifest
+    pwa_icon:        null,
+    pwa_name:        props.brand.pwa_name        || '',
+    pwa_short_name:  props.brand.pwa_short_name  || '',
+    pwa_description: props.brand.pwa_description || '',
+    pwa_bg_color:    props.brand.pwa_bg_color    || '#0f172a',
 });
 const logoLightPreview = ref(props.brand.logo_light ? '/storage/' + props.brand.logo_light : '/images/logo.png');
 const logoDarkPreview  = ref(props.brand.logo_dark  ? '/storage/' + props.brand.logo_dark  : '/images/logo.png');
 const faviconPreview   = ref(props.brand.favicon    ? '/storage/' + props.brand.favicon    : null);
+const pwaIconPreview   = ref(props.brand.pwa_icon   ? '/storage/' + props.brand.pwa_icon   : '/icons/icon-192x192.png');
 const onLogoLight = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.logo_light = f; logoLightPreview.value = URL.createObjectURL(f); };
 const onLogoDark  = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.logo_dark  = f; logoDarkPreview.value  = URL.createObjectURL(f); };
 const onFavicon   = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.favicon     = f; faviconPreview.value   = URL.createObjectURL(f); };
+const onPwaIcon   = (e) => { const f = e.target.files[0]; if (!f) return; brandForm.pwa_icon    = f; pwaIconPreview.value   = URL.createObjectURL(f); };
 const saveBrand = () => brandForm.post(route('admin.appearance.brand'), { forceFormData: true, preserveScroll: true });
 
 // --- Imágenes: siempre se muestra la actual (custom o el default real) ---
@@ -247,6 +257,99 @@ const buttonFields = [
     { key: 'success', label: 'Success', variant: 'success' },
     { key: 'danger',  label: 'Danger',  variant: 'danger'  },
 ];
+
+// =============================================================================
+// Pestaña TARJETAS — iconos de los info blocks + feature cards de la home.
+// El texto/visibilidad es contenido (Settings); aquí solo se edita el ICONO.
+// El acento de cada tarjeta sale de la paleta de Home (form.home.palette), en vivo.
+// =============================================================================
+const infoMeta = [
+    { id: 'rates',   label: 'EXP / Job / Drop', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>` },
+    { id: 'level',   label: 'Max Base / Job',   svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>` },
+    { id: 'mode',    label: 'Game Mode',        svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>` },
+    { id: 'episode', label: 'Episode',          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>` },
+    { id: 'intl',    label: 'International',     svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>` },
+];
+const featureMeta = [
+    { title: 'Dashboard',    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>` },
+    { title: 'Item DB',      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>` },
+    { title: 'Wiki',         svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>` },
+    { title: 'MvP Cards',    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>` },
+    { title: 'Live Console', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>` },
+    { title: 'Who Sell',     svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>` },
+];
+
+const buildCardState = (meta, saved, key) => meta.map((m, i) => {
+    const s = (key === 'id' ? (props.cards.info || []).find(b => b.id === m.id) : (props.cards.feature || [])[i]) || {};
+    return {
+        label:      key === 'id' ? m.label : (s.title || m.title),
+        defaultSvg: m.svg,
+        icon_type:  s.icon_type || 'icon',
+        image:      s.image || null,
+        svg_code:   s.svg_code || null,
+        removed:    false,
+    };
+});
+
+const infoCards    = ref(buildCardState(infoMeta, props.cards.info, 'id'));
+const featCards    = ref(buildCardState(featureMeta, props.cards.feature, 'idx'));
+const infoFiles    = ref(Array(infoMeta.length).fill(null));
+const featFiles    = ref(Array(featureMeta.length).fill(null));
+const infoPreviews = ref(infoCards.value.map(c => c.image ? '/storage/' + c.image : null));
+const featPreviews = ref(featCards.value.map(c => c.image ? '/storage/' + c.image : null));
+const cardsSaving  = ref(false);
+
+const cardAccent = (i) => form.home.palette[i % form.home.palette.length] || '#4A90E2';
+
+const onCardImage = (group, i, e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const [arr, files, prev] = group === 'info'
+        ? [infoCards, infoFiles, infoPreviews]
+        : [featCards, featFiles, featPreviews];
+    files.value[i]    = f;
+    prev.value[i]     = URL.createObjectURL(f);
+    arr.value[i].icon_type = 'image';
+    arr.value[i].svg_code  = null;
+    arr.value[i].removed   = false;
+};
+const onCardSvg = (group, i) => {
+    const [arr, files, prev] = group === 'info'
+        ? [infoCards, infoFiles, infoPreviews]
+        : [featCards, featFiles, featPreviews];
+    files.value[i] = null;
+    prev.value[i]  = null;
+    arr.value[i].removed = false;
+};
+const resetCardIcon = (group, i) => {
+    const [arr, files, prev] = group === 'info'
+        ? [infoCards, infoFiles, infoPreviews]
+        : [featCards, featFiles, featPreviews];
+    files.value[i]   = null;
+    prev.value[i]    = null;
+    arr.value[i].icon_type = 'icon';
+    arr.value[i].svg_code  = null;
+    arr.value[i].image     = null;
+    arr.value[i].removed   = true;
+};
+
+const saveCards = () => {
+    cardsSaving.value = true;
+    const fd = new FormData();
+    const pack = (group, arr, files) => {
+        arr.value.forEach((c, i) => {
+            if (files.value[i])      fd.append(`${group}[${i}][image]`, files.value[i]);
+            else if (c.removed)      fd.append(`${group}[${i}][remove]`, '1');
+            else if (c.svg_code)     fd.append(`${group}[${i}][svg_code]`, c.svg_code);
+        });
+    };
+    pack('blocks', infoCards, infoFiles);
+    pack('cards',  featCards, featFiles);
+    router.post(route('admin.appearance.cards'), fd, {
+        forceFormData: true, preserveScroll: true,
+        onFinish: () => { cardsSaving.value = false; },
+    });
+};
 </script>
 
 <template>
@@ -328,6 +431,55 @@ const buttonFields = [
                     </div>
                 </div>
 
+                <!-- App / PWA -->
+                <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                    <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark">{{ __('App icon (PWA)') }}</h2>
+                    <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 mt-1 mb-5">
+                        {{ __('Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.') }}
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-2">{{ __('Master icon') }}</label>
+                            <div class="h-20 w-20 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 rounded-xl border border-rapanel-navy-100 dark:border-white/10 flex items-center justify-center mb-2 overflow-hidden">
+                                <img v-if="pwaIconPreview" :src="pwaIconPreview" class="h-16 w-16 object-contain" alt="" />
+                                <PhotoIcon v-else class="w-8 h-8 text-rapanel-navy-300 dark:text-rapanel-navy-600" />
+                            </div>
+                            <input type="file" accept=".png,.jpg,.jpeg,.webp" @change="onPwaIcon"
+                                class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                            <p class="mt-1 text-[11px] text-rapanel-text-light/55 dark:text-rapanel-text-dark/55">{{ __('PNG/WebP, square, max 4MB') }}</p>
+                            <p v-if="brandForm.errors.pwa_icon" class="mt-1 text-xs text-rapanel-danger">{{ brandForm.errors.pwa_icon }}</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-1.5">{{ __('App name') }}</label>
+                                <input type="text" v-model="brandForm.pwa_name" maxlength="60" placeholder="rApanel"
+                                    class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-1.5">{{ __('Short name') }}</label>
+                                    <input type="text" v-model="brandForm.pwa_short_name" maxlength="30" placeholder="rApanel"
+                                        class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-1.5">{{ __('Background color') }}</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" v-model="brandForm.pwa_bg_color"
+                                            class="h-9 w-11 shrink-0 rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 cursor-pointer p-0.5" />
+                                        <input type="text" v-model="brandForm.pwa_bg_color" maxlength="20" placeholder="#0f172a"
+                                            class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-2 text-xs font-mono text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-rapanel-text-light dark:text-rapanel-text-dark mb-1.5">{{ __('Description') }}</label>
+                                <input type="text" v-model="brandForm.pwa_description" maxlength="200"
+                                    class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-2 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <PrimaryButton type="submit" :disabled="brandForm.processing">
                         {{ brandForm.processing ? __('Saving...') : __('Save') }}
@@ -395,6 +547,73 @@ const buttonFields = [
                             class="w-24 font-mono text-xs rounded-md border-rapanel-navy-100 dark:border-white/10 bg-white dark:bg-rapanel-surface text-rapanel-text-light dark:text-rapanel-text-dark focus:ring-rapanel-blue focus:border-rapanel-blue" />
                         <ActionButton :variant="f.variant" size="sm" class="pointer-events-none ml-auto">{{ __(f.label) }}</ActionButton>
                     </div>
+                </div>
+            </div>
+
+            <!-- ════════ CARDS (iconos de info blocks + feature cards) ════════ -->
+            <div v-show="activeTab === 'cards'" class="space-y-6">
+                <p class="text-sm text-rapanel-text-light/70 dark:text-rapanel-text-dark/70 -mt-2">
+                    {{ __('Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.') }}
+                </p>
+
+                <!-- Reusable: grupo de tarjetas -->
+                <template v-for="grp in [
+                    { key: 'info',    title: __('Server Info blocks'), arr: infoCards, files: infoFiles, prev: infoPreviews, group: 'info' },
+                    { key: 'feature', title: __('Feature cards'),      arr: featCards, files: featFiles, prev: featPreviews, group: 'feature' },
+                ]" :key="grp.key">
+                    <div class="bg-white dark:bg-rapanel-navy-900 border border-rapanel-navy-100 dark:border-white/10 rounded-xl p-6">
+                        <h2 class="font-display font-bold uppercase tracking-wider text-sm text-rapanel-text-light dark:text-rapanel-text-dark mb-5">{{ grp.title }}</h2>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div v-for="(card, i) in grp.arr" :key="i"
+                                 class="rounded-xl border border-rapanel-navy-100 dark:border-white/10 p-4">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="`background:${cardAccent(i)}`"></span>
+                                    <span class="text-sm font-semibold text-rapanel-navy-900 dark:text-white truncate">{{ card.label }}</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <!-- Preview -->
+                                    <div class="relative flex-shrink-0">
+                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
+                                             :style="`background:${cardAccent(i)}20; border:1px solid ${cardAccent(i)}40`">
+                                            <img v-if="grp.prev[i]" :src="grp.prev[i]" class="w-10 h-10 object-contain" />
+                                            <span v-else-if="card.svg_code" class="w-6 h-6" :style="`color:${cardAccent(i)}`" v-html="card.svg_code" />
+                                            <span v-else class="w-6 h-6" :style="`color:${cardAccent(i)}`" v-html="card.defaultSvg" />
+                                        </div>
+                                        <button v-if="grp.prev[i] || card.svg_code" type="button"
+                                                @click="resetCardIcon(grp.group, i)"
+                                                class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rapanel-danger flex items-center justify-center shadow hover:opacity-80 transition-opacity z-10"
+                                                :title="__('Revert to default icon')">
+                                            <svg class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+                                    <!-- Controls -->
+                                    <div class="min-w-0 flex-1 space-y-2">
+                                        <input type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg"
+                                               @change="onCardImage(grp.group, i, $event)"
+                                               class="block w-full text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
+                                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">PNG / WebP · 40×40 px</p>
+                                        <div>
+                                            <label class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Or paste SVG code (e.g. from heroicons):') }}</label>
+                                            <textarea v-model="card.svg_code" rows="2" spellcheck="false"
+                                                      placeholder="<svg viewBox=&quot;0 0 24 24&quot; ...>...</svg>"
+                                                      @input="onCardSvg(grp.group, i)"
+                                                      class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-1.5 text-xs text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none font-mono" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="flex items-center gap-3">
+                    <PrimaryButton :class="{ 'opacity-50': cardsSaving }" :disabled="cardsSaving" @click="saveCards">
+                        {{ cardsSaving ? __('Saving...') : __('Save') }}
+                    </PrimaryButton>
+                    <p class="text-xs text-rapanel-text-light/60 dark:text-rapanel-text-dark/60">{{ __('Free SVG icons:') }}
+                        <a href="https://heroicons.com" target="_blank" class="text-rapanel-gold hover:underline">heroicons.com</a> ·
+                        <a href="https://lucide.dev" target="_blank" class="text-rapanel-gold hover:underline">lucide.dev</a>
+                    </p>
                 </div>
             </div>
 
@@ -675,7 +894,7 @@ const buttonFields = [
         </div>
 
         <!-- Barra de acciones: tema (colores). En la pestaña Brand hay un form aparte. -->
-        <div v-show="activeTab !== 'brand'" class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
+        <div v-show="activeTab !== 'brand' && activeTab !== 'cards'" class="fixed bottom-0 inset-x-0 lg:left-64 z-20 bg-white/95 dark:bg-rapanel-surface-deep/95 backdrop-blur border-t border-rapanel-navy-100 dark:border-white/10 px-4 sm:px-8 py-3 flex items-center gap-3">
             <ActionButton variant="reset-look" @click="showReset = true">
                 <ArrowPathIcon class="w-4 h-4" /> {{ __('Reset to defaults') }}
             </ActionButton>

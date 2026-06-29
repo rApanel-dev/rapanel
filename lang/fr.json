@@ -1520,5 +1520,20 @@
     "Logo": "Logo",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Les logos, le favicon et la couleur du thème se règlent désormais dans Apparence → Brand.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon et couleur du thème du navigateur. Affichés sur le site public et l'espace connecté.",
-    "Accent colors come from the palette in Appearance → Home.": "Les couleurs d'accent proviennent de la palette dans Apparence → Accueil."
+    "Accent colors come from the palette in Appearance → Home.": "Les couleurs d'accent proviennent de la palette dans Apparence → Accueil.",
+    "Configure each info block: toggle visibility and set the display value.": "Configurez chaque bloc d'info : activez la visibilité et définissez la valeur affichée.",
+    "Toggle visibility and edit the title and description of each feature card.": "Activez la visibilité et modifiez le titre et la description de chaque carte.",
+    "Icons and accent colors are set in Appearance → Cards.": "Les icônes et couleurs d'accent se définissent dans Apparence → Cartes.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Définissez l'icône de chaque carte d'accueil. Les titres et textes se modifient dans Paramètres ; l'accent provient de la palette d'accueil.",
+    "Server Info blocks": "Blocs d'infos serveur",
+    "Feature cards": "Cartes de fonctionnalités",
+    "Revert to default icon": "Revenir à l'icône par défaut",
+    "Or paste SVG code (e.g. from heroicons):": "Ou collez du code SVG (p. ex. depuis heroicons) :",
+    "Free SVG icons:": "Icônes SVG gratuites :",
+    "App icon (PWA)": "Icône de l'app (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Téléversez une image maîtresse carrée (512×512). Toutes les tailles (192, 512, maskable et Apple touch) sont générées automatiquement.",
+    "Master icon": "Icône maîtresse",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, carré, max 4 Mo",
+    "App name": "Nom de l'app",
+    "Short name": "Nom court"
 }

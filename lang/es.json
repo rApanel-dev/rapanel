@@ -1519,5 +1519,20 @@
     "Logo": "Logo",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Los logos, favicon y color de tema ahora se configuran en Apariencia → Brand.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon y color de tema del navegador. Se muestran en el sitio público y el área de usuario.",
-    "Accent colors come from the palette in Appearance → Home.": "Los colores de acento se toman de la paleta en Apariencia → Home."
+    "Accent colors come from the palette in Appearance → Home.": "Los colores de acento se toman de la paleta en Apariencia → Home.",
+    "Configure each info block: toggle visibility and set the display value.": "Configura cada bloque de info: alterna la visibilidad y define el valor mostrado.",
+    "Toggle visibility and edit the title and description of each feature card.": "Alterna la visibilidad y edita el título y la descripción de cada tarjeta.",
+    "Icons and accent colors are set in Appearance → Cards.": "Los iconos y colores de acento se configuran en Apariencia → Tarjetas.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Define el icono de cada tarjeta de la home. Los títulos y textos se editan en Configuración; el acento viene de la paleta de Home.",
+    "Server Info blocks": "Bloques de Server Info",
+    "Feature cards": "Tarjetas de funciones",
+    "Revert to default icon": "Volver al icono por defecto",
+    "Or paste SVG code (e.g. from heroicons):": "O pega código SVG (p. ej. de heroicons):",
+    "Free SVG icons:": "Iconos SVG gratis:",
+    "App icon (PWA)": "Icono de la app (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Sube una imagen maestra cuadrada (512×512). Todos los tamaños (192, 512, maskable y Apple touch) se generan automáticamente.",
+    "Master icon": "Icono maestro",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, cuadrado, máx. 4MB",
+    "App name": "Nombre de la app",
+    "Short name": "Nombre corto"
 }

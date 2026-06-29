@@ -141,17 +141,10 @@ const cardPalette = computed(() => {
 });
 
 const infoBlocks   = ref(parseInfoBlocks())
-const infoFiles    = ref([null, null, null, null, null])
-const infoPreviews = ref(parseInfoBlocks().map(b => b.image ? '/storage/' + b.image : null))
 const infoSaving   = ref(false)
 
-const onInfoFile = (e, i) => {
-    const file = e.target.files[0]
-    if (!file) return
-    infoFiles.value[i]    = file
-    infoPreviews.value[i] = URL.createObjectURL(file)
-    infoBlocks.value[i].icon_type = 'image'
-}
+// El icono de cada bloque (icon_type/image/svg_code) es DISEÑO y se edita en
+// Appearance → Tarjetas. Aquí solo se gestiona visibilidad + valores de texto.
 
 // Valores de texto de cada bloque
 const infoTextValues = ref({
@@ -168,12 +161,9 @@ const infoTextValues = ref({
 const submitInfoBlocks = () => {
     infoSaving.value = true
     const fd = new FormData()
-    // Bloques config
+    // Solo visibilidad (el icono se edita en Appearance → Tarjetas)
     infoBlocks.value.forEach((b, i) => {
-        fd.append(`blocks[${i}][show]`,      b.show ? '1' : '0')
-        fd.append(`blocks[${i}][icon_type]`, b.icon_type)
-        fd.append(`blocks[${i}][svg_code]`,  b.svg_code ?? '')
-        if (infoFiles.value[i]) fd.append(`blocks[${i}][image]`, infoFiles.value[i])
+        fd.append(`blocks[${i}][show]`, b.show ? '1' : '0')
     })
     // Valores de texto (incluyendo intl)
     Object.entries(infoTextValues.value).forEach(([k, v]) => fd.append(k, v ?? ''))
@@ -319,31 +309,19 @@ const parseFeatureCards = () => {
 const featuresTitle    = ref(props.settings.home_features_title    ?? '');
 const featuresSubtitle = ref(props.settings.home_features_subtitle ?? '');
 const featureCards     = ref(parseFeatureCards());
-const featureFiles     = ref([null, null, null, null, null, null]);
-const featurePreviews  = ref(parseFeatureCards().map(c => c.image ? '/storage/' + c.image : null));
 const featuresSaving   = ref(false);
 
-const onFeatureFile = (e, i) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    featureFiles.value[i]    = file;
-    featurePreviews.value[i] = URL.createObjectURL(file);
-    featureCards.value[i].icon_type = 'image';
-    featureCards.value[i].svg_code  = null;
-};
-
+// El icono de cada tarjeta (icon_type/image/svg_code) es DISEÑO y se edita en
+// Appearance → Tarjetas. Aquí solo título, descripción y visibilidad.
 const submitFeatures = () => {
     featuresSaving.value = true;
     const fd = new FormData();
     fd.append('features_title',    featuresTitle.value);
     fd.append('features_subtitle', featuresSubtitle.value);
     featureCards.value.forEach((c, i) => {
-        fd.append(`cards[${i}][title]`,     c.title     ?? '');
-        fd.append(`cards[${i}][desc]`,      c.desc      ?? '');
-        fd.append(`cards[${i}][svg_code]`,  c.svg_code  ?? '');
-        fd.append(`cards[${i}][icon_type]`, c.icon_type ?? 'icon');
-        fd.append(`cards[${i}][enabled]`,   c.enabled   ? '1' : '0');
-        if (featureFiles.value[i]) fd.append(`cards[${i}][image]`, featureFiles.value[i]);
+        fd.append(`cards[${i}][title]`,   c.title   ?? '');
+        fd.append(`cards[${i}][desc]`,    c.desc    ?? '');
+        fd.append(`cards[${i}][enabled]`, c.enabled ? '1' : '0');
     });
     router.post(route('admin.settings.home-features'), fd, {
         forceFormData: true, preserveScroll: true,
@@ -586,17 +564,11 @@ const executeDanger = () => {
                     <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Server Info') }}</h2>
                     <span v-if="infoSaving" class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 animate-pulse">{{ __('Saving...') }}</span>
                 </div>
-                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Configure each info block: toggle visibility, choose icon type and set the display value.') }}</p>
-                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 mb-5">
-                    {{ __('Custom icon recommended size: 40×40 px.') }}
-                    {{ __('Free SVG icons:') }}
-                    <a href="https://heroicons.com" target="_blank" class="text-rapanel-gold hover:underline">heroicons.com</a> ·
-                    <a href="https://lucide.dev" target="_blank" class="text-rapanel-gold hover:underline">lucide.dev</a>
-                </p>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Configure each info block: toggle visibility and set the display value.') }}</p>
                 <Link :href="route('admin.appearance.index')"
                     class="flex items-center gap-1.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue transition mb-5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
-                    <span>{{ __('Accent colors come from the palette in Appearance → Home.') }}</span>
+                    <span>{{ __('Icons and accent colors are set in Appearance → Cards.') }}</span>
                 </Link>
 
                 <div class="space-y-3">
@@ -620,60 +592,8 @@ const executeDanger = () => {
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Columna izquierda: icono -->
-                            <div class="space-y-2">
-                                <p class="text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 uppercase tracking-wide">{{ __('Icon') }}</p>
-
-                                <div class="flex items-start gap-3">
-                                    <!-- Preview: imagen custom O svg original -->
-                                    <!-- Preview actual -->
-                                    <div class="relative flex-shrink-0">
-                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                                             :style="`background:${cardPalette[i % cardPalette.length]}20; border:1px solid ${cardPalette[i % cardPalette.length]}40`">
-                                            <img v-if="infoPreviews[i]" :src="infoPreviews[i]" class="w-10 h-10 object-contain" />
-                                            <span v-else-if="block.svg_code"
-                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
-                                                  v-html="block.svg_code" />
-                                            <span v-else
-                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
-                                                  v-html="infoBlocksMeta[i].svg" />
-                                        </div>
-                                        <!-- × quita lo custom y vuelve al original -->
-                                        <button v-if="infoPreviews[i] || block.svg_code" type="button"
-                                                @click="infoPreviews[i] = null; block.icon_type = 'icon'; infoFiles[i] = null; block.svg_code = null"
-                                                class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rapanel-danger flex items-center justify-center shadow hover:opacity-80 transition-opacity z-10"
-                                                title="Volver al SVG original">
-                                            <svg class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Opciones de cambio -->
-                                    <div class="min-w-0 flex-1 space-y-2">
-                                        <!-- Subir archivo -->
-                                        <input type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg"
-                                               @change="onInfoFile($event, i)"
-                                               class="block w-full text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">PNG / WebP · 40×40 px</p>
-
-                                        <!-- Pegar código SVG -->
-                                        <div>
-                                            <label class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">
-                                                {{ __('Or paste SVG code (e.g. from heroicons):') }}
-                                            </label>
-                                            <textarea v-model="block.svg_code" rows="2" spellcheck="false"
-                                                      placeholder="<svg viewBox=&quot;0 0 24 24&quot; ...>...</svg>"
-                                                      @input="infoPreviews[i] = null; infoFiles[i] = null"
-                                                      class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-1.5 text-xs text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none font-mono" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- Columna derecha: valores de texto -->
+                        <div>
+                            <!-- Solo valores de texto: el icono se edita en Appearance → Tarjetas -->
                             <div class="space-y-2">
                                 <p class="text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 uppercase tracking-wide">{{ __('Value') }}</p>
 
@@ -849,11 +769,11 @@ const executeDanger = () => {
                     <h2 class="text-sm font-bold text-rapanel-navy-900 dark:text-white uppercase tracking-wider">{{ __('Feature Cards') }}</h2>
                     <span v-if="featuresSaving" class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-50 animate-pulse">{{ __('Saving...') }}</span>
                 </div>
-                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Toggle visibility and customize each feature card. Paste SVG code to replace the default icon.') }}</p>
+                <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">{{ __('Toggle visibility and edit the title and description of each feature card.') }}</p>
                 <Link :href="route('admin.appearance.index')"
                     class="flex items-center gap-1.5 text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 hover:opacity-100 hover:text-rapanel-blue transition mb-5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
-                    <span>{{ __('Accent colors come from the palette in Appearance → Home.') }}</span>
+                    <span>{{ __('Icons and accent colors are set in Appearance → Cards.') }}</span>
                 </Link>
 
                 <div class="space-y-4">
@@ -875,69 +795,17 @@ const executeDanger = () => {
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Izquierda: título, descripción, color -->
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Title') }}</label>
-                                    <input v-model="card.title" type="text" maxlength="80"
-                                           class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Description') }}</label>
-                                    <textarea v-model="card.desc" rows="2" maxlength="300"
-                                              class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
-                                </div>
+                        <!-- Solo contenido: el icono se edita en Appearance → Tarjetas -->
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Title') }}</label>
+                                <input v-model="card.title" type="text" maxlength="80"
+                                       class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue" />
                             </div>
-
-                            <!-- Derecha: ícono (mismo patrón que Server Info) -->
-                            <div class="space-y-2">
-                                <p class="text-xs font-semibold text-rapanel-text-light dark:text-rapanel-text-dark opacity-70 uppercase tracking-wide">{{ __('Icon') }}</p>
-
-                                <div class="flex items-start gap-3">
-                                    <!-- Preview actual -->
-                                    <div class="relative flex-shrink-0">
-                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                                             :style="`background:${cardPalette[i % cardPalette.length]}20; border:1px solid ${cardPalette[i % cardPalette.length]}40`">
-                                            <img v-if="featurePreviews[i]" :src="featurePreviews[i]" class="w-10 h-10 object-contain" />
-                                            <span v-else-if="card.svg_code"
-                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
-                                                  v-html="card.svg_code" />
-                                            <span v-else
-                                                  class="w-6 h-6" :style="`color:${cardPalette[i % cardPalette.length]}`"
-                                                  v-html="defaultFeatureCards[i].icon" />
-                                        </div>
-                                        <!-- × quita lo custom y vuelve al original -->
-                                        <button v-if="featurePreviews[i] || card.svg_code" type="button"
-                                                @click="featurePreviews[i] = null; card.icon_type = 'icon'; featureFiles[i] = null; card.svg_code = null"
-                                                class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rapanel-danger flex items-center justify-center shadow hover:opacity-80 transition-opacity z-10"
-                                                title="Volver al ícono original">
-                                            <svg class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Opciones de cambio -->
-                                    <div class="min-w-0 flex-1 space-y-2">
-                                        <!-- Subir archivo -->
-                                        <input type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg"
-                                               @change="onFeatureFile($event, i)"
-                                               class="block w-full text-xs text-rapanel-text-light dark:text-rapanel-text-dark file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rapanel-blue/10 file:text-rapanel-blue hover:file:bg-rapanel-blue/20 cursor-pointer" />
-                                        <p class="text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-40">PNG / WebP · 40×40 px</p>
-
-                                        <!-- Pegar código SVG -->
-                                        <div>
-                                            <label class="block text-xs text-rapanel-text-light dark:text-rapanel-text-dark opacity-60 mb-1">
-                                                {{ __('Or paste SVG code (e.g. from heroicons):') }}
-                                            </label>
-                                            <textarea v-model="card.svg_code" rows="2" spellcheck="false"
-                                                      placeholder="<svg viewBox=&quot;0 0 24 24&quot; ...>...</svg>"
-                                                      @input="featurePreviews[i] = null; featureFiles[i] = null; card.icon_type = 'svg'"
-                                                      class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-2 py-1.5 text-xs text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none font-mono" />
-                                        </div>
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-rapanel-navy-900 dark:text-white mb-1">{{ __('Description') }}</label>
+                                <textarea v-model="card.desc" rows="2" maxlength="300"
+                                          class="w-full rounded-lg border border-rapanel-navy-100 dark:border-white/10 bg-rapanel-navy-50 dark:bg-rapanel-navy-800 px-3 py-1.5 text-sm text-rapanel-navy-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rapanel-blue resize-none" />
                             </div>
                         </div>
                     </div>

@@ -118,41 +118,24 @@ class SiteSettingsController extends Controller
             'home_intl_text'      => $request->home_intl_text      ?? 'EN · ES · PT · FR',
         ]);
 
-        // Guardar config de bloques (toggle + icono/imagen)
+        // Guardar config de bloques: SOLO contenido (visibilidad). El icono de cada
+        // bloque (icon_type/image/svg_code) es DISEÑO y se edita en Appearance →
+        // Tarjetas; aquí se preserva tal cual venga de la BD (read-merge), de modo
+        // que ambos editores escriben el mismo JSON sin pisarse.
         $current = json_decode(SiteSetting::getValue('home_info_blocks') ?? '[]', true);
         $ids     = ['rates', 'level', 'mode', 'episode', 'intl'];
         $blocks  = [];
 
         foreach ($ids as $i => $id) {
-            $existing  = collect($current)->firstWhere('id', $id) ?? [];
-            $iconType  = $request->input("blocks.{$i}.icon_type", $existing['icon_type'] ?? 'icon');
-            $show      = $request->boolean("blocks.{$i}.show", $existing['show'] ?? true);
-            $image     = $existing['image'] ?? null;
-
-            // Eliminar imagen custom si se pidió volver al default
-            if ($request->boolean("blocks.{$i}.remove_image") || $iconType === 'icon') {
-                if ($image) Storage::disk('public')->delete($image);
-                $image = null;
-            }
-
-            if ($request->hasFile("blocks.{$i}.image")) {
-                if ($image) Storage::disk('public')->delete($image);
-                $image    = $request->file("blocks.{$i}.image")->store('settings/info', 'public');
-                $iconType = 'image';
-            }
-
-            $svgCode = $request->input("blocks.{$i}.svg_code", $existing['svg_code'] ?? null);
-            // Si se sube archivo nuevo, descarta el svg_code
-            if ($request->hasFile("blocks.{$i}.image")) $svgCode = null;
-            // Si se pega svg_code nuevo, descarta la imagen
-            if ($svgCode && $request->input("blocks.{$i}.svg_code") !== ($existing['svg_code'] ?? null)) {
-                if ($image) Storage::disk('public')->delete($image);
-                $image = null;
-            }
-
-            // El color de acento ya no se guarda por bloque: lo define la paleta
-            // editable en Appearance → Home → Card palette (consumida por HomeAlt).
-            $blocks[] = ['id' => $id, 'show' => $show, 'icon_type' => $iconType, 'image' => $image, 'svg_code' => $svgCode];
+            $existing = collect($current)->firstWhere('id', $id) ?? [];
+            $blocks[] = [
+                'id'        => $id,
+                'show'      => $request->boolean("blocks.{$i}.show", $existing['show'] ?? true),
+                // Campos de diseño preservados (dueño: Appearance).
+                'icon_type' => $existing['icon_type'] ?? 'icon',
+                'image'     => $existing['image']     ?? null,
+                'svg_code'  => $existing['svg_code']  ?? null,
+            ];
         }
 
         SiteSetting::setValue('home_info_blocks', json_encode($blocks));
@@ -291,46 +274,22 @@ class SiteSettingsController extends Controller
             ['color' => '#F1C40F', 'title' => 'Who Sell',     'desc' => 'Search the live vending market by item name or ID and find sellers in real time.'],
         ];
 
+        // SOLO contenido: título, descripción y visibilidad. El icono (icon_type/
+        // image/svg_code) es DISEÑO y se edita en Appearance → Tarjetas; aquí se
+        // preserva tal cual (read-merge) para no pisar el otro editor.
         $current = json_decode(SiteSetting::getValue('home_feature_cards') ?? '[]', true);
         $cards   = [];
 
         for ($i = 0; $i < 6; $i++) {
-            $existing  = $current[$i] ?? [];
-            $iconType  = $request->input("cards.{$i}.icon_type", $existing['icon_type'] ?? 'icon');
-            $enabled   = $request->boolean("cards.{$i}.enabled", $existing['enabled'] ?? true);
-            $image     = $existing['image'] ?? null;
-
-            // Volver al ícono por defecto borra la imagen guardada
-            if ($iconType === 'icon') {
-                if ($image) Storage::disk('public')->delete($image);
-                $image = null;
-            }
-
-            // Nueva imagen sube el archivo
-            if ($request->hasFile("cards.{$i}.image")) {
-                if ($image) Storage::disk('public')->delete($image);
-                $image    = $request->file("cards.{$i}.image")->store('settings/features', 'public');
-                $iconType = 'image';
-            }
-
-            $svgCode = $request->input("cards.{$i}.svg_code", $existing['svg_code'] ?? null) ?: null;
-            // Si se sube imagen, descarta svg_code
-            if ($request->hasFile("cards.{$i}.image")) $svgCode = null;
-            // Si se pega svg_code nuevo, descarta la imagen
-            if ($svgCode && $svgCode !== ($existing['svg_code'] ?? null)) {
-                if ($image) Storage::disk('public')->delete($image);
-                $image = null;
-            }
-
-            // El color de acento ya no se guarda por tarjeta: lo define la paleta
-            // editable en Appearance → Home → Card palette (consumida por HomeAlt).
-            $cards[] = [
-                'title'     => $request->input("cards.{$i}.title",  $existing['title']  ?? $defaults[$i]['title']),
-                'desc'      => $request->input("cards.{$i}.desc",   $existing['desc']   ?? $defaults[$i]['desc']),
-                'svg_code'  => $svgCode,
-                'image'     => $image,
-                'icon_type' => $iconType,
-                'enabled'   => $enabled,
+            $existing = $current[$i] ?? [];
+            $cards[]  = [
+                'title'     => $request->input("cards.{$i}.title", $existing['title'] ?? $defaults[$i]['title']),
+                'desc'      => $request->input("cards.{$i}.desc",  $existing['desc']  ?? $defaults[$i]['desc']),
+                'enabled'   => $request->boolean("cards.{$i}.enabled", $existing['enabled'] ?? true),
+                // Campos de diseño preservados (dueño: Appearance).
+                'svg_code'  => $existing['svg_code']  ?? null,
+                'image'     => $existing['image']     ?? null,
+                'icon_type' => $existing['icon_type'] ?? 'icon',
             ];
         }
 

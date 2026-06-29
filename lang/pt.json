@@ -1519,5 +1519,20 @@
     "Logo": "Logo",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Logos, favicon e cor do tema agora são configurados em Aparência → Brand.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon e cor do tema do navegador. Exibidos no site público e na área do usuário.",
-    "Accent colors come from the palette in Appearance → Home.": "As cores de destaque vêm da paleta em Aparência → Home."
+    "Accent colors come from the palette in Appearance → Home.": "As cores de destaque vêm da paleta em Aparência → Home.",
+    "Configure each info block: toggle visibility and set the display value.": "Configure cada bloco de info: alterne a visibilidade e defina o valor exibido.",
+    "Toggle visibility and edit the title and description of each feature card.": "Alterne a visibilidade e edite o título e a descrição de cada cartão.",
+    "Icons and accent colors are set in Appearance → Cards.": "Os ícones e cores de destaque são definidos em Aparência → Cartões.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Defina o ícone de cada cartão da home. Títulos e textos são editados em Configurações; o destaque vem da paleta da Home.",
+    "Server Info blocks": "Blocos de Server Info",
+    "Feature cards": "Cartões de recursos",
+    "Revert to default icon": "Voltar ao ícone padrão",
+    "Or paste SVG code (e.g. from heroicons):": "Ou cole código SVG (ex.: do heroicons):",
+    "Free SVG icons:": "Ícones SVG grátis:",
+    "App icon (PWA)": "Ícone do app (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Envie uma imagem mestra quadrada (512×512). Todos os tamanhos (192, 512, maskable e Apple touch) são gerados automaticamente.",
+    "Master icon": "Ícone mestre",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, quadrado, máx. 4MB",
+    "App name": "Nome do app",
+    "Short name": "Nome curto"
 }

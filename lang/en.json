@@ -1519,5 +1519,20 @@
     "Logo": "Logo",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Logos, favicon and theme color are now set in Appearance → Brand.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.",
-    "Accent colors come from the palette in Appearance → Home.": "Accent colors come from the palette in Appearance → Home."
+    "Accent colors come from the palette in Appearance → Home.": "Accent colors come from the palette in Appearance → Home.",
+    "Configure each info block: toggle visibility and set the display value.": "Configure each info block: toggle visibility and set the display value.",
+    "Toggle visibility and edit the title and description of each feature card.": "Toggle visibility and edit the title and description of each feature card.",
+    "Icons and accent colors are set in Appearance → Cards.": "Icons and accent colors are set in Appearance → Cards.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.",
+    "Server Info blocks": "Server Info blocks",
+    "Feature cards": "Feature cards",
+    "Revert to default icon": "Revert to default icon",
+    "Or paste SVG code (e.g. from heroicons):": "Or paste SVG code (e.g. from heroicons):",
+    "Free SVG icons:": "Free SVG icons:",
+    "App icon (PWA)": "App icon (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.",
+    "Master icon": "Master icon",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, square, max 4MB",
+    "App name": "App name",
+    "Short name": "Short name"
 }

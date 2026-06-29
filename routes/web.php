@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ManifestController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -319,11 +320,15 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
         Route::get('/',         [AppearanceController::class, 'index'])->name('index');
         Route::post('/',          [AppearanceController::class, 'update'])->name('update');
         Route::post('/brand',     [AppearanceController::class, 'updateBrand'])->name('brand');
+        Route::post('/cards',     [AppearanceController::class, 'updateHomeCards'])->name('cards');
         Route::post('/character', [AppearanceController::class, 'updateCharacter'])->name('character');
         Route::post('/reset',     [AppearanceController::class, 'reset'])->name('reset');
         Route::delete('/image', [AppearanceController::class, 'removeImage'])->name('image.destroy');
     });
 });
+
+// Manifest PWA dinámico (servido desde ra_site_settings, editable en Appearance).
+Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
 
 // Noticias públicas
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');

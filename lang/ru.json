@@ -1519,5 +1519,20 @@
     "Logo": "Логотип",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Логотипы, фавикон и цвет темы теперь настраиваются в Оформление → Brand.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Логотип, фавикон и цвет темы браузера. Отображаются на публичном сайте и в личном кабинете.",
-    "Accent colors come from the palette in Appearance → Home.": "Акцентные цвета берутся из палитры в Оформление → Home."
+    "Accent colors come from the palette in Appearance → Home.": "Акцентные цвета берутся из палитры в Оформление → Home.",
+    "Configure each info block: toggle visibility and set the display value.": "Настройте каждый информационный блок: переключите видимость и задайте отображаемое значение.",
+    "Toggle visibility and edit the title and description of each feature card.": "Переключайте видимость и редактируйте заголовок и описание каждой карточки.",
+    "Icons and accent colors are set in Appearance → Cards.": "Значки и акцентные цвета задаются в Оформление → Карточки.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Задайте значок для каждой карточки главной. Заголовки и текст редактируются в Настройках; акцент берётся из палитры главной.",
+    "Server Info blocks": "Блоки информации о сервере",
+    "Feature cards": "Карточки функций",
+    "Revert to default icon": "Вернуть значок по умолчанию",
+    "Or paste SVG code (e.g. from heroicons):": "Или вставьте SVG-код (например, из heroicons):",
+    "Free SVG icons:": "Бесплатные SVG-значки:",
+    "App icon (PWA)": "Значок приложения (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Загрузите одно квадратное мастер-изображение (512×512). Все размеры (192, 512, maskable и Apple touch) создаются автоматически.",
+    "Master icon": "Мастер-значок",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, квадрат, до 4 МБ",
+    "App name": "Название приложения",
+    "Short name": "Короткое название"
 }

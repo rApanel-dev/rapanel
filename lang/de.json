@@ -1519,5 +1519,20 @@
     "Logo": "Logo",
     "Logos, favicon and theme color are now set in Appearance → Brand.": "Logos, Favicon und Themenfarbe werden jetzt unter Erscheinungsbild → Brand festgelegt.",
     "Logo, favicon and browser theme color. Shown across the public site and the logged-in area.": "Logo, Favicon und Browser-Themenfarbe. Werden auf der öffentlichen Seite und im angemeldeten Bereich angezeigt.",
-    "Accent colors come from the palette in Appearance → Home.": "Die Akzentfarben stammen aus der Palette unter Erscheinungsbild → Home."
+    "Accent colors come from the palette in Appearance → Home.": "Die Akzentfarben stammen aus der Palette unter Erscheinungsbild → Home.",
+    "Configure each info block: toggle visibility and set the display value.": "Konfiguriere jeden Info-Block: Sichtbarkeit umschalten und Anzeigewert festlegen.",
+    "Toggle visibility and edit the title and description of each feature card.": "Sichtbarkeit umschalten und Titel und Beschreibung jeder Karte bearbeiten.",
+    "Icons and accent colors are set in Appearance → Cards.": "Symbole und Akzentfarben werden unter Darstellung → Karten festgelegt.",
+    "Set the icon for each home card. Titles and text are edited in Settings; the accent comes from the Home palette.": "Lege das Symbol für jede Home-Karte fest. Titel und Texte werden in den Einstellungen bearbeitet; die Akzentfarbe stammt aus der Home-Palette.",
+    "Server Info blocks": "Server-Info-Blöcke",
+    "Feature cards": "Funktionskarten",
+    "Revert to default icon": "Auf Standardsymbol zurücksetzen",
+    "Or paste SVG code (e.g. from heroicons):": "Oder SVG-Code einfügen (z. B. von heroicons):",
+    "Free SVG icons:": "Kostenlose SVG-Symbole:",
+    "App icon (PWA)": "App-Symbol (PWA)",
+    "Upload one square master image (512×512). All sizes (192, 512, maskable and Apple touch) are generated automatically.": "Lade ein quadratisches Master-Bild hoch (512×512). Alle Größen (192, 512, maskable und Apple Touch) werden automatisch erzeugt.",
+    "Master icon": "Master-Symbol",
+    "PNG/WebP, square, max 4MB": "PNG/WebP, quadratisch, max. 4MB",
+    "App name": "App-Name",
+    "Short name": "Kurzname"
 }
