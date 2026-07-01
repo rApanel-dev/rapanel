@@ -60,6 +60,18 @@ return [
             'report' => false,
         ],
 
+        // Archivos de parche del cliente RO servidos directo por nginx en
+        // /downloads/patch/ — los descarga el patcher (eluRair / Thor).
+        // Gestionado desde el módulo admin "Patcher".
+        'patches' => [
+            'driver' => 'local',
+            'root' => public_path('downloads/patch'),
+            'url' => '/downloads/patch',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

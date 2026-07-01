@@ -19,6 +19,7 @@ import {
     XMarkIcon,
     NewspaperIcon,
     ArrowDownTrayIcon,
+    ArrowUpTrayIcon,
     TagIcon,
     TrophyIcon,
     BookOpenIcon,
@@ -80,6 +81,7 @@ const groups = [
         items: [
             { name: 'Files',            route: 'admin.downloads.index',              icon: ArrowDownTrayIcon },
             { name: 'Categories',       route: 'admin.download-categories.index',    icon: TagIcon           },
+            { name: 'Patcher',          route: 'admin.patches.index',                icon: ArrowUpTrayIcon   },
         ],
     },
     {

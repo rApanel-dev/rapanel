@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
 use App\Http\Controllers\Admin\DownloadCategoryController as AdminDownloadCategoryController;
+use App\Http\Controllers\Admin\PatchController as AdminPatchController;
 use App\Http\Controllers\MvpCardController;
 use App\Http\Controllers\WhoSellController;
 use App\Http\Controllers\ForgotGamePasswordController;
@@ -226,6 +227,14 @@ Route::middleware(['auth', 'admin', 'admin.2fa'])->prefix('admin')->name('admin.
     Route::get('downloads/local-files', [AdminDownloadController::class, 'localFiles'])->name('downloads.local-files');
     Route::resource('downloads', AdminDownloadController::class)->except(['show']);
     Route::resource('download-categories', AdminDownloadCategoryController::class)->except(['show']);
+
+    // Patcher — gestión de archivos de parche del cliente RO + lista (patch_main.txt)
+    Route::get   ('patches',          [AdminPatchController::class, 'index'])->name('patches.index');
+    Route::post  ('patches/upload',   [AdminPatchController::class, 'upload'])->name('patches.upload');
+    Route::put   ('patches/rename',   [AdminPatchController::class, 'renameFile'])->name('patches.rename');
+    Route::delete('patches/file',     [AdminPatchController::class, 'deleteFile'])->name('patches.delete-file');
+    Route::put   ('patches/list',     [AdminPatchController::class, 'saveList'])->name('patches.save-list');
+    Route::put   ('patches/settings', [AdminPatchController::class, 'saveSettings'])->name('patches.settings');
     Route::get('mvp-cards', [MvpCardAdminController::class, 'index'])->name('mvp-cards.index');
     Route::patch('mvp-cards/{itemId}/toggle', [MvpCardAdminController::class, 'toggle'])->name('mvp-cards.toggle')->whereNumber('itemId');
     Route::get('mvp-cards/{itemId}/holders', [MvpCardAdminController::class, 'holders'])->name('mvp-cards.holders')->whereNumber('itemId');
